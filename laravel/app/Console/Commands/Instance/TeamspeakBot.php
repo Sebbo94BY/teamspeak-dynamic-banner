@@ -151,7 +151,12 @@ class TeamspeakBot extends Command
      */
     protected function update_data_in_redis(array $data, string $redis_key, int $ttl = 60)
     {
+        if (count($data) == 0) {
+            return;
+        }
+
         try {
+            Redis::expire($redis_key, -2);
             Redis::hmset($redis_key, $data);
             Redis::expire($redis_key, $ttl);
         } catch (ConnectionException) {
