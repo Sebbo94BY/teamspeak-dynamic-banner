@@ -1,5 +1,6 @@
 # TeamSpeak Dynamic Banner
 
+[![PHPUnit](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/actions/workflows/phpunit.yml/badge.svg?branch=main)](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/actions/workflows/phpunit.yml?branch=main)
 [![Code-Style](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/actions/workflows/phpcsfixer.yml/badge.svg?branch=main)](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/actions/workflows/phpcsfixer.yml?branch=main)
 
 I first played around with building dynamic banners for TeamSpeak in 2015. After gaining some knowledge, however, it was not pushed further. In 2018 I re-tackled the topic again, as it was a project for a small hosting company, but due to unresolved technical questions it was never released. Then in 2023 I decided to revive the project and release it on Github as an OpenSource project. And here we are now.
