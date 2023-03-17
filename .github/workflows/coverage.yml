@@ -1,4 +1,4 @@
-name: "PHPUnit"
+name: "Coverage"
 
 on:
   push:
@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         php_versions: [
-          '8.1',
           '8.2',
         ]
     name: PHP ${{ matrix.php_versions }}
@@ -61,9 +60,15 @@ jobs:
           touch database/database.sqlite
         working-directory: laravel
 
-      - name: run phpunit tests
-        run: php artisan test --without-tty tests/
+      - name: generate coverage report
+        run: php artisan test --without-tty --coverage tests/
         working-directory: laravel
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
+
+      - name: upload code coverage report to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          working-directory: laravel
+          token: ${{ secrets.CODECOV_TOKEN }}
