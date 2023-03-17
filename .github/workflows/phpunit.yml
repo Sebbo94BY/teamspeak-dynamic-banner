@@ -1,0 +1,61 @@
+name: "PHPUnit"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 15 * * 2'
+
+jobs:
+  phpunit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        php_versions: [
+          '8.1',
+          '8.2',
+        ]
+    name: PHP ${{ matrix.php_versions }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: install php ${{ matrix.php_versions }} with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_versions }}
+          extensions: json ctype openssl ssh2
+          coverage: xdebug
+          tools: none
+
+      - name: checkout repository
+        uses: actions/checkout@v3
+
+      - name: copy dotenv file
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+        working-directory: laravel
+
+      - name: install dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        working-directory: laravel
+
+      - name: generate unique application key
+        run: php artisan key:generate
+        working-directory: laravel
+
+      - name: adjust directory permissions
+        run: chmod -R 775 storage bootstrap/cache
+        working-directory: laravel
+
+      - name: setup database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+        working-directory: laravel
+
+      - name: run phpunit tests
+        run: php artisan test --without-tty tests/
+        working-directory: laravel
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
