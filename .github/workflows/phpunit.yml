@@ -34,6 +34,14 @@ jobs:
       - name: copy dotenv file
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
         working-directory: laravel
+      
+      - name: change dotenv environment to local
+        run: sed -i "s/^APP_ENV=.*/APP_ENV=local/g" .env
+        working-directory: laravel
+
+      - name: change dotenv debug to true
+        run: sed -i "s/^APP_DEBUG=.*/APP_DEBUG=true/g" .env
+        working-directory: laravel
 
       - name: install npm dependencies
         run: npm install
@@ -60,6 +68,13 @@ jobs:
           mkdir -p database
           touch database/database.sqlite
         working-directory: laravel
+
+      - name: run migrations
+        run: php artisan migrate:fresh --no-interaction
+        working-directory: laravel
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
 
       - name: run phpunit tests
         run: php artisan test --without-tty tests/

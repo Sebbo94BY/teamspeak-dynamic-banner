@@ -15,15 +15,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('banners', function (Blueprint $table) {
-            $table->id();
+            $table->id()->from(100000000000); // Start the initial first ID at a higher value to get a better banner API URL
             $table->string('name');
             $table->foreignId('instance_id')->constrained();
             $table->boolean('random_rotation')->default(false);
             $table->timestamps();
         });
-
-        // Start the initial first ID at a higher value to get a better banner API URL
-        DB::statement('ALTER TABLE banners AUTO_INCREMENT = 100000000000;');
     }
 
     /**
