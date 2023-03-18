@@ -2,32 +2,46 @@
 
 namespace Tests\Unit;
 
+use App\Models\Banner;
+use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Instance;
+use App\Models\Template;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BannerTemplateTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_model_can_be_created()
     {
-        $banner_template = new BannerTemplate([
-            'banner_id' => 1,
-            'template_id' => 2,
-            'enabled' => true,
-        ]);
+        $banner_template = BannerTemplate::factory()->for(
+            Banner::factory()->for(
+                Instance::factory()->create()
+            )->create()
+        )->for(
+            Template::factory()->create()
+        )->create();
 
-        $this->assertEquals(1, $banner_template->banner_id);
-        $this->assertEquals(2, $banner_template->template_id);
-        $this->assertEquals(true, $banner_template->enabled);
+        $this->assertModelExists($banner_template);
     }
 
-    public function test_casts_are_as_expected()
+    public function test_model_relationships()
     {
-        $banner_template = new BannerTemplate([
-            'banner_id' => 1,
-            'template_id' => 2,
-            'enabled' => true,
-        ]);
+        $banner_template = BannerTemplate::factory()->for(
+            Banner::factory()->for(
+                Instance::factory()->create()
+            )->create()
+        )->for(
+            Template::factory()->create()
+        )->create();
 
-        $this->assertIsBool($banner_template->enabled);
+        BannerConfiguration::factory(3)->for($banner_template)->create();
+
+        $this->assertInstanceOf(Banner::class, $banner_template->banner);
+        $this->assertInstanceOf(Template::class, $banner_template->template);
+        $this->assertContainsOnlyInstancesOf(BannerConfiguration::class, $banner_template->configurations);
+        $this->assertEquals(3, $banner_template->configurations->count());
     }
 }

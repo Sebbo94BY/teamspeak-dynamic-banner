@@ -3,31 +3,41 @@
 namespace Tests\Unit;
 
 use App\Models\Banner;
+use App\Models\Instance;
+use App\Models\Template;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BannerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_model_can_be_created()
     {
-        $banner = new Banner([
-            'name' => 'My Banner',
-            'instance_id' => 1,
-            'random_rotation' => false,
-        ]);
+        $banner = Banner::factory()->for(
+            Instance::factory()->create()
+        )->create();
 
-        $this->assertEquals('My Banner', $banner->name);
-        $this->assertEquals(1, $banner->instance_id);
-        $this->assertEquals(false, $banner->random_rotation);
+        $this->assertModelExists($banner);
+        $this->assertIsBool($banner->random_rotation);
     }
 
-    public function test_casts_are_as_expected()
+    public function test_model_casts()
     {
-        $banner = new Banner([
-            'name' => 'My Banner',
-            'instance_id' => 1,
-            'random_rotation' => false,
-        ]);
+        $banner = Banner::factory()->for(
+            Instance::factory()->create()
+        )->create();
 
         $this->assertIsBool($banner->random_rotation);
+    }
+
+    public function test_model_relationships()
+    {
+        $banner = Banner::factory()->for(
+            Instance::factory()->create()
+        )->create();
+
+        $this->assertInstanceOf(Instance::class, $banner->instance);
+        $this->assertContainsOnlyInstancesOf(Template::class, $banner->templates);
     }
 }
