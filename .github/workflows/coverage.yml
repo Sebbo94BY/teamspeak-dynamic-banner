@@ -34,6 +34,10 @@ jobs:
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
         working-directory: laravel
 
+      - name: change dotenv environment to local
+        run: sed -i "s/^APP_ENV=.*/APP_ENV=local/g" .env
+        working-directory: laravel
+
       - name: install npm dependencies
         run: npm install
         working-directory: laravel
