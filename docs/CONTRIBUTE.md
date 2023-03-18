@@ -59,6 +59,17 @@ php artisan test
 ```
 
 
+## Code-Style
+
+This project uses PHP-CS-Fixer for the code-style.
+
+You can automatically fix your code-style by running a composer script command:
+
+```shell
+composer run code-style
+```
+
+
 ## Contribute
 
 1. Fork this repository
