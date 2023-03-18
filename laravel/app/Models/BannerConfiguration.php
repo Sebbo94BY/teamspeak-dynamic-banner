@@ -39,6 +39,14 @@ class BannerConfiguration extends Model
     protected $casts = [];
 
     /**
+     * Get the banner template associated with the banner configuration.
+     */
+    public function bannerTemplate(): BelongsTo
+    {
+        return $this->belongsTo(BannerTemplate::class);
+    }
+
+    /**
      * Get the template associated with the banner configuration.
      */
     public function template(): BelongsTo
