@@ -45,6 +45,9 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "code-style": [
+            "\"vendor/bin/php-cs-fixer\" fix --config .php-cs-fixer.php --diff"
         ]
     },
     "extra": {
