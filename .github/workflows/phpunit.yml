@@ -39,6 +39,10 @@ jobs:
         run: sed -i "s/^APP_ENV=.*/APP_ENV=local/g" .env
         working-directory: laravel
 
+      - name: change dotenv debug to true
+        run: sed -i "s/^APP_DEBUG=.*/APP_DEBUG=true/g" .env
+        working-directory: laravel
+
       - name: install npm dependencies
         run: npm install
         working-directory: laravel
