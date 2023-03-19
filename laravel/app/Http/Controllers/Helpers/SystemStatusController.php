@@ -295,9 +295,11 @@ class SystemStatusController extends Controller
         $requirements['APP_DEBUG']['required_value'] = 'should be disabled in production';
         $requirements['APP_DEBUG']['severity'] = SystemStatusSeverity::Info;
 
-        $requirements['SERVER_SOFTWARE']['name'] = 'Server Software';
-        $requirements['SERVER_SOFTWARE']['current_value'] = $_SERVER['SERVER_SOFTWARE'];
-        $requirements['SERVER_SOFTWARE']['severity'] = SystemStatusSeverity::Info;
+        if (isset($_SERVER['SERVER_SOFTWARE'])) {
+            $requirements['SERVER_SOFTWARE']['name'] = 'Server Software';
+            $requirements['SERVER_SOFTWARE']['current_value'] = $_SERVER['SERVER_SOFTWARE'];
+            $requirements['SERVER_SOFTWARE']['severity'] = SystemStatusSeverity::Info;
+        }
 
         $requirements['PHP_BINARY']['name'] = 'PHP Binary';
         $requirements['PHP_BINARY']['current_value'] = PHP_BINARY;

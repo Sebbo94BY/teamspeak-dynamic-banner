@@ -83,6 +83,10 @@
                                                 </td>
                                             </tr>
                                         @else
+                                            @if (! isset($nested_checks->name))
+                                                @continue
+                                            @endif
+
                                             @if ($nested_checks->name == $previous_nested_check_key)
                                                 @continue
                                             @endif

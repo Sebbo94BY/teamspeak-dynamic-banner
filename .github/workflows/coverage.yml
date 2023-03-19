@@ -30,14 +30,6 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v3
 
-      - name: copy dotenv file
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-        working-directory: laravel
-
-      - name: change dotenv environment to local
-        run: sed -i "s/^APP_ENV=.*/APP_ENV=local/g" .env
-        working-directory: laravel
-
       - name: install npm dependencies
         run: npm install
         working-directory: laravel
@@ -50,26 +42,27 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         working-directory: laravel
 
+      - name: copy dotenv file
+        run: cp .env.ci .env
+        working-directory: laravel
+
       - name: generate unique application key
         run: php artisan key:generate
         working-directory: laravel
-
-      - name: adjust directory permissions
-        run: chmod -R 775 storage bootstrap/cache
+      
+      - name: cache config, routes and views
+        run: |
+          php artisan optimize
+          php artisan view:cache
         working-directory: laravel
 
-      - name: setup database
-        run: |
-          mkdir -p database
-          touch database/database.sqlite
+      - name: run migrations
+        run: php artisan migrate:fresh --no-interaction
         working-directory: laravel
 
       - name: generate coverage report
-        run: php artisan test --without-tty --coverage tests/
+        run: php artisan test --without-tty --coverage
         working-directory: laravel
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
 
       - name: upload code coverage report to codecov.io
         uses: codecov/codecov-action@v3
