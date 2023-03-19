@@ -18,7 +18,7 @@ class TemplateFactory extends Factory
     {
         return [
             'alias' => fake()->text(32),
-            'filename' => fake()->text(32).'.png',
+            'filename' => str_replace(' ', '_', fake()->text(32)).'png',
             'file_path_original' => 'uploads/templates',
             'file_path_drawed_grid' => 'uploads/templates/drawed_grid',
             'file_path_drawed_grid_text' => 'uploads/templates/drawed_grid_text',
