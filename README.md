@@ -59,7 +59,7 @@ Be a [stargazer](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/stargazer
 * [Redis](https://redis.io/)
 * Git
 * [Composer](https://getcomposer.org/)
-* [npm](https://www.npmjs.com/)
+* [npm](https://www.npmjs.com/) (Version 9.x or newer)
 
 
 ## TeamSpeak Permissions
