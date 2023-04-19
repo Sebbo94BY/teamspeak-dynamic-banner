@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Instance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
+use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 use Predis\Connection\ConnectionException;
 
@@ -79,20 +80,32 @@ class BannerVariableController extends Controller
     public function get_current_servergroup_list(): array
     {
         $this->virtualserver->clientListReset();
+        $servergroups = [];
 
         /**
          * SERVERGROUP MEMBER ONLINE COUNTER VARIABLE
          */
+        try {
+            $client_list = $this->virtualserver->clientList();
+        } catch (ServerQueryException) {
+            return array_change_key_case($servergroups, CASE_UPPER);
+        }
+
         $client_servergroup_ids = [];
-        foreach ($this->virtualserver->clientList() as $client) {
+        foreach ($client_list as $client) {
             $client_servergroup_ids = array_merge($client_servergroup_ids, explode(',', $client->client_servergroups));
         }
 
         /**
          * VIRTUALSERVER SERVERGROUPS
          */
-        $servergroups = [];
-        foreach ($this->virtualserver->serverGroupList(['type' => 1]) as $servergroup) {
+        try {
+            $servergroup_list = $this->virtualserver->serverGroupList(['type' => 1]);
+        } catch (ServerQueryException) {
+            return array_change_key_case($servergroups, CASE_UPPER);
+        }
+
+        foreach ($servergroup_list as $servergroup) {
             $servergroups['servergroup_'.$servergroup->sgid.'_id'] = $servergroup->sgid;
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
             $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
