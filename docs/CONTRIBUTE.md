@@ -52,10 +52,10 @@ Get your Server Admin token using `docker-compose logs teamspeak | grep "|token=
 
 This project uses PHPUnit for testing the application. You will find the PHPUnit tests in `laravel/tests/`.
 
-You can run all tests by using the Laravel Artisan command:
+You can run all tests by running a composer script command:
 
 ```shell
-php artisan test
+composer run code-style
 ```
 
 
