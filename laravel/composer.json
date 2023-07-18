@@ -48,6 +48,9 @@
         ],
         "code-style": [
             "\"vendor/bin/php-cs-fixer\" fix --config .php-cs-fixer.php --diff"
+        ],
+        "phpunit-tests": [
+            "@php artisan test --without-tty"
         ]
     },
     "extra": {
