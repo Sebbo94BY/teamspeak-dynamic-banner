@@ -3,7 +3,7 @@ name: "dynamic-banner"
 
 services:
   frontend:
-    image: nginx:1.23.3
+    image: nginx:1.25.1
     container_name: application-frontend
     depends_on:
       - backend
@@ -67,7 +67,7 @@ services:
       - bridge-network
 
   cache:
-    image: redis:7.0.9
+    image: redis:7.0.12
     container_name: application-cache
     restart: unless-stopped
     environment:
@@ -79,7 +79,7 @@ services:
       - bridge-network
 
   database:
-    image: mysql:8.0.32
+    image: mysql:8.0.33
     container_name: application-mysql
     restart: unless-stopped
     environment:
@@ -91,7 +91,7 @@ services:
       - bridge-network
 
   teamspeak:
-    image: teamspeak
+    image: teamspeak:3.13.7
     container_name: teamspeak
     restart: always
     ports:
