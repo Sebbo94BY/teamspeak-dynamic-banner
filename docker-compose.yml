@@ -13,8 +13,6 @@ services:
     volumes:
       - ./laravel/public:/var/www/public
       - ./docker/nginx:/etc/nginx/conf.d
-    networks:
-      - bridge-network
 
   backend:
     build:
@@ -29,8 +27,6 @@ services:
     working_dir: /var/www/
     volumes:
       - ./laravel/:/var/www
-    networks:
-      - bridge-network
 
   schedule:
     build:
@@ -46,8 +42,6 @@ services:
     volumes:
       - ./laravel/:/var/www
     command: php artisan schedule:work --no-interaction -vvv
-    networks:
-      - bridge-network
 
   queue:
     build:
@@ -63,8 +57,6 @@ services:
     volumes:
       - ./laravel/:/var/www
     command: php artisan queue:listen --timeout=10 --tries=1 --no-interaction -vvv
-    networks:
-      - bridge-network
 
   cache:
     image: redis:7.0.12
@@ -75,8 +67,6 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: True
     volumes:
       - ./docker/redis/data:/data
-    networks:
-      - bridge-network
 
   database:
     image: mysql:8.0.33
@@ -87,8 +77,6 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: True
     volumes:
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/99-custom.cnf
-    networks:
-      - bridge-network
 
   teamspeak:
     image: teamspeak:3.13.7
@@ -101,9 +89,11 @@ services:
       - 30033:30033
     environment:
       TS3SERVER_LICENSE: accept
-    networks:
-      - bridge-network
 
 networks:
-  bridge-network:
+  default:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.20.0.1/16
