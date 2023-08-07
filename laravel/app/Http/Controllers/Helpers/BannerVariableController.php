@@ -59,7 +59,7 @@ class BannerVariableController extends Controller
         $this->virtualserver->clientListReset();
 
         $clientlist = [];
-        foreach ($this->virtualserver->clientList() as $client) {
+        foreach ($this->virtualserver->clientList(["client_type" => 0]) as $client) {
             $clientlist['client_'.$client->client_database_id.'_database_id'] = $client->client_database_id;
             $clientlist['client_'.$client->client_database_id.'_id'] = $client->clid;
             $clientlist['client_'.$client->client_database_id.'_nickname'] = $client->client_nickname;
@@ -79,12 +79,13 @@ class BannerVariableController extends Controller
     public function get_current_servergroup_list(): array
     {
         $this->virtualserver->clientListReset();
+        $this->virtualserver->serverGroupListReset();
 
         /**
          * SERVERGROUP MEMBER ONLINE COUNTER VARIABLE
          */
         $client_servergroup_ids = [];
-        foreach ($this->virtualserver->clientList() as $client) {
+        foreach ($this->virtualserver->clientList(["client_type" => 0]) as $client) {
             $client_servergroup_ids = array_merge($client_servergroup_ids, explode(',', $client->client_servergroups));
         }
 
