@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Instance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
+use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 use Predis\Connection\ConnectionException;
 
@@ -96,7 +97,18 @@ class BannerVariableController extends Controller
         foreach ($this->virtualserver->serverGroupList(['type' => 1]) as $servergroup) {
             $servergroups['servergroup_'.$servergroup->sgid.'_id'] = $servergroup->sgid;
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
-            $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
+            try {
+                $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
+            } catch (ServerQueryException $serverquery_exception) {
+                // TODO: Remove this try-catch and rather fix it properly. We are currently fully ignoring some servergroups, which can't be parsed properly.
+                // https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/12
+                if ($serverquery_exception->getCode() == 1538) {
+                    // Error: invalid parameter
+                    // Until this issue is fixed in the TS3PHPFramework: Ignore this error and do not check this servergroup.
+                    $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = 0;
+                    continue;
+                }
+            }
             $servergroups['servergroup_'.$servergroup->sgid.'_member_online_count'] = (in_array($servergroup->sgid, $client_servergroup_ids)) ? array_count_values($client_servergroup_ids)[$servergroup->sgid] : 0;
         }
 
