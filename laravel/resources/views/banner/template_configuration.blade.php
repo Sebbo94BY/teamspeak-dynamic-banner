@@ -28,11 +28,35 @@
     </div>
 
     <div class="col-md-4">
+        <label for="validationFont" class="form-label">Font</label>
+        <select class="form-select" name="fontfile_path[]" aria-describedby="FontHelp" required>
+            @foreach ($installed_ttf_files as $fontfile_path)
+            @if (isset($configuration) AND $configuration->fontfile_path == $fontfile_path)
+            <option value="{{ $fontfile_path }}" selected>{{ preg_replace("/fonts\//", '', $fontfile_path) }}</option>
+            @else
+            <option value="{{ $fontfile_path }}">{{ preg_replace("/fonts\//", '', $fontfile_path) }}</option>
+            @endif
+            @endforeach
+        </select>
+        <div id="FontHelp" class="form-text">Please select the font for this specific text.</div>
+        <div class="valid-feedback">{{ __("Looks good!") }}</div>
+        <div class="invalid-feedback">{{ __("Please provide a valid and existing font (path).") }}</div>
+    </div>
+
+    <div class="col-md-4">
         <label for="validationFontSize" class="form-label">Font Size</label>
-        <input class="form-control" id="validationFontSize" type="number" min="1" step="1" max="5" name="font_size[]" value="{{ old('font_size[]', (isset($configuration)) ? $configuration->font_size : 5) }}" placeholder="e.g. 5" aria-describedby="fontSizeHelp" required>
+        <input class="form-control" id="validationFontSize" type="number" min="1" step="1" max="{{ $banner_template->template->height }}" name="font_size[]" value="{{ old('font_size[]', (isset($configuration)) ? $configuration->font_size : 25) }}" placeholder="e.g. 5" aria-describedby="fontSizeHelp" required>
         <div id="fontSizeHelp" class="form-text">The font size of the text, which should get printed to the image.</div>
         <div class="valid-feedback">{{ __("Looks good!") }}</div>
         <div class="invalid-feedback">{{ __("Please provide a valid font size.") }}</div>
+    </div>
+
+    <div class="col-md-4">
+        <label for="validationFontAngle" class="form-label">Font Angle</label>
+        <input class="form-control" id="validationFontAngle" type="number" min="0" step="1" max="360" name="font_angle[]" value="{{ old('font_angle[]', (isset($configuration)) ? $configuration->font_angle : 0) }}" placeholder="e.g. 0" aria-describedby="fontAngleHelp" required>
+        <div id="fontAngleHelp" class="form-text">The font angle between 0 and 360 degree in which the text should get printed to the image.</div>
+        <div class="valid-feedback">{{ __("Looks good!") }}</div>
+        <div class="invalid-feedback">{{ __("Please provide a valid font angle between 0 and 360 degree.") }}</div>
     </div>
 
     <div class="col-md-4">

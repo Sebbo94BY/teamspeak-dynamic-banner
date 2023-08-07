@@ -20,7 +20,9 @@ class BannerConfiguration extends Model
         'x_coordinate',
         'y_coordinate',
         'text',
+        'fontfile_path',
         'font_size',
+        'font_angle',
         'font_color_in_hexadecimal',
     ];
 

@@ -39,7 +39,9 @@ Be a [stargazer](https://github.com/Sebi94nbg/teamspeak-dynamic-banner/stargazer
         * Random: Every client, which requests the banner, gets a random, maybe different template shown.
 * Add and configure one or more templates for each banner
     * Over 140 standard variables (e.g. current time, count of online clients, client nickname, etc.)
+    * Use your preferred TrueType Font (TTF)
     * Set the font size for your texts
+    * Set the font angel for your texts
     * Set the font color (RGB) for your texts
     * Optionally disable a specific template in a banner configuration if you don't want to delete it's configuration and is only necessary temporary for announcements or events for example
 * The ServerQuery client stays 24x7 connected on your TeamSpeak server
@@ -113,6 +115,7 @@ If you want to regulary backup this application, you should backup the following
 
 * `.env` file (or only the `APP_KEY` from this file)
 * Database
+* `laravel/public/fonts/` directory
 * `laravel/public/uploads/` directory
 
 

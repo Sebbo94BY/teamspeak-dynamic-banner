@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -134,6 +135,24 @@ class AdministrationController extends Controller
             'success' => 'user-delete-successful',
             'message' => 'Successfully deleted the user.',
         ]);
+    }
+
+    /**
+     * Callback function to only return TTF files.
+     */
+    public function is_ttf_file($value, $key)
+    {
+        return preg_match("/\.ttf$/", $value);
+    }
+
+    /**
+     * Display the fonts view.
+     */
+    public function fonts(): View
+    {
+        $installed_ttf_files = array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH);
+
+        return view('administration.fonts', ['fonts' => $installed_ttf_files]);
     }
 
     /**

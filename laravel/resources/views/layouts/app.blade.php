@@ -69,6 +69,10 @@
                                         Users
                                     </a>
 
+                                    <a class="dropdown-item" href="{{ route('administration.fonts') }}">
+                                        Fonts
+                                    </a>
+
                                     <a class="dropdown-item" href="{{ route('administration.systemstatus') }}">
                                         System Status
                                     </a>

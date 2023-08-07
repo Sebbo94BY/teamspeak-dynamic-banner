@@ -189,11 +189,12 @@ After you have completed the install wizard, you will see the dashboard of the a
 
 Your next steps should be the following:
 
-1. Add and configure an instance
-2. Start the newly created instance
-3. Upload one or more templates
-4. Add a new banner configuration
-5. Add one or more recently uploaded templates to the banner configuration
-6. Configure your templates for your banner with some texts
-7. Configure the banner API URL in your TeamSpeak server as Hostbanner Gfx URL
-8. Enjoy your dynamic banner :-)
+1. Download and install one or more TrueType Fonts as explained under Administration > Fonts
+2. Add and configure an instance
+3. Start the newly created instance
+4. Upload one or more templates
+5. Add a new banner configuration
+6. Add one or more recently uploaded templates to the banner configuration
+7. Configure your templates for your banner with some texts
+8. Configure the banner API URL in your TeamSpeak server as Hostbanner Gfx URL
+9. Enjoy your dynamic banner :-)

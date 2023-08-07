@@ -91,13 +91,14 @@ class DrawTextOnTemplateController extends Controller
                     }
                 }
 
-                // Write text to the image
-                if (! imagestring($this->gd_image,
+                if (! imagefttext($this->gd_image,
                     $configuration->font_size,
+                    $configuration->font_angle,
                     $configuration->x_coordinate,
                     $configuration->y_coordinate,
-                    $text,
-                    $font_color
+                    $font_color,
+                    public_path($configuration->fontfile_path),
+                    $text
                 )) {
                     throw new Exception("Failed to write the text `$text` to the image.");
                 }

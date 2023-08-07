@@ -11,10 +11,19 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BannerConfigurationController extends Controller
 {
+    /**
+     * Callback function to only return TTF files.
+     */
+    public function is_ttf_file($value, $key)
+    {
+        return preg_match("/\.ttf$/", $value);
+    }
+
     /**
      * Display the edit view.
      */
@@ -31,8 +40,11 @@ class BannerConfigurationController extends Controller
                 ]);
         }
 
+        $installed_ttf_files = array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH);
+
         return view('banner.configuration')->with([
             'banner_template' => $banner_template,
+            'installed_ttf_files' => $installed_ttf_files,
         ]);
     }
 
@@ -69,7 +81,9 @@ class BannerConfigurationController extends Controller
             $configuration['x_coordinate'] = $request->x_coordinate[$i];
             $configuration['y_coordinate'] = $request->y_coordinate[$i];
             $configuration['text'] = $request->text[$i];
+            $configuration['fontfile_path'] = $request->fontfile_path[$i];
             $configuration['font_size'] = $request->font_size[$i];
+            $configuration['font_angle'] = $request->font_angle[$i];
             $configuration['font_color_in_hexadecimal'] = $request->font_color_in_hexadecimal[$i];
             $configuration['id'] = isset($request->banner_configuration_id[$i]) ? $request->banner_configuration_id[$i] : null;
 
@@ -81,7 +95,9 @@ class BannerConfigurationController extends Controller
             'x_coordinate',
             'y_coordinate',
             'text',
+            'fontfile_path',
             'font_size',
+            'font_angle',
             'font_color_in_hexadecimal',
         ])) {
             return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])

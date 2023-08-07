@@ -19,7 +19,9 @@ return new class extends Migration
             $table->integer('x_coordinate');
             $table->integer('y_coordinate');
             $table->string('text');
-            $table->integer('font_size')->default(5);
+            $table->string('fontfile_path');
+            $table->integer('font_size')->default(25);
+            $table->string('font_angle')->default(0);
             $table->string('font_color_in_hexadecimal')->default('#000000');
             $table->timestamps();
         });
