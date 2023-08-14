@@ -94,68 +94,6 @@
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>
-
-                    <script type="module">
-                        // On page load, remove the `required` attributes for the hidden DIV to avoid
-                        // issues by the form validation when it's not filled out.
-                        $(document).ready(function(){
-                            $('div.d-none > div > div > input').each(function() {
-                                $(this).prop("required", false);
-                            });
-                        });
-
-                        // Example starter JavaScript for disabling form submissions if there are invalid fields
-                        (function () {
-                        'use strict'
-
-                        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                        var forms = document.querySelectorAll('.needs-validation')
-
-                        // Loop over them and prevent submission
-                        Array.prototype.slice.call(forms)
-                            .forEach(function (form) {
-                            form.addEventListener('submit', function (event) {
-                                if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                                }
-
-                                form.classList.add('was-validated')
-                            }, false)
-                            })
-                        })();
-
-                        // Add additional configuration row, if requested by the user
-                        $("#add-config-row").click(function () {
-                            // Find the last DIV with the ID "new-config-row-<NUMBER>"
-                            var $config_row = $('[id^="new-config-row"]:last');
-
-                            if ($config_row.prop("class").match(/d-none/g)) {
-                                // Add the `required` attribute to enforce the form validation
-                                $('div.d-none > div > div > input').each(function() {
-                                    $(this).prop("required", true);
-                                });
-
-                                // Unhide the row
-                                $config_row.removeClass("d-none");
-                            } else {
-                                // Otherwise clone the DIV
-                                // Get the NUMBER from the DIV and increment it by one
-                                var next_number = parseInt($config_row.prop("id").match(/\d+/g), 10) + 1;
-
-                                // Clone the last DIV and replace the ID to make it unique
-                                var $clone = $config_row.clone().prop('id', 'new-config-row-' + next_number);
-
-                                // Insert the cloned DIV at the end
-                                $config_row.after($clone);
-                            }
-                        });
-
-                        // Remove existing, but not yet saved configuration row, if requested by the user
-                        $(document).on('click', '#remove-config-row', function () {
-                            $(this).closest('[id^="new-config-row"]').remove();
-                        })
-                    </script>
                 </div>
             </div>
         </div>
@@ -179,5 +117,65 @@
             $('input[name=y_coordinate_preview]').val(Math.floor(y_coordinate));
         });
     });
+
+    // On page load, remove the `required` attributes for the hidden DIV to avoid
+    // issues by the form validation when it's not filled out.
+    $(document).ready(function(){
+        $('div.d-none > div > div > input').each(function() {
+            $(this).prop("required", false);
+        });
+    });
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+        })
+    })();
+
+    // Add additional configuration row, if requested by the user
+    $("#add-config-row").click(function () {
+        // Find the last DIV with the ID "new-config-row-<NUMBER>"
+        var $config_row = $('[id^="new-config-row"]:last');
+
+        if ($config_row.prop("class").match(/d-none/g)) {
+            // Add the `required` attribute to enforce the form validation
+            $('div.d-none > div > div > input').each(function() {
+                $(this).prop("required", true);
+            });
+
+            // Unhide the row
+            $config_row.removeClass("d-none");
+        } else {
+            // Otherwise clone the DIV
+            // Get the NUMBER from the DIV and increment it by one
+            var next_number = parseInt($config_row.prop("id").match(/\d+/g), 10) + 1;
+
+            // Clone the last DIV and replace the ID to make it unique
+            var $clone = $config_row.clone().prop('id', 'new-config-row-' + next_number);
+
+            // Insert the cloned DIV at the end
+            $config_row.after($clone);
+        }
+    });
+
+    // Remove existing, but not yet saved configuration row, if requested by the user
+    $(document).on('click', '#remove-config-row', function () {
+        $(this).closest('[id^="new-config-row"]').remove();
+    })
 </script>
 @endsection
