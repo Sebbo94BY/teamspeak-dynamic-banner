@@ -22,19 +22,18 @@
                     <div class="alert alert-primary" role="alert">
                         <p>This project uses <i>TrueType Fonts (TTF)</i> for writing the text on the banner images.</p>
 
-                        <p>In general, you can use and upload any TTF file, but this project is optimized for the usage of <a href="https://fontsource.org" target="_blank">Fontsource.org</a>.</p>
-
                         <p>Installation instructions:</p>
                         <ol>
                             <li>Visit <a href="https://fontsource.org" target="_blank">Fontsource.org</a></li>
-                            <li>Enable the checkbox for <code>Show only variable fonts</code> in the filter section</li>
-                            <li>Specify further filters or search for specific fonts</li>
+                            <li>Specify filters or search for specific fonts</li>
                             <li>Checkout the font previews to find a font, which you like and open the font details page</li>
                             <li>Click on the download button for this specific font</li>
                             <li>Unzip the recently downloaded ZIP file</li>
                             <li>Upload the required <code>*.ttf</code> file(s) to this project under <code>laravel/public/fonts/</code></li>
                             <li>Refresh this page to validate that your font has been properly installed</li>
                         </ol>
+
+                        <p>You can upload and use any TTF file - it does not have to be from Fontsource.</p>
                     </div>
 
                     <table id="fonts" class="table table-striped" style="width:100%">
