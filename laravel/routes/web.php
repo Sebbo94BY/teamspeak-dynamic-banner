@@ -88,6 +88,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/administration/user/{user_id}/update', [AdministrationController::class, 'update_user'])->name('administration.user.update');
     Route::delete('/administration/user/{user_id}/delete', [AdministrationController::class, 'delete_user'])->name('administration.user.delete');
 
+    Route::get('/administration/roles', [AdministrationController::class, 'roles'])->name('administration.roles');
+
     Route::get('/administration/fonts', [AdministrationController::class, 'fonts'])->name('administration.fonts');
 
     Route::get('/administration/phpinfo', [AdministrationController::class, 'php_info'])->name('administration.phpinfo');

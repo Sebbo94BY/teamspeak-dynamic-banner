@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class AdministrationController extends Controller
 {
@@ -135,6 +136,14 @@ class AdministrationController extends Controller
             'success' => 'user-delete-successful',
             'message' => 'Successfully deleted the user.',
         ]);
+    }
+
+    /**
+     * Display the roles view.
+     */
+    public function roles(): View
+    {
+        return view('administration.roles', ['roles' => Role::all()]);
     }
 
     /**
