@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Users') }} <a href="{{ route('administration.user.add') }}" class="btn btn-primary">Add</a></div>
+                <div class="card-header">
+                    {{ __('Users') }}
+
+                    @can('add users')
+                    <a href="{{ route('administration.user.add') }}" class="btn btn-primary">Add</a>
+                    @endcan
+                </div>
 
                 <div class="card-body">
                     @if (session('success'))
@@ -55,13 +61,16 @@
                                     <a href="{{ route('administration.user.edit', ['user_id' => $user->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
+                                    @endcan
 
                                     @if (Auth::user()->id != $user->id)
+                                    @can('delete users')
                                     <form method="POST" action="{{ route('administration.user.delete', ['user_id' => $user->id]) }}">
                                         @method('delete')
                                         @csrf
                                         <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></a>
                                     </form>
+                                    @endcan
                                     @endif
                                 </td>
                             </tr>

@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Instances') }} <a href="{{ route('instance.add') }}" class="btn btn-primary">Add</a></div>
+                <div class="card-header">
+                    {{ __('Instances') }}
+
+                    @can('add instances')
+                    <a href="{{ route('instance.add') }}" class="btn btn-primary">Add</a>
+                    @endcan
+                </div>
 
                 <div class="card-body">
                     @if (session('success'))
@@ -62,32 +68,41 @@
                                 <td>{{ $instance->client_nickname }}</td>
                                 <td>
                                     @if (is_null($instance->process))
+                                        @can('start instances')
                                         <form method="POST" action="{{ route('instance.start', ['instance_id' => $instance->id]) }}">
                                             @csrf
                                             <button type="submit" class="btn btn-success">
                                                 <i class="fa-solid fa-play"></i>
                                             </button>
                                         </form>
+                                        @endcan
                                     @else
+                                        @can('stop instances')
                                         <form method="POST" action="{{ route('instance.stop', ['instance_id' => $instance->id]) }}">
                                             @csrf
                                             <button type="submit" class="btn btn-warning">
                                                 <i class="fa-solid fa-power-off"></i>
                                             </button>
                                         </form>
+                                        @endcan
 
+                                        @can('restart instances')
                                         <form method="POST" action="{{ route('instance.restart', ['instance_id' => $instance->id]) }}">
                                             @csrf
                                             <button type="submit" class="btn btn-warning">
                                                 <i class="fa-solid fa-arrow-rotate-left"></i>
                                             </button>
                                         </form>
+                                        @endcan
                                     @endif
 
+                                    @can('edit instances')
                                     <a href="{{ route('instance.edit', ['instance_id' => $instance->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
+                                    @endcan
 
+                                    @can('delete instances')
                                     <form method="POST" action="{{ route('instance.delete', ['instance_id' => $instance->id]) }}">
                                         @method('delete')
                                         @csrf
@@ -95,6 +110,7 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </a>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                             @endforeach
