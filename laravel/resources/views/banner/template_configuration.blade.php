@@ -12,7 +12,7 @@
     </div>
 
     <div class="col-md-4">
-    <label for="validationYCoordinate" class="form-label">Y-Coordinate (vertical)</label>
+        <label for="validationYCoordinate" class="form-label">Y-Coordinate (vertical)</label>
         <input class="form-control" id="validationYCoordinate" type="number" min="0" step="1" max="{{ $template->height }}" name="y_coordinate[]" value="{{ old('y_coordinate[]', (isset($configuration)) ? $configuration->y_coordinate : '') }}" placeholder="60" aria-describedby="ycoordinateHelp" required>
         <div id="ycoordinateHelp" class="form-text">The Y-Coordinate, at which position the text should start.</div>
         <div class="valid-feedback">{{ __("Looks good!") }}</div>

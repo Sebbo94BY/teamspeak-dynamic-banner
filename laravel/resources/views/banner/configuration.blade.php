@@ -46,10 +46,19 @@
 
                     <hr>
 
-                    <div class="col-md-12">
+                    <div class="col-md-12 row">
                         <p><b>About the Grid System</b></p>
                         <p>{{ __('With the help of the grid system, you are able to faster identify, which X-Y-Coordinates you need to put your text at the correct position.') }}</p>
                         <p>{{ __('Each horizontal and vertical line of the grid system represents 25px. In the left top corner, X and Y is 0px.') }}</p>
+                        <p>{{ __('Click on the position in the image to get the X-Y-Coordinates: ') }}</p>
+                        <div class="col-md-3">
+                            <label for="XCoordinatePreview" class="form-label">X-Coordinate (horizontal)</label>
+                            <input class="form-control" id="XCoordinatePreview" type="number" min="0" step="1" max="{{ $banner_template->template->width }}" name="x_coordinate_preview" value="0" disabled>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="YCoordinatePreview" class="form-label">Y-Coordinate (vertical)</label>
+                            <input class="form-control" id="YCoordinatePreview" type="number" min="0" step="1" max="{{ $banner_template->template->height }}" name="y_coordinate_preview" value="0" disabled>
+                        </div>
                     </div>
 
                     <hr>
@@ -85,71 +94,88 @@
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>
-
-                    <script type="module">
-                        // On page load, remove the `required` attributes for the hidden DIV to avoid
-                        // issues by the form validation when it's not filled out.
-                        $(document).ready(function(){
-                            $('div.d-none > div > div > input').each(function() {
-                                $(this).prop("required", false);
-                            });
-                        });
-
-                        // Example starter JavaScript for disabling form submissions if there are invalid fields
-                        (function () {
-                        'use strict'
-
-                        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                        var forms = document.querySelectorAll('.needs-validation')
-
-                        // Loop over them and prevent submission
-                        Array.prototype.slice.call(forms)
-                            .forEach(function (form) {
-                            form.addEventListener('submit', function (event) {
-                                if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                                }
-
-                                form.classList.add('was-validated')
-                            }, false)
-                            })
-                        })();
-
-                        // Add additional configuration row, if requested by the user
-                        $("#add-config-row").click(function () {
-                            // Find the last DIV with the ID "new-config-row-<NUMBER>"
-                            var $config_row = $('[id^="new-config-row"]:last');
-
-                            if ($config_row.prop("class").match(/d-none/g)) {
-                                // Add the `required` attribute to enforce the form validation
-                                $('div.d-none > div > div > input').each(function() {
-                                    $(this).prop("required", true);
-                                });
-
-                                // Unhide the row
-                                $config_row.removeClass("d-none");
-                            } else {
-                                // Otherwise clone the DIV
-                                // Get the NUMBER from the DIV and increment it by one
-                                var next_number = parseInt($config_row.prop("id").match(/\d+/g), 10) + 1;
-
-                                // Clone the last DIV and replace the ID to make it unique
-                                var $clone = $config_row.clone().prop('id', 'new-config-row-' + next_number);
-
-                                // Insert the cloned DIV at the end
-                                $config_row.after($clone);
-                            }
-                        });
-
-                        // Remove existing, but not yet saved configuration row, if requested by the user
-                        $(document).on('click', '#remove-config-row', function () {
-                            $(this).closest('[id^="new-config-row"]').remove();
-                        })
-                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="module">
+    // Get X-Y-Coordinates when clicking on the image
+    $(document).ready(function() {
+        $('img').click(function(e) {
+            var offset = $(this).offset();
+
+            var x_padding_offset = $(this).innerWidth() - $(this).width();
+            var x_coordinate = ((e.pageX - offset.left) * (this.naturalWidth / $(this).width())) - x_padding_offset;
+
+            $('input[name=x_coordinate_preview]').val(Math.floor(x_coordinate));
+
+            var y_padding_offset = $(this).innerHeight() - $(this).height();
+            var y_coordinate = ((e.pageY - offset.top) * (this.naturalHeight / $(this).height())) - y_padding_offset;
+
+            $('input[name=y_coordinate_preview]').val(Math.floor(y_coordinate));
+        });
+    });
+
+    // On page load, remove the `required` attributes for the hidden DIV to avoid
+    // issues by the form validation when it's not filled out.
+    $(document).ready(function(){
+        $('div.d-none > div > div > input').each(function() {
+            $(this).prop("required", false);
+        });
+    });
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+        })
+    })();
+
+    // Add additional configuration row, if requested by the user
+    $("#add-config-row").click(function () {
+        // Find the last DIV with the ID "new-config-row-<NUMBER>"
+        var $config_row = $('[id^="new-config-row"]:last');
+
+        if ($config_row.prop("class").match(/d-none/g)) {
+            // Add the `required` attribute to enforce the form validation
+            $('div.d-none > div > div > input').each(function() {
+                $(this).prop("required", true);
+            });
+
+            // Unhide the row
+            $config_row.removeClass("d-none");
+        } else {
+            // Otherwise clone the DIV
+            // Get the NUMBER from the DIV and increment it by one
+            var next_number = parseInt($config_row.prop("id").match(/\d+/g), 10) + 1;
+
+            // Clone the last DIV and replace the ID to make it unique
+            var $clone = $config_row.clone().prop('id', 'new-config-row-' + next_number);
+
+            // Insert the cloned DIV at the end
+            $config_row.after($clone);
+        }
+    });
+
+    // Remove existing, but not yet saved configuration row, if requested by the user
+    $(document).on('click', '#remove-config-row', function () {
+        $(this).closest('[id^="new-config-row"]').remove();
+    })
+</script>
 @endsection
