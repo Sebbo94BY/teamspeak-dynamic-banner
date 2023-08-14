@@ -46,10 +46,19 @@
 
                     <hr>
 
-                    <div class="col-md-12">
+                    <div class="col-md-12 row">
                         <p><b>About the Grid System</b></p>
                         <p>{{ __('With the help of the grid system, you are able to faster identify, which X-Y-Coordinates you need to put your text at the correct position.') }}</p>
                         <p>{{ __('Each horizontal and vertical line of the grid system represents 25px. In the left top corner, X and Y is 0px.') }}</p>
+                        <p>{{ __('Click on the position in the image to get the X-Y-Coordinates: ') }}</p>
+                        <div class="col-md-3">
+                            <label for="XCoordinatePreview" class="form-label">X-Coordinate (horizontal)</label>
+                            <input class="form-control" id="XCoordinatePreview" type="number" min="0" step="1" max="{{ $banner_template->template->width }}" name="x_coordinate_preview" value="0" disabled>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="YCoordinatePreview" class="form-label">Y-Coordinate (vertical)</label>
+                            <input class="form-control" id="YCoordinatePreview" type="number" min="0" step="1" max="{{ $banner_template->template->height }}" name="y_coordinate_preview" value="0" disabled>
+                        </div>
                     </div>
 
                     <hr>
@@ -152,4 +161,23 @@
         </div>
     </div>
 </div>
+
+<script type="module">
+    // Get X-Y-Coordinates when clicking on the image
+    $(document).ready(function() {
+        $('img').click(function(e) {
+            var offset = $(this).offset();
+
+            var x_padding_offset = $(this).innerWidth() - $(this).width();
+            var x_coordinate = ((e.pageX - offset.left) * (this.naturalWidth / $(this).width())) - x_padding_offset;
+
+            $('input[name=x_coordinate_preview]').val(Math.floor(x_coordinate));
+
+            var y_padding_offset = $(this).innerHeight() - $(this).height();
+            var y_coordinate = ((e.pageY - offset.top) * (this.naturalHeight / $(this).height())) - y_padding_offset;
+
+            $('input[name=y_coordinate_preview]').val(Math.floor(y_coordinate));
+        });
+    });
+</script>
 @endsection
