@@ -20,7 +20,7 @@ cd /var/www/
 ```
 
 ```shell
-git clone https://github.com/Sebi94nbg/teamspeak-dynamic-banner.git
+git clone https://github.com/Sebbo94BY/teamspeak-dynamic-banner.git
 ```
 
 
