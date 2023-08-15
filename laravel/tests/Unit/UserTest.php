@@ -18,6 +18,9 @@ class UserTest extends TestCase
         $this->seed();
     }
 
+    /**
+     * Test if the model can be crated.
+     */
     public function test_model_can_be_created()
     {
         $user = User::factory()->create();
