@@ -51,7 +51,7 @@ class TeamspeakBot extends Command
     /**
      * The TeamSpeak virtualserver connection.
      */
-    protected Server $virtualserver;
+    protected ?Server $virtualserver;
 
     /**
      * A helper variable for properly stopping this endless running script.
@@ -63,7 +63,10 @@ class TeamspeakBot extends Command
      */
     public function __destruct()
     {
-        unset($this->virtualserver);
+        if (isset($this->virtualserver)) {
+            $this->virtualserver->request('quit');
+            unset($this->virtualserver);
+        }
     }
 
     /**
@@ -237,7 +240,6 @@ class TeamspeakBot extends Command
         $this->message('INFO', "Received the PCNTL signal number `$signal_number`. Stopping the bot.");
 
         $this->keep_running = false;
-        $this->virtualserver->request('quit');
 
         if (! $this->instance_process->delete()) {
             $this->message('WARNING', 'Failed to delete the process ID from the database.');
@@ -327,10 +329,6 @@ class TeamspeakBot extends Command
             $this->message('WARNING', 'Failed to save the process ID to the database, so that it can be stopped later by the UI.');
         }
 
-        try {
-            $this->start_bot();
-        } catch (TransportException $transport_exception) {
-            $this->message('ERROR', $transport_exception->getMessage());
-        }
+        $this->start_bot();
     }
 }
