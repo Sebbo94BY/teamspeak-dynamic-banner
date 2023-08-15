@@ -14,7 +14,9 @@ RUN apt-get update && apt-get install -y \
     libssh2-1 \
     zip \
     unzip \
-    npm
+    npm \
+    strace \
+    lsof
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
