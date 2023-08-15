@@ -45,6 +45,9 @@ class UserController extends Controller
             ]);
         }
 
+        // Grant the initial user the 'Super Admin' role
+        $user->assignRole('Super Admin');
+
         // Authenticate user immediately to avoid the login mask
         Auth::attempt([
             'email' => $request->email,

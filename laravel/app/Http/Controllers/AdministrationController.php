@@ -31,7 +31,7 @@ class AdministrationController extends Controller
      */
     public function add_user(): View
     {
-        return view('administration.user.add');
+        return view('administration.user.add', ['roles' => Role::all()]);
     }
 
     /**
@@ -48,7 +48,7 @@ class AdministrationController extends Controller
             ]);
         }
 
-        return view('administration.user.edit', ['user' => $user]);
+        return view('administration.user.edit', ['user' => $user, 'roles' => Role::all()]);
     }
 
     /**
@@ -71,6 +71,10 @@ class AdministrationController extends Controller
                 'error' => 'user-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
+        }
+
+        foreach ($request->roles as $role_id) {
+            $user->assignRole($role_id);
         }
 
         return Redirect::route('administration.users')->with([
@@ -104,6 +108,8 @@ class AdministrationController extends Controller
                 'message' => 'Failed to update the user in the database. Please try again.',
             ]);
         }
+
+        $user->syncRoles($request->roles);
 
         return redirect()->back()->with([
             'success' => 'user-update-successful',

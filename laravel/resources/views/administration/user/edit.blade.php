@@ -59,6 +59,22 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="validationRoles" class="form-label">Roles</label>
+                            <select class="form-control selectpicker" id="validationRoles" multiple data-live-search="true" name="roles[]" aria-describedby="rolesHelp">
+                                @foreach ($roles as $role)
+                                @if ($role->id == $user->hasRole($role->id))
+                                <option value="{{ $role->id }}" selected>{{ $role->name }}</option>
+                                @else
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                            <div id="rolesHelp" class="form-text">The roles (and thus permissions), which the user should get.</div>
+                            <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                            <div class="invalid-feedback">{{ __("Please select at least one role.") }}</div>
+                        </div>
+
+                        <div class="mb-3">
                             <a href="{{ route('administration.users') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
