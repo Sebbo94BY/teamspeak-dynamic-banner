@@ -5,7 +5,7 @@ This documentation describes, how you can update an existing installation of thi
 
 ## Read release notes
 
-First of all, you should read the release notes and understand them. You can find those here: https://github.com/Sebi94nbg/teamspeak-dynamic-banner/releases
+First of all, you should read the release notes and understand them. You can find those here: https://github.com/Sebbo94BY/teamspeak-dynamic-banner/releases
 
 There might be some breaking changes, which will affect your installation. Please check the release notes and do the necessary changes, if required.
 
