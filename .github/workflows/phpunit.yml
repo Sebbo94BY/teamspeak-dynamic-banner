@@ -58,7 +58,7 @@ jobs:
         working-directory: laravel
 
       - name: run migrations
-        run: php artisan migrate:fresh --no-interaction
+        run: php artisan migrate:fresh --seed --no-interaction
         working-directory: laravel
 
       - name: run phpunit tests

@@ -102,6 +102,12 @@ Install the database schemas:
 php artisan migrate
 ```
 
+Seed the database with the necessary defaults:
+
+```shell
+php artisan db:seed
+```
+
 Grant the web server user (e.g. `www-data`) the necessary permissions:
 
 ```shell

@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Banners') }} <a href="{{ route('banner.add') }}" class="btn btn-primary">Add</a></div>
+                <div class="card-header">
+                    {{ __('Banners') }}
+
+                    @can('add banners')
+                    <a href="{{ route('banner.add') }}" class="btn btn-primary">Add</a>
+                    @endcan
+                </div>
 
                 <div class="card-body">
                     @if (session('success'))
@@ -41,18 +47,27 @@
                                 </td>
                                 <td>{{ $banner->templates->count() }}</td>
                                 <td>
+                                    @can('edit banners')
                                     <a href="{{ route('banner.edit', ['banner_id' => $banner->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
+                                    @endcan
+
                                     <a href="{{ route('banner.variables', ['banner_id' => $banner->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-square-root-variable"></i>
                                     </a>
+
+                                    @can('edit banners')
                                     <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-images"></i>
                                     </a>
+                                    @endcan
+
                                     <a href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}" target="_blank" class="btn btn-info">
                                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                     </a>
+
+                                    @can('delete banners')
                                     <form method="POST" action="{{ route('banner.delete', ['banner_id' => $banner->id]) }}">
                                         @method('delete')
                                         @csrf
@@ -60,6 +75,7 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </a>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                             @endforeach

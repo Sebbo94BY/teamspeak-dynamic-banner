@@ -35,17 +35,23 @@
                             <a class="nav-link" href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                         </li>
 
+                        @can('view instances')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('instances') }}">{{ __('Instances') }}</a>
                         </li>
+                        @endcan
 
+                        @can('view templates')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('templates') }}">{{ __('Templates') }}</a>
                         </li>
+                        @endcan
 
+                        @can('view banners')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('banners') }}">{{ __('Banners') }}</a>
                         </li>
+                        @endcan
                         @endauth
                     </ul>
 
@@ -59,29 +65,45 @@
                                 </li>
                             @endif
                         @else
+                            @canany(['view users', 'view roles', 'view fonts', 'view system status', 'view php info'])
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Administration
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @can('view users')
                                     <a class="dropdown-item" href="{{ route('administration.users') }}">
                                         Users
                                     </a>
+                                    @endcan
 
+                                    @can('view roles')
+                                    <a class="dropdown-item" href="{{ route('administration.roles') }}">
+                                        Roles
+                                    </a>
+                                    @endcan
+
+                                    @can('view fonts')
                                     <a class="dropdown-item" href="{{ route('administration.fonts') }}">
                                         Fonts
                                     </a>
+                                    @endcan
 
+                                    @can('view system status')
                                     <a class="dropdown-item" href="{{ route('administration.systemstatus') }}">
                                         System Status
                                     </a>
+                                    @endcan
 
+                                    @can('view php info')
                                     <a class="dropdown-item" href="{{ route('administration.phpinfo') }}">
                                         PHP Info
                                     </a>
+                                    @endcan
                                 </div>
                             </li>
+                            @endcanany
 
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

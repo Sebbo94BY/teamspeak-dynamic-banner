@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class AdministrationController extends Controller
 {
@@ -30,7 +31,7 @@ class AdministrationController extends Controller
      */
     public function add_user(): View
     {
-        return view('administration.user.add');
+        return view('administration.user.add', ['roles' => Role::all()]);
     }
 
     /**
@@ -47,7 +48,7 @@ class AdministrationController extends Controller
             ]);
         }
 
-        return view('administration.user.edit', ['user' => $user]);
+        return view('administration.user.edit', ['user' => $user, 'roles' => Role::all()]);
     }
 
     /**
@@ -70,6 +71,10 @@ class AdministrationController extends Controller
                 'error' => 'user-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
+        }
+
+        foreach ($request->roles as $role_id) {
+            $user->assignRole($role_id);
         }
 
         return Redirect::route('administration.users')->with([
@@ -104,6 +109,8 @@ class AdministrationController extends Controller
             ]);
         }
 
+        $user->syncRoles($request->roles);
+
         return redirect()->back()->with([
             'success' => 'user-update-successful',
             'message' => 'Successfully updated the user.',
@@ -135,6 +142,14 @@ class AdministrationController extends Controller
             'success' => 'user-delete-successful',
             'message' => 'Successfully deleted the user.',
         ]);
+    }
+
+    /**
+     * Display the roles view.
+     */
+    public function roles(): View
+    {
+        return view('administration.roles', ['roles' => Role::all()]);
     }
 
     /**

@@ -45,53 +45,55 @@ Route::post('/setup/installer/user/add', [UserController::class, 'create'])->nam
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/instances', [InstanceController::class, 'overview'])->name('instances');
-    Route::get('/instance/add', [InstanceController::class, 'add'])->name('instance.add');
-    Route::post('/instance/save', [InstanceController::class, 'save'])->name('instance.save');
-    Route::get('/instance/{instance_id}/edit', [InstanceController::class, 'edit'])->name('instance.edit');
-    Route::patch('/instance/{instance_id}/update', [InstanceController::class, 'update'])->name('instance.update');
-    Route::delete('/instance/{instance_id}/delete', [InstanceController::class, 'delete'])->name('instance.delete');
-    Route::post('/instance/{instance_id}/start', [InstanceController::class, 'start'])->name('instance.start');
-    Route::post('/instance/{instance_id}/stop', [InstanceController::class, 'stop'])->name('instance.stop');
-    Route::post('/instance/{instance_id}/restart', [InstanceController::class, 'restart'])->name('instance.restart');
+    Route::get('/instances', [InstanceController::class, 'overview'])->name('instances')->middleware('permission:view instances');
+    Route::get('/instance/add', [InstanceController::class, 'add'])->name('instance.add')->middleware('permission:add instances');
+    Route::post('/instance/save', [InstanceController::class, 'save'])->name('instance.save')->middleware('permission:add instances');
+    Route::get('/instance/{instance_id}/edit', [InstanceController::class, 'edit'])->name('instance.edit')->middleware('permission:edit instances');
+    Route::patch('/instance/{instance_id}/update', [InstanceController::class, 'update'])->name('instance.update')->middleware('permission:edit instances');
+    Route::delete('/instance/{instance_id}/delete', [InstanceController::class, 'delete'])->name('instance.delete')->middleware('permission:delete instances');
+    Route::post('/instance/{instance_id}/start', [InstanceController::class, 'start'])->name('instance.start')->middleware('permission:start instances');
+    Route::post('/instance/{instance_id}/stop', [InstanceController::class, 'stop'])->name('instance.stop')->middleware('permission:stop instances');
+    Route::post('/instance/{instance_id}/restart', [InstanceController::class, 'restart'])->name('instance.restart')->middleware('permission:restart instances');
 
-    Route::get('/templates', [TemplateController::class, 'overview'])->name('templates');
-    Route::get('/template/add', [TemplateController::class, 'add'])->name('template.add');
-    Route::post('/template/save', [TemplateController::class, 'save'])->name('template.save');
-    Route::get('/template/{template_id}/edit', [TemplateController::class, 'edit'])->name('template.edit');
-    Route::patch('/template/{template_id}/update', [TemplateController::class, 'update'])->name('template.update');
-    Route::delete('/template/{template_id}/delete', [TemplateController::class, 'delete'])->name('template.delete');
+    Route::get('/templates', [TemplateController::class, 'overview'])->name('templates')->middleware('permission:view templates');
+    Route::get('/template/add', [TemplateController::class, 'add'])->name('template.add')->middleware('permission:add templates');
+    Route::post('/template/save', [TemplateController::class, 'save'])->name('template.save')->middleware('permission:add templates');
+    Route::get('/template/{template_id}/edit', [TemplateController::class, 'edit'])->name('template.edit')->middleware('permission:edit templates');
+    Route::patch('/template/{template_id}/update', [TemplateController::class, 'update'])->name('template.update')->middleware('permission:edit templates');
+    Route::delete('/template/{template_id}/delete', [TemplateController::class, 'delete'])->name('template.delete')->middleware('permission:delete templates');
 
-    Route::get('/banners', [BannerController::class, 'overview'])->name('banners');
-    Route::get('/banner/add', [BannerController::class, 'add'])->name('banner.add');
-    Route::post('/banner/save', [BannerController::class, 'save'])->name('banner.save');
-    Route::get('/banner/{banner_id}/edit', [BannerController::class, 'edit'])->name('banner.edit');
-    Route::patch('/banner/{banner_id}/update', [BannerController::class, 'update'])->name('banner.update');
-    Route::delete('/banner/{banner_id}/delete', [BannerController::class, 'delete'])->name('banner.delete');
+    Route::get('/banners', [BannerController::class, 'overview'])->name('banners')->middleware('permission:view banners');
+    Route::get('/banner/add', [BannerController::class, 'add'])->name('banner.add')->middleware('permission:add banners');
+    Route::post('/banner/save', [BannerController::class, 'save'])->name('banner.save')->middleware('permission:add banners');
+    Route::get('/banner/{banner_id}/edit', [BannerController::class, 'edit'])->name('banner.edit')->middleware('permission:edit banners');
+    Route::patch('/banner/{banner_id}/update', [BannerController::class, 'update'])->name('banner.update')->middleware('permission:edit banners');
+    Route::delete('/banner/{banner_id}/delete', [BannerController::class, 'delete'])->name('banner.delete')->middleware('permission:delete banners');
 
     Route::get('/banner/{banner_id}/variables', [BannerVariableController::class, 'overview'])->name('banner.variables');
 
-    Route::get('/banner/{banner_id}/templates', [BannerTemplateController::class, 'edit'])->name('banner.templates');
-    Route::post('/banner/template/add', [BannerTemplateController::class, 'add'])->name('banner.template.add');
-    Route::delete('/banner/template/remove', [BannerTemplateController::class, 'remove'])->name('banner.template.remove');
-    Route::patch('/banner/template/disable', [BannerTemplateController::class, 'disable'])->name('banner.template.disable');
-    Route::patch('/banner/template/enable', [BannerTemplateController::class, 'enable'])->name('banner.template.enable');
+    Route::get('/banner/{banner_id}/templates', [BannerTemplateController::class, 'edit'])->name('banner.templates')->middleware('permission:edit banners');
+    Route::post('/banner/template/add', [BannerTemplateController::class, 'add'])->name('banner.template.add')->middleware('permission:edit banners');
+    Route::delete('/banner/template/remove', [BannerTemplateController::class, 'remove'])->name('banner.template.remove')->middleware('permission:edit banners');
+    Route::patch('/banner/template/disable', [BannerTemplateController::class, 'disable'])->name('banner.template.disable')->middleware('permission:edit banners');
+    Route::patch('/banner/template/enable', [BannerTemplateController::class, 'enable'])->name('banner.template.enable')->middleware('permission:edit banners');
 
     Route::get('/banner/{banner_id}/configuration/{template_id}', [BannerConfigurationController::class, 'edit'])->name('banner.template.configuration.edit');
     Route::patch('/banner/{banner_id}/configuration/{template_id}', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
     Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
-    Route::get('/administration/users', [AdministrationController::class, 'users'])->name('administration.users');
-    Route::get('/administration/user/add', [AdministrationController::class, 'add_user'])->name('administration.user.add');
-    Route::post('/administration/user/create', [AdministrationController::class, 'create_user'])->name('administration.user.create');
-    Route::get('/administration/user/{user_id}/edit', [AdministrationController::class, 'edit_user'])->name('administration.user.edit');
-    Route::patch('/administration/user/{user_id}/update', [AdministrationController::class, 'update_user'])->name('administration.user.update');
-    Route::delete('/administration/user/{user_id}/delete', [AdministrationController::class, 'delete_user'])->name('administration.user.delete');
+    Route::get('/administration/users', [AdministrationController::class, 'users'])->name('administration.users')->middleware('permission:view users');
+    Route::get('/administration/user/add', [AdministrationController::class, 'add_user'])->name('administration.user.add')->middleware('permission:add users');
+    Route::post('/administration/user/create', [AdministrationController::class, 'create_user'])->name('administration.user.create')->middleware('permission:add users');
+    Route::get('/administration/user/{user_id}/edit', [AdministrationController::class, 'edit_user'])->name('administration.user.edit')->middleware('permission:edit users');
+    Route::patch('/administration/user/{user_id}/update', [AdministrationController::class, 'update_user'])->name('administration.user.update')->middleware('permission:edit users');
+    Route::delete('/administration/user/{user_id}/delete', [AdministrationController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
 
-    Route::get('/administration/fonts', [AdministrationController::class, 'fonts'])->name('administration.fonts');
+    Route::get('/administration/roles', [AdministrationController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
 
-    Route::get('/administration/phpinfo', [AdministrationController::class, 'php_info'])->name('administration.phpinfo');
-    Route::get('/administration/systemstatus', [AdministrationController::class, 'system_status'])->name('administration.systemstatus');
+    Route::get('/administration/fonts', [AdministrationController::class, 'fonts'])->name('administration.fonts')->middleware('permission:view fonts');
+
+    Route::get('/administration/phpinfo', [AdministrationController::class, 'php_info'])->name('administration.phpinfo')->middleware('permission:view php info');
+    Route::get('/administration/systemstatus', [AdministrationController::class, 'system_status'])->name('administration.systemstatus')->middleware('permission:view system status');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

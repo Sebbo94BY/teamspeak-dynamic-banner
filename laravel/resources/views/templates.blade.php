@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Templates') }} <a href="{{ route('template.add') }}" class="btn btn-primary">Add</a></div>
+                <div class="card-header">
+                    {{ __('Templates') }}
+
+                    @can('add templates')
+                    <a href="{{ route('template.add') }}" class="btn btn-primary">Add</a>
+                    @endcan
+                </div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -31,9 +37,13 @@
                                     <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                                 </td>
                                 <td>
+                                    @can('edit templates')
                                     <a href="{{ route('template.edit', ['template_id' => $template->id]) }}" class="btn btn-info">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
+                                    @endcan
+
+                                    @can('delete templates')
                                     <form method="POST" action="{{ route('template.delete', ['template_id' => $template->id]) }}">
                                         @method('delete')
                                         @csrf
@@ -41,6 +51,7 @@
                                             <i class="fa-solid fa-trash-can"></i>
                                         </a>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                             @endforeach
