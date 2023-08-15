@@ -16,7 +16,11 @@ class AdministrationSystemstatusTest extends TestCase
     {
         parent::setUp();
 
+        // Run the DatabaseSeeder
+        $this->seed();
+
         $this->user = User::factory()->create();
+        $this->user->syncRoles('System Status Viewer');
     }
 
     /**

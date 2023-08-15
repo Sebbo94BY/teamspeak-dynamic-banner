@@ -17,7 +17,11 @@ class AdministrationUserTest extends TestCase
     {
         parent::setUp();
 
+        // Run the DatabaseSeeder
+        $this->seed();
+
         $this->user = User::factory()->create();
+        $this->user->syncRoles('Users Admin');
     }
 
     /**
