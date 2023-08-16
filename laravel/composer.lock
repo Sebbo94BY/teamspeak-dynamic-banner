@@ -3015,12 +3015,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/planetteamspeak/ts3phpframework.git",
-                "reference": "64aa90a5c93004285dd22b8ab7b9012a30ca2771"
+                "reference": "cd059285c694b4f6dabe3498966d1494ca19fc3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/64aa90a5c93004285dd22b8ab7b9012a30ca2771",
-                "reference": "64aa90a5c93004285dd22b8ab7b9012a30ca2771",
+                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/cd059285c694b4f6dabe3498966d1494ca19fc3f",
+                "reference": "cd059285c694b4f6dabe3498966d1494ca19fc3f",
                 "shasum": ""
             },
             "require": {
@@ -3074,7 +3074,7 @@
                 "issues": "https://github.com/planetteamspeak/ts3phpframework/issues",
                 "source": "https://github.com/planetteamspeak/ts3phpframework/tree/dev"
             },
-            "time": "2023-08-06T23:28:07+00:00"
+            "time": "2023-08-16T20:29:02+00:00"
         },
         {
             "name": "predis/predis",
