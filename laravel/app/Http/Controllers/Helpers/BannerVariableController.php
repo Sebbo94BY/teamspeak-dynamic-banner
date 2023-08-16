@@ -40,7 +40,7 @@ class BannerVariableController extends Controller
     {
         $current_datetime = Carbon::now();
 
-        $variables = [
+        $datetimes = [
             'current_time_utc_hi' => $current_datetime->setTimezone('UTC')->format('H:i'),
             'current_time_europe_berlin_hi' => $current_datetime->setTimezone('Europe/Berlin')->format('H:i'),
             'current_date_utc_ymd' => $current_datetime->setTimezone('UTC')->format('Y-m-d'),
@@ -49,7 +49,7 @@ class BannerVariableController extends Controller
             'current_datetime_europe_berlin_dmy_hi' => $current_datetime->setTimezone('Europe/Berlin')->format('d.m.Y H:i'),
         ];
 
-        return array_change_key_case($variables, CASE_UPPER);
+        return array_change_key_case($datetimes, CASE_UPPER);
     }
 
     /**
@@ -120,19 +120,19 @@ class BannerVariableController extends Controller
      */
     public function get_current_virtualserver_info(): array
     {
-        $variables = [];
+        $virtualserver_info = [];
 
         /**
          * VIRTUALSERVER NODE INFO
          */
-        $variables = array_merge($variables, $this->virtualserver->getInfo(true, true));
+        $virtualserver_info = array_merge($virtualserver_info, $this->virtualserver->getInfo(true, true));
 
         /**
          * VIRTUALSERVER CONNECTION INFO
          */
-        $variables = array_merge($variables, $this->virtualserver->connectionInfo());
+        $virtualserver_info = array_merge($virtualserver_info, $this->virtualserver->connectionInfo());
 
-        return array_change_key_case($variables, CASE_UPPER);
+        return array_change_key_case($virtualserver_info, CASE_UPPER);
     }
 
     /**
