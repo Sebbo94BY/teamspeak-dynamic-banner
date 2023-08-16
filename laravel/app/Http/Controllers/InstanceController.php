@@ -167,6 +167,14 @@ class InstanceController extends Controller
             ]);
         }
 
+        $instance->host = $request->host;
+        $instance->voice_port = $request->voice_port;
+        $instance->serverquery_port = $request->serverquery_port;
+        $instance->serverquery_username = $request->serverquery_username;
+        $instance->serverquery_password = $request->serverquery_password;
+        $instance->client_nickname = $request->client_nickname;
+        $instance->default_channel_id = $request->default_channel_id;
+
         // Try SSH first and fallback to RAW
         try {
             $instance->is_ssh = true;
@@ -193,13 +201,6 @@ class InstanceController extends Controller
         }
 
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
-        $instance->host = $request->host;
-        $instance->voice_port = $request->voice_port;
-        $instance->serverquery_port = $request->serverquery_port;
-        $instance->serverquery_username = $request->serverquery_username;
-        $instance->serverquery_password = $request->serverquery_password;
-        $instance->client_nickname = $request->client_nickname;
-        $instance->default_channel_id = $request->default_channel_id;
         $instance->autostart_enabled = ($request->has('autostart_enabled')) ? true : false;
 
         if (! $instance->save()) {

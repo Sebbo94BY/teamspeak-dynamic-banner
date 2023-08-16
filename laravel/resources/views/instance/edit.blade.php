@@ -97,7 +97,7 @@
                         <div class="mb-3">
                             <label for="validationDefaultChannelId" class="form-label">Default Channel</label>
                             <select class="form-select" name="default_channel_id" aria-describedby="defaultChannelIdHelp">
-                                <option selected>Default Channel</option>
+                                <option value="" selected>Default Channel</option>
                                 @foreach ($channel_list as $channel)
                                 @if (old('default_channel_id', $instance->default_channel_id) == $channel->cid) "selected"
                                 <option value="{{ $channel->cid }}" selected>{{ $channel->channel_name }}</option>
