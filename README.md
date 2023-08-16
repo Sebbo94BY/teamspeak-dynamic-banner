@@ -77,6 +77,7 @@ This project requires the following permissions on your TeamSpeak server:
 | `i_channel_join_power` | The join power, which the bot should have. |
 | `i_client_move_power` | The move power, which the bot should have to move itself into the default channel. |
 | `b_virtualserver_notify_register` | Allow the bot to register and listen for TeamSpeak server events. |
+| `b_virtualserver_notify_unregister` | Allow the bot to unregister from TeamSpeak server events. |
 | `b_virtualserver_info_view` | Allow the bot to get some information. |
 | `b_virtualserver_connectioninfo_view` | Allow the bot to get some information. |
 | `b_virtualserver_client_list` | Allow the bot to get some information. |

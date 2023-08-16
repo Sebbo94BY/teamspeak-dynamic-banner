@@ -107,6 +107,15 @@ class TeamspeakBot extends Command
             $this->message('DEBUG', "No reply from the server for $idle_seconds seconds.");
         }
 
+        if (! $this->keep_running) {
+            // unregister from all events
+            $this->virtualserver->notifyUnregister();
+
+            // Finally exit the script.
+            // Otherwise the Artisan command hangs forever.
+            exit(0);
+        }
+
         // If the timestamp on the last query is more than 300 seconds (5 minutes) in the past, send 'keepalive'
         // 'keepalive' command is just server query command 'clientupdate' which does nothing without properties. So nothing changes.
         if ($serverquery->getQueryLastTimestamp() < time() - 260) {
@@ -233,26 +242,6 @@ class TeamspeakBot extends Command
     }
 
     /**
-     * PCNTL Signal Handler
-     */
-    protected function pcntl_signal_handler(int $signal_number)
-    {
-        $this->message('INFO', "Received the PCNTL signal number `$signal_number`. Stopping the bot.");
-
-        $this->keep_running = false;
-
-        if (! $this->instance_process->delete()) {
-            $this->message('WARNING', 'Failed to delete the process ID from the database.');
-        }
-
-        $this->message('INFO', 'Successfully stopped the bot.');
-
-        // Finally exit the script.
-        // Otherwise the Artisan command hangs forever in the PCNTL signal handler.
-        exit;
-    }
-
-    /**
      * Starts the actual bot for the instance.
      */
     protected function start_bot()
@@ -305,9 +294,24 @@ class TeamspeakBot extends Command
 
         // setup signal handlers
         $this->message('INFO', 'Setting up signal handlers.');
-        pcntl_async_signals(true);
-        pcntl_signal(SIGINT, $this->pcntl_signal_handler(...)); // handle Ctrl+C signals
-        pcntl_signal(SIGTERM, $this->pcntl_signal_handler(...)); // handle shutdown signals
+        $this->trap([
+            SIGINT,  // Ctrl+C signals
+            SIGQUIT, // Similar to SIGINT
+            SIGTERM, // shutdown signals
+            SIGHUP,  // "hang-up" signals (e. g. user's terminal disconnected)
+        ], function (int $signal) {
+            $this->message('INFO', "Received the PCNTL signal number `$signal`. Stopping the bot.");
+
+            $this->keep_running = false;
+
+            $this->message('INFO', 'Stopping the bot. Please wait a few seconds.');
+
+            if (! $this->instance_process->delete()) {
+                $this->message('WARNING', 'Failed to delete the process ID from the database.');
+            }
+
+            $this->message('INFO', 'Successfully stopped the bot.');
+        });
 
         $instance_id = intval($this->argument('instance_id'));
 
