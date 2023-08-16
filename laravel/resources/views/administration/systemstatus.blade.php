@@ -140,6 +140,22 @@
                                     (strtoupper($section) == strtoupper("Versions"))
                                 )
                                     <tr>
+                                        <td>Bootstrap Version</td>
+                                        <td>
+                                            <i class="fa-solid fa-circle-info text-info"></i>
+                                        </td>
+                                        <td id="bootstrap_version"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Datatable Version</td>
+                                        <td>
+                                            <i class="fa-solid fa-circle-info text-info"></i>
+                                        </td>
+                                        <td id="datatable_version"></td>
+                                    </tr>
+
+                                    <tr>
                                         <td>jQuery Version</td>
                                         <td>
                                             <i class="fa-solid fa-circle-info text-info"></i>
@@ -169,6 +185,8 @@
 
             <script type="module">
                 $(document).ready(function () {
+                    $("#bootstrap_version").html(bootstrap.Tooltip.VERSION);
+                    $("#datatable_version").html($.fn.dataTable.version);
                     $("#jquery_version").html($.fn.jquery);
                 });
             </script>
