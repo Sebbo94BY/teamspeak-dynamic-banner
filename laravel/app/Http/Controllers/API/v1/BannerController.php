@@ -46,8 +46,16 @@ class BannerController extends Controller
 
         // Return the generated image to the client
         $draw_text_on_template_helper = new DrawTextOnTemplateController();
+
+        // Set headers to e. g. avoid caching
+        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
+        header('Cache-Control: no-cache');
+        header('Expires: -1');
+        header('ETag: '.md5($current_rfc7231_datetime));
+        header('Last-Modified: '.$current_rfc7231_datetime);
+        header('Content-Type: image/jpeg');
+
         try {
-            header('Content-Type: image/jpeg');
             $draw_text_on_template_helper->draw_text_to_image($banner_template, false, true, $request->ip());
         } catch (Exception $exception) {
             return response($exception->getMessage(), 500);
