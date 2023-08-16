@@ -59,8 +59,14 @@ class BannerVariableController extends Controller
     {
         $this->virtualserver->clientListReset();
 
+        try {
+            $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
+        } catch (ServerQueryException) {
+            $virtualserver_clientlist = [];
+        }
+
         $clientlist = [];
-        foreach ($this->virtualserver->clientList(['client_type' => 0]) as $client) {
+        foreach ($virtualserver_clientlist as $client) {
             $clientlist['client_'.$client->client_database_id.'_database_id'] = $client->client_database_id;
             $clientlist['client_'.$client->client_database_id.'_id'] = $client->clid;
             $clientlist['client_'.$client->client_database_id.'_nickname'] = $client->client_nickname;
@@ -85,8 +91,14 @@ class BannerVariableController extends Controller
         /**
          * SERVERGROUP MEMBER ONLINE COUNTER VARIABLE
          */
+        try {
+            $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
+        } catch (ServerQueryException) {
+            $virtualserver_clientlist = [];
+        }
+
         $client_servergroup_ids = [];
-        foreach ($this->virtualserver->clientList(['client_type' => 0]) as $client) {
+        foreach ($virtualserver_clientlist as $client) {
             $client_servergroup_ids = array_merge($client_servergroup_ids, explode(',', $client->client_servergroups));
         }
 
@@ -99,15 +111,8 @@ class BannerVariableController extends Controller
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
             try {
                 $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
-            } catch (ServerQueryException $serverquery_exception) {
-                // TODO: Remove this try-catch and rather fix it properly. We are currently fully ignoring some servergroups, which can't be parsed properly.
-                // https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/12
-                if ($serverquery_exception->getCode() == 1538) {
-                    // Error: invalid parameter
-                    // Until this issue is fixed in the TS3PHPFramework: Ignore this error and do not check this servergroup.
-                    $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = 0;
-                    continue;
-                }
+            } catch (ServerQueryException) {
+                $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = 0;
             }
             $servergroups['servergroup_'.$servergroup->sgid.'_member_online_count'] = (in_array($servergroup->sgid, $client_servergroup_ids)) ? array_count_values($client_servergroup_ids)[$servergroup->sgid] : 0;
         }
