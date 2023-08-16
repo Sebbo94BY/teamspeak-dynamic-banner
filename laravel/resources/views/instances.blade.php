@@ -52,16 +52,28 @@
                                     @if (is_null($instance->process))
                                     <span class="badge bg-danger">Stopped</span>
                                     @else
-                                    <span class="badge bg-success">Connected</span>
+                                    <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="PID <b>{{ $instance->process->process_id }}</b> is active since <b>{{ $instance->process->created_at }} UTC</b>."
+                                        id="status-badge">
+                                        Connected
+                                    </span>
                                     @endif
                                 </td>
                                 <td>{{ $instance->virtualserver_name }}</td>
                                 <td>
                                     {{ $instance->host }}
                                     @if ($instance->is_ssh)
-                                    <span class="badge bg-success">SSH</span>
+                                    <span class="badge bg-success" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="{{ $instance->serverquery_port }} (TCP)"
+                                        id="instance-port-ssh-badge">
+                                        SSH
+                                    </span>
                                     @else
-                                    <span class="badge bg-warning">RAW</span>
+                                    <span class="badge bg-warning" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="{{ $instance->serverquery_port }} (TCP)"
+                                        id="instance-port-raw-badge">
+                                        RAW
+                                    </span>
                                     @endif
                                 </td>
                                 <td>{{ $instance->voice_port }}</td>
@@ -126,6 +138,10 @@
                 $(document).ready(function () {
                     $('#instances').DataTable();
                 });
+
+                // Enable Bootstrap Tooltips
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             </script>
         </div>
     </div>
