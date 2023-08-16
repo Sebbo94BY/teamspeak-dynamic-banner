@@ -44,15 +44,7 @@ class Kernel extends ConsoleKernel
 
         // INSTANCES: Cleanup dead processes
         $schedule->call(function () {
-            foreach (InstanceProcess::all(['id', 'process_id']) as $process) {
-                if (file_exists("/proc/$process->process_id")) {
-                    continue;
-                }
-
-                Log::info("Cleaning up dead PID $process->process_id from database...");
-
-                $process->delete();
-            }
+            Process::start('php '.base_path().'/artisan process:cleanup-dead-pids');
         })->environments(['staging', 'production'])->name('instances:cleanup-dead-processes')->everyMinute();
 
         // INSTANCES: Autostart
