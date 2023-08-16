@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
 use App\Http\Requests\BannerConfigurationUpsertRequest;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
@@ -122,10 +123,16 @@ class BannerConfigurationController extends Controller
                 ]);
         }
 
+        // Set headers to e. g. avoid caching
+        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
+
         return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
             // The `Cache-Control` header is required here as the user otherwise sometimes see the old image after a form submission
             // and only after a Ctrl+F5, the expected image is visible.
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate')
+            ->header('Cache-Control', 'no-cache')
+            ->header('Expires', '-1')
+            ->header('ETag', md5($current_rfc7231_datetime))
+            ->header('Last-Modified', $current_rfc7231_datetime)
             ->with([
                 'banner_template' => $banner_template,
                 'success' => 'banner-template-upsert-success',
