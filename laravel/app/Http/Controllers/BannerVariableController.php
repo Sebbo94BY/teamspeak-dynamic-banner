@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Helpers\BannerVariableController as HelpersBannerVariableController;
 use App\Models\Banner;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
@@ -16,7 +17,7 @@ class BannerVariableController extends Controller
     /**
      * Display the overview page.
      */
-    public function overview(Request $request): View
+    public function overview(Request $request): View|RedirectResponse
     {
         try {
             $banner = Banner::findOrFail($request->banner_id);

@@ -43,24 +43,16 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         working-directory: laravel
 
-      - name: copy dotenv file
-        run: cp .env.ci .env
-        working-directory: laravel
-
-      - name: generate unique application key
-        run: php artisan key:generate
-        working-directory: laravel
-      
       - name: cache config, routes and views
         run: |
-          php artisan optimize
-          php artisan view:cache
+          php artisan optimize --env=testing
+          php artisan view:cache --env=testing
         working-directory: laravel
 
       - name: run migrations
-        run: php artisan migrate:fresh --seed --no-interaction
+        run: php artisan migrate:fresh --seed --no-interaction --env=testing
         working-directory: laravel
 
       - name: run phpunit tests
-        run: php artisan test --without-tty
+        run: php artisan test --without-tty --env=testing
         working-directory: laravel

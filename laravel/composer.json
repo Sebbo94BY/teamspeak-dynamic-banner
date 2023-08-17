@@ -51,7 +51,8 @@
             "\"vendor/bin/php-cs-fixer\" fix --config .php-cs-fixer.php --diff"
         ],
         "phpunit-tests": [
-            "@php artisan test --without-tty"
+            "@php artisan config:clear",
+            "@php artisan test --without-tty --env=testing"
         ]
     },
     "extra": {

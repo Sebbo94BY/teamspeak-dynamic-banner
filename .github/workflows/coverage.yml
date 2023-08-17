@@ -41,27 +41,19 @@ jobs:
       - name: install dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         working-directory: laravel
-
-      - name: copy dotenv file
-        run: cp .env.ci .env
-        working-directory: laravel
-
-      - name: generate unique application key
-        run: php artisan key:generate
-        working-directory: laravel
       
       - name: cache config, routes and views
         run: |
-          php artisan optimize
-          php artisan view:cache
+          php artisan optimize --env=testing
+          php artisan view:cache --env=testing
         working-directory: laravel
 
       - name: run migrations
-        run: php artisan migrate:fresh --no-interaction
+        run: php artisan migrate:fresh --no-interaction --env=testing
         working-directory: laravel
 
       - name: generate coverage report
-        run: php artisan test --without-tty --coverage
+        run: php artisan test --without-tty --coverage --env=testing
         working-directory: laravel
 
       - name: upload code coverage report to codecov.io

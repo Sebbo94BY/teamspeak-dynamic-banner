@@ -74,6 +74,7 @@ Edit the `.env` file to your needs:
 
 * `APP_NAME`: The name of this application (only shown in the browsers tab)
 * `APP_ENV`: Based on the environment, some implementations may work different (e.g. more or less logging, more or less schedules, ...)
+    * `testing`: For PHPUnit tests only
     * `local`: For local development using the here provided Docker setup use only
     * `staging`: For testing/staging use only
     * `production`: For production use only

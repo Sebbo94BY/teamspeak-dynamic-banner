@@ -2,16 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Models\Banner;
+use App\Models\Instance;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class AdministrationUserTest extends TestCase
+class BannerVariableTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
+    protected Banner $banner;
 
     public function setUp(): void
     {
@@ -21,7 +24,10 @@ class AdministrationUserTest extends TestCase
         $this->seed();
 
         $this->user = User::factory()->create();
-        $this->user->syncRoles('Users Admin');
+
+        $this->banner = Banner::factory()->for(
+            Instance::factory()->create()
+        )->create();
     }
 
     /**
@@ -29,18 +35,17 @@ class AdministrationUserTest extends TestCase
      */
     public function test_user_gets_redirected_to_login_when_unauthenticated(): void
     {
-        $response = $this->get(route('administration.users'));
+        $response = $this->get(route('banner.variables', ['banner_id', $this->banner->id]));
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));
     }
 
     /**
-     * Test, that the user can access the page, when he is authenticated.
+     * Test, that the user gets redirected to the overview page, when the given banner ID does not exist.
      */
-    public function test_page_gets_displayed_when_authenticated(): void
+    public function test_user_gets_redirected_when_banner_id_does_not_exist(): void
     {
-        $response = $this->actingAs($this->user)->get(route('administration.users'));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
+        $response = $this->actingAs($this->user)->get(route('banner.variables', ['banner_id', 1337]));
+        $response->assertRedirect(route('banners'));
     }
 }

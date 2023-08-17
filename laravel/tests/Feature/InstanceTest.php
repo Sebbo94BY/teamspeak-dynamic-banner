@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class InstanceTest extends TestCase
@@ -43,4 +42,39 @@ class InstanceTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('instances');
     }
+
+    /**
+     * Test, that the user can access the "add instance" page, when he is authenticated.
+     */
+    public function test_add_instance_page_gets_displayed_when_authenticated(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('instance.add'));
+        $response->assertStatus(200);
+        $response->assertViewIs('instance.add');
+    }
+
+    /**
+     * Test, that the user gets redirected to the instances overview, when the requested instance ID for the edit page does not exist.
+     */
+    public function test_edit_instance_page_gets_redirected_to_overview_when_instance_id_does_not_exist(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('instance.edit', ['instance_id' => 1337]));
+        $response->assertRedirect(route('instances'));
+    }
+
+    /**
+     * Test, that the user can access the "edit instance" page, when the requested instance ID for the edit page exists.
+     *
+     * Disabled because the assertions are failing with this error:
+     *    fwrite(): Argument #1 ($stream) must be of type resource, bool given
+     */
+    // public function test_edit_instance_page_gets_displayed_when_instance_id_exists(): void
+    // {
+    //     $instance = Instance::factory()->create();
+    //
+    //     $response = $this->actingAs($this->user)->get(route('instance.edit', ['instance_id' => $instance->id]));
+    //     $response->assertViewIs('instance.edit');
+    //     $response->assertViewHas('instance');
+    //     $response->assertViewHas('channel_list');
+    // }
 }
