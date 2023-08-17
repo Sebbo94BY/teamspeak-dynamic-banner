@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7690e58d0795c96e32b7bf70f24b659d",
+    "content-hash": "ea1a827fd150e72cb260c734d48d76dc",
     "packages": [
         {
             "name": "brick/math",
@@ -3015,12 +3015,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/planetteamspeak/ts3phpframework.git",
-                "reference": "cd059285c694b4f6dabe3498966d1494ca19fc3f"
+                "reference": "83a2ffaace6073ca2589881a764625f2993996bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/cd059285c694b4f6dabe3498966d1494ca19fc3f",
-                "reference": "cd059285c694b4f6dabe3498966d1494ca19fc3f",
+                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/83a2ffaace6073ca2589881a764625f2993996bc",
+                "reference": "83a2ffaace6073ca2589881a764625f2993996bc",
                 "shasum": ""
             },
             "require": {
@@ -3074,7 +3074,7 @@
                 "issues": "https://github.com/planetteamspeak/ts3phpframework/issues",
                 "source": "https://github.com/planetteamspeak/ts3phpframework/tree/dev"
             },
-            "time": "2023-08-16T20:29:02+00:00"
+            "time": "2023-08-17T06:44:02+00:00"
         },
         {
             "name": "predis/predis",
