@@ -38,6 +38,7 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
         * Non-Random: Every client, which requests the banner, will always see the same template as all other clients.
         * Random: Every client, which requests the banner, gets a random, maybe different template shown.
 * Add and configure one or more templates for each banner
+    * Configure (different) URL redirects for each banner (e.g. one banner redirects to your homepage, the other to your social media account)
     * Over 140 standard variables (e.g. current time, count of online clients, client nickname, etc.)
     * Use your preferred TrueType Font (TTF)
     * Set the font size for your texts

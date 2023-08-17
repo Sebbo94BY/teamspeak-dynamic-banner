@@ -16,4 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('/banner/{banner_id}', [BannerController::class, 'get_rendered_template'])->name('api.banner');
+
+    Route::get('/banner/{banner_id}/redirect-url', [BannerController::class, 'redirect_url'])->name('api.banner.redirect_url');
 });

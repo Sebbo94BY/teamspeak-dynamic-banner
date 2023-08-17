@@ -68,6 +68,21 @@
                         @csrf
                         <input type="hidden" name="banner_template_id" value="{{ $banner_template->id }}">
 
+                        <div class="col-md-12">
+                            <label for="validationRedirectUrl" class="form-label">Redirect URL</label>
+                            <div class="input-group">
+                                <input class="form-control" id="validationRedirectUrl" type="url" name="redirect_url" value="{{ old('redirect_url', (isset($banner_template)) ? $banner_template->redirect_url : '') }}" placeholder="e.g. https://example.com/news" aria-describedby="redirectUrlHelp">
+                                <a href="{{ route('api.banner.redirect_url', ['banner_id' => base_convert($banner_template->banner_id, 10, 35), 'banner_template_id' => $banner_template->id]) }}" target="_blank" class="btn btn-primary">Test Redirect</a>
+                            </div>
+                            <div id="redirectUrlHelp" class="form-text">An optional URL, where the user should get redirected, when he clicks on the banner. By default, the rendered template will be opened.</div>
+                            <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                            <div class="invalid-feedback">{{ __("Please provide a valid URL.") }}</div>
+                        </div>
+
+                        <p>For this functionality you need to configure the following URL as Hostbanner URL on your TeamSpeak server: <code>{{ route('api.banner.redirect_url', ['banner_id' => base_convert($banner_template->banner_id, 10, 35)]) }}</code></p>
+
+                        <hr>
+
                         @if ($banner_template->configurations->count() > 0)
                             @foreach ($banner_template->configurations as $configuration)
                                 <div id="config-row-{{ $configuration->id }}">
