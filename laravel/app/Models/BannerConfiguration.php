@@ -47,12 +47,4 @@ class BannerConfiguration extends Model
     {
         return $this->belongsTo(BannerTemplate::class);
     }
-
-    /**
-     * Get the template associated with the banner configuration.
-     */
-    public function template(): BelongsTo
-    {
-        return $this->belongsTo(Template::class);
-    }
 }
