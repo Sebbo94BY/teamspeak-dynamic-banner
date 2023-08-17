@@ -19,6 +19,7 @@ class BannerTemplate extends Model
     protected $fillable = [
         'banner_id',
         'template_id',
+        'redirect_url',
         'enabled',
     ];
 

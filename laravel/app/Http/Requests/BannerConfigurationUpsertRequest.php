@@ -17,6 +17,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
         $banner_template = BannerTemplate::findOrFail($this->banner_template_id);
 
         return [
+            'redirect_url' => ['nullable', 'url'],
             'banner_configuration_id.*' => ['sometimes', 'integer', 'exists:App\Models\BannerConfiguration,id'],
             'banner_template_id' => ['sometimes', 'integer', 'exists:App\Models\BannerTemplate,id'],
             'x_coordinate.*' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:'.$banner_template->template->width],

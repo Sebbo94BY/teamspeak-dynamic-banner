@@ -67,6 +67,18 @@ class BannerConfigurationController extends Controller
                 ]);
         }
 
+        $banner_template->redirect_url = $request->redirect_url;
+
+        if (! $banner_template->save()) {
+            return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+                ->withInput($request->all())
+                ->with([
+                    'banner_template' => $banner_template,
+                    'error' => 'banner-template-redirect-url-error',
+                    'message' => 'Failed to update the redirect URL for this banner template in the database. Please try again.',
+                ]);
+        }
+
         $banner_configurations = [];
 
         for ($i = 0; $i < count($request->font_color_in_hexadecimal); $i++) {

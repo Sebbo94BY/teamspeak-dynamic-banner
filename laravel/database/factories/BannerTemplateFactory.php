@@ -17,6 +17,7 @@ class BannerTemplateFactory extends Factory
     public function definition(): array
     {
         return [
+            'redirect_url' => fake()->url(),
             'enabled' => fake()->boolean(),
         ];
     }
