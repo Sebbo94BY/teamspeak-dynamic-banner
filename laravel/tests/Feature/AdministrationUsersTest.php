@@ -4,10 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class AdministrationUserTest extends TestCase
+class AdministrationUsersTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -42,5 +41,16 @@ class AdministrationUserTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('administration.users'));
         $response->assertStatus(200);
         $response->assertViewIs('administration.users');
+    }
+
+    /**
+     * Test, that the user can access the "add user" page, when he is authenticated.
+     */
+    public function test_add_user_page_gets_displayed_when_authenticated(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('administration.user.add'));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.user.add');
+        $response->assertViewHas('roles');
     }
 }
