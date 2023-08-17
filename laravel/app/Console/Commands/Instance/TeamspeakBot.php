@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\BannerVariableController;
 use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Models\Instance;
 use App\Models\InstanceProcess;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -171,8 +172,10 @@ class TeamspeakBot extends Command
             Redis::expire($redis_key, -2);
             Redis::hmset($redis_key, $data);
             Redis::expire($redis_key, $ttl);
-        } catch (ConnectionException) {
-            // Do nothing when the Redis should not answer within the expected timeout time.
+        } catch (ConnectionException | Exception) {
+            // Do nothing when the Redis
+            // - should not answer within the expected timeout time.
+            // - should fail to expire / save data.
             // The next iteration will retry it.
         }
     }
