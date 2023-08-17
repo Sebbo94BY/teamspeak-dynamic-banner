@@ -20,4 +20,7 @@
             <clover outputFile="clover.xml" />
         </report>
     </coverage>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
 </phpunit>
