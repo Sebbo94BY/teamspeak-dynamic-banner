@@ -6,9 +6,43 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    {{ __("Edit the banner configuration.") }}
+                    <div class="col-md-12 row">
+                        <div class="col-md-6">
+                            {{ __("Edit the banner configuration.") }}
 
-                    <a href="{{ route('banner.variables', ['banner_id' => $banner_template->banner->id]) }}" target="_blank" class="btn btn-info">{{ __("Available Variables") }}</a>
+                            <a href="{{ route('banner.variables', ['banner_id' => $banner_template->banner->id]) }}" target="_blank" class="btn btn-info">{{ __("Available Variables") }}</a>
+                        </div>
+
+                        <div class="col-md-1 offset-md-5">
+                            @if ($banner_template->enabled)
+                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.disable') }}" novalidate>
+                                    @method('patch')
+                                    @csrf
+                                    <input type="hidden" name="banner_id" value="{{ $banner_template->banner_id }}">
+                                    <input type="hidden" name="template_id" value="{{ $banner_template->template_id }}">
+
+                                    <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="Disable this configuration."
+                                        id="disable-configuration-badge">
+                                        <button type="submit" class="btn btn-info"><i class="fa-solid fa-toggle-on"></i></button>
+                                    </span>
+                                </form>
+                            @else
+                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.enable') }}" novalidate>
+                                    @method('patch')
+                                    @csrf
+                                    <input type="hidden" name="banner_id" value="{{ $banner_template->banner_id }}">
+                                    <input type="hidden" name="template_id" value="{{ $banner_template->template_id }}">
+
+                                    <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="Enable this configuration."
+                                        id="disable-configuration-badge">
+                                        <button type="submit" class="btn btn-dark"><i class="fa-solid fa-toggle-off"></i></button>
+                                    </span>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body">
@@ -116,6 +150,10 @@
 </div>
 
 <script type="module">
+    // Enable Bootstrap Tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
     // Get X-Y-Coordinates when clicking on the image
     $(document).ready(function() {
         $('img').click(function(e) {
