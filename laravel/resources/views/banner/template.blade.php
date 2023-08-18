@@ -41,8 +41,8 @@
                             @foreach($templates as $template)
                             <tr>
                                 <td>
-                                    @if ($template->isEnabledForBannerId($banner->id))
-                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-100" style="max-height: 200px;" src="{{ asset($template->file_path_drawed_text.'/'.$template->filename) }}" alt="{{ $template->alias }}">
+                                    @if ($template->isUsedByBannerId($banner->id))
+                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($template->isEnabledForBannerId($banner->id)) ? 100 : 50 }}" style="max-height: 200px;" src="{{ asset($template->file_path_drawed_text.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                                     @else
                                     <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-50" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                                     @endif
