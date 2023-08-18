@@ -50,7 +50,17 @@
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ implode(', ', $roles) }}</td>
+                                <td>
+                                    @foreach ($roles as $role)
+                                    @if ($role == 'Super Admin')
+                                    <span class="badge bg-danger">{{ $role }}</span>
+                                    @elseif (($role != 'Super Admin') and (preg_match('/Admin/i', $role)))
+                                    <span class="badge bg-warning">{{ $role }}</span>
+                                    @else
+                                    <span class="badge bg-primary">{{ $role }}</span>
+                                    @endif
+                                    @endforeach
+                                </td>
                                 <td>{{ $user->created_at }}</td>
                                 <td>
                                     <a class="btn btn-primary" data-bs-toggle="modal" href="#roles-and-permissions-modal-uid-{{ $user->id }}" role="button">
@@ -77,6 +87,13 @@
                             @endforeach
                         </tbody>
                     </table>
+
+                    <p>
+                        Legend:
+                        <span class="badge bg-danger">Super Admin</span>
+                        <span class="badge bg-warning">Area Admin</span>
+                        <span class="badge bg-primary">Limited Role</span>
+                    </p>
                 </div>
             </div>
 
