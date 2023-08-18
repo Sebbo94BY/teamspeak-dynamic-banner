@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Administration;
 
-use App\Http\Controllers\Helpers\SystemStatusController;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\UserAddRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
@@ -11,12 +11,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
-class AdministrationController extends Controller
+class UsersController extends Controller
 {
     /**
      * Display the users view.
@@ -142,54 +141,5 @@ class AdministrationController extends Controller
             'success' => 'user-delete-successful',
             'message' => 'Successfully deleted the user.',
         ]);
-    }
-
-    /**
-     * Display the roles view.
-     */
-    public function roles(): View
-    {
-        return view('administration.roles', ['roles' => Role::all()]);
-    }
-
-    /**
-     * Callback function to only return TTF files.
-     */
-    public function is_ttf_file($value, $key)
-    {
-        return preg_match("/\.ttf$/", $value);
-    }
-
-    /**
-     * Display the fonts view.
-     */
-    public function fonts(): View
-    {
-        $installed_ttf_files = array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH);
-
-        return view('administration.fonts', ['fonts' => $installed_ttf_files]);
-    }
-
-    /**
-     * Display system status information.
-     */
-    public function system_status(): View
-    {
-        $system_status_helper = new SystemStatusController();
-        $system_status = $system_status_helper->system_status_json();
-
-        return view('administration.systemstatus', [
-            'system_status' => json_decode($system_status),
-            'system_status_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $system_status),
-            'system_status_danger_count' => preg_match_all("/\"severity\"\:\"danger\"/", $system_status),
-        ]);
-    }
-
-    /**
-     * Display PHP information.
-     */
-    public function php_info(): View
-    {
-        return view('administration.phpinfo');
     }
 }

@@ -1,6 +1,10 @@
 <?php
 
-use App\Http\Controllers\AdministrationController;
+use App\Http\Controllers\Administration\FontsController;
+use App\Http\Controllers\Administration\PhpInfoController;
+use App\Http\Controllers\Administration\RolesController;
+use App\Http\Controllers\Administration\SystemStatusController;
+use App\Http\Controllers\Administration\UsersController;
 use App\Http\Controllers\BannerConfigurationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BannerTemplateController;
@@ -81,19 +85,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/banner/{banner_id}/configuration/{template_id}', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
     Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
-    Route::get('/administration/users', [AdministrationController::class, 'users'])->name('administration.users')->middleware('permission:view users');
-    Route::get('/administration/user/add', [AdministrationController::class, 'add_user'])->name('administration.user.add')->middleware('permission:add users');
-    Route::post('/administration/user/create', [AdministrationController::class, 'create_user'])->name('administration.user.create')->middleware('permission:add users');
-    Route::get('/administration/user/{user_id}/edit', [AdministrationController::class, 'edit_user'])->name('administration.user.edit')->middleware('permission:edit users');
-    Route::patch('/administration/user/{user_id}/update', [AdministrationController::class, 'update_user'])->name('administration.user.update')->middleware('permission:edit users');
-    Route::delete('/administration/user/{user_id}/delete', [AdministrationController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
+    Route::get('/administration/users', [UsersController::class, 'users'])->name('administration.users')->middleware('permission:view users');
+    Route::get('/administration/user/add', [UsersController::class, 'add_user'])->name('administration.user.add')->middleware('permission:add users');
+    Route::post('/administration/user/create', [UsersController::class, 'create_user'])->name('administration.user.create')->middleware('permission:add users');
+    Route::get('/administration/user/{user_id}/edit', [UsersController::class, 'edit_user'])->name('administration.user.edit')->middleware('permission:edit users');
+    Route::patch('/administration/user/{user_id}/update', [UsersController::class, 'update_user'])->name('administration.user.update')->middleware('permission:edit users');
+    Route::delete('/administration/user/{user_id}/delete', [UsersController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
 
-    Route::get('/administration/roles', [AdministrationController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
+    Route::get('/administration/roles', [RolesController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
 
-    Route::get('/administration/fonts', [AdministrationController::class, 'fonts'])->name('administration.fonts')->middleware('permission:view fonts');
+    Route::get('/administration/fonts', [FontsController::class, 'fonts'])->name('administration.fonts')->middleware('permission:view fonts');
 
-    Route::get('/administration/phpinfo', [AdministrationController::class, 'php_info'])->name('administration.phpinfo')->middleware('permission:view php info');
-    Route::get('/administration/systemstatus', [AdministrationController::class, 'system_status'])->name('administration.systemstatus')->middleware('permission:view system status');
+    Route::get('/administration/systemstatus', [SystemStatusController::class, 'system_status'])->name('administration.systemstatus')->middleware('permission:view system status');
+
+    Route::get('/administration/phpinfo', [PhpInfoController::class, 'php_info'])->name('administration.phpinfo')->middleware('permission:view php info');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
