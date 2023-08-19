@@ -63,9 +63,13 @@ class BannerController extends Controller
         } elseif ($this->banner->random_rotation) {
             $this->selected_banner_template = $this->banner_templates->random(1)->first();
         } else {
-            $current_minute = Carbon::now()->format('i');
-            $display_duration_per_template = intval(60 / $this->banner_templates->count());
-            $this->selected_banner_template = $this->banner_templates[abs(intval(ceil($current_minute / $display_duration_per_template)) - 1)];
+            if ($this->banner_templates->count() == 1) {
+                $this->selected_banner_template = $this->banner_templates[0];
+            } else {
+                $current_minute = Carbon::now()->format('i');
+                $display_duration_per_template = intval(60 / $this->banner_templates->count());
+                $this->selected_banner_template = $this->banner_templates[abs(intval(ceil($current_minute / $display_duration_per_template)) - 1)];
+            }
         }
 
         if (count($this->selected_banner_template->configurations) == 0) {
