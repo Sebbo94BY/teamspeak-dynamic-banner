@@ -91,6 +91,16 @@ class DrawTextOnTemplateController extends Controller
                     }
                 }
 
+                // Calculate required text width in pixel
+                $text_bounding_box = imagettfbbox($configuration->font_size, $configuration->font_angle, public_path($configuration->fontfile_path), $text);
+                $total_text_width_in_pixel = $text_bounding_box[2];
+
+                // Avoid writing text outside of the template. Instead, automatically wrap the text.
+                if ($configuration->x_coordinate + $total_text_width_in_pixel >= $banner_template->template->width) {
+                    $word_wrap_width = intval(($banner_template->template->width - $configuration->x_coordinate) / $total_text_width_in_pixel * 100);
+                    $text = wordwrap($text, $word_wrap_width, "\n", false);
+                }
+
                 if (! imagefttext($this->gd_image,
                     $configuration->font_size,
                     $configuration->font_angle,
