@@ -12,7 +12,7 @@
                     <form method="POST" action="{{ route('administration.user.delete', ['user_id' => $user->id]) }}">
                         @method('delete')
                         @csrf
-                        <button type="submit" class="btn btn-danger">Delete</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                     @endif
                 </div>

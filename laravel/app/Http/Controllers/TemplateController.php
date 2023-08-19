@@ -110,7 +110,7 @@ class TemplateController extends Controller
         try {
             $template = Template::findOrFail($request->template_id);
         } catch (ModelNotFoundException) {
-            return Redirect::route('template.edit', ['template_id' => $template->id])
+            return Redirect::route('template.edit', ['template_id' => $request->template->id])
                 ->withInput($request->all())
                 ->with([
                     'error' => 'template-not-found',

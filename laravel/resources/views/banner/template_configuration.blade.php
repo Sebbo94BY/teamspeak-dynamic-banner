@@ -29,7 +29,7 @@
 
     <div class="col-md-4">
         <label for="validationFont" class="form-label">Font</label>
-        <select class="form-select" name="fontfile_path[]" aria-describedby="FontHelp" required>
+        <select class="form-select" name="fontfile_path[]" id="validationFont" aria-describedby="FontHelp" required>
             @foreach ($installed_ttf_files as $fontfile_path)
             @if (isset($configuration) AND $configuration->fontfile_path == $fontfile_path)
             <option value="{{ $fontfile_path }}" selected>{{ preg_replace("/fonts\//", '', $fontfile_path) }}</option>
