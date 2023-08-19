@@ -56,7 +56,11 @@
                                                 <input type="hidden" name="banner_id" value="{{ $banner->id }}">
                                                 <input type="hidden" name="template_id" value="{{ $template->id }}">
 
-                                                <button type="submit" class="btn btn-info"><i class="fa-solid fa-toggle-on"></i></button>
+                                                <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                                    title="Disable this configuration."
+                                                    id="disable-configuration-badge">
+                                                    <button type="submit" class="btn btn-info"><i class="fa-solid fa-toggle-on"></i></button>
+                                                </span>
                                             </form>
                                         @else
                                             <form method="POST" action="{{ route('banner.template.enable') }}" novalidate>
@@ -65,13 +69,21 @@
                                                 <input type="hidden" name="banner_id" value="{{ $banner->id }}">
                                                 <input type="hidden" name="template_id" value="{{ $template->id }}">
 
-                                                <button type="submit" class="btn btn-dark"><i class="fa-solid fa-toggle-off"></i></button>
+                                                <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                                    title="Enable this configuration."
+                                                    id="disable-configuration-badge">
+                                                    <button type="submit" class="btn btn-dark"><i class="fa-solid fa-toggle-off"></i></button>
+                                                </span>
                                             </form>
                                         @endif
 
-                                        <a href="{{ route('banner.template.configuration.edit', ['banner_id' => $banner->id, 'template_id' => $template->id]) }}" class="btn btn-info">
-                                            <i class="fa-solid fa-gear"></i>
-                                        </a>
+                                        <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                            title="Edit this configuration."
+                                            id="configure-badge">
+                                            <a href="{{ route('banner.template.configuration.edit', ['banner_id' => $banner->id, 'template_id' => $template->id]) }}" class="btn btn-info">
+                                                <i class="fa-solid fa-gear"></i>
+                                            </a>
+                                        </span>
 
                                         <form method="POST" action="{{ route('banner.template.remove') }}" novalidate>
                                             @method('delete')
@@ -79,7 +91,11 @@
                                             <input type="hidden" name="banner_id" value="{{ $banner->id }}">
                                             <input type="hidden" name="template_id" value="{{ $template->id }}">
 
-                                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-minus"></i></button>
+                                            <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                                title="Delete this configuration."
+                                                id="delete-badge">
+                                                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-minus"></i></button>
+                                            </span>
                                         </form>
                                     @else
                                         <form method="POST" action="{{ route('banner.template.add') }}" novalidate>
@@ -87,7 +103,11 @@
                                             <input type="hidden" name="banner_id" value="{{ $banner->id }}">
                                             <input type="hidden" name="template_id" value="{{ $template->id }}">
 
-                                            <button type="submit" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
+                                            <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                                title="Add this template. Make it configurable."
+                                                id="add-badge">
+                                                <button type="submit" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
+                                            </span>
                                         </form>
                                     @endif
                                 </td>
@@ -125,6 +145,10 @@
                 $(document).ready(function () {
                     $('#templates').DataTable();
                 });
+
+                // Enable Bootstrap Tooltips
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             </script>
         </div>
     </div>

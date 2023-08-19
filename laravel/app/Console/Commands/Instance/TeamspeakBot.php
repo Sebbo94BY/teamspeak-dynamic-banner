@@ -258,9 +258,13 @@ class TeamspeakBot extends Command
         } catch (TransportException $transport_exception) {
             $this->message('ERROR', "Coult not connect to the host `$this->instance->host`: ".$transport_exception->getMessage());
 
+            $this->cleanup_instance_process_id();
+
             return;
         } catch (ServerQueryException $serverquery_exception) {
             $this->message('ERROR', 'ServerQuery command failed: '.$serverquery_exception->getMessage().' (Error #'.$serverquery_exception->getCode().')');
+
+            $this->cleanup_instance_process_id();
 
             return;
         }
@@ -287,6 +291,16 @@ class TeamspeakBot extends Command
     }
 
     /**
+     * Removes the process ID from the database, when the process exited.
+     */
+    protected function cleanup_instance_process_id(): void
+    {
+        if (! $this->instance_process->delete()) {
+            $this->message('WARNING', 'Failed to delete the process ID from the database.');
+        }
+    }
+
+    /**
      * Execute the console command.
      */
     public function handle(): void
@@ -309,9 +323,7 @@ class TeamspeakBot extends Command
 
             $this->message('INFO', 'Stopping the bot. Please wait a few seconds.');
 
-            if (! $this->instance_process->delete()) {
-                $this->message('WARNING', 'Failed to delete the process ID from the database.');
-            }
+            $this->cleanup_instance_process_id();
 
             $this->message('INFO', 'Successfully stopped the bot.');
         });
@@ -326,14 +338,31 @@ class TeamspeakBot extends Command
             return;
         }
 
+        $command = 'php artisan instance:start-teamspeak-bot '.$this->instance->id;
+
+        $existing_instance_process = InstanceProcess::where([
+            ['instance_id', '=', $instance_id],
+            ['command', '=', $command],
+        ])->first();
+
+        if (! is_null($existing_instance_process)) {
+            $this->message('ERROR', "There is already a bot with the process ID (PID) `$existing_instance_process->process_id` for this instance running. Aborting.");
+            $this->message('WARNING', 'If this is a dead process ID (PID), a schedule will remove it within the next minute from the database.');
+            $this->message('WARNING', 'Alternatively, you can run the following Artisan command to remove it immediately: php artisan process:cleanup-dead-pids');
+
+            return;
+        }
+
         $this->instance_process = InstanceProcess::create([
             'instance_id' => $this->instance->id,
-            'command' => 'php artisan instance:start-teamspeak-bot '.$this->instance->id,
+            'command' => $command,
             'process_id' => $process_id,
         ]);
 
-        if (! $this->instance_process->save()) {
-            $this->message('WARNING', 'Failed to save the process ID to the database, so that it can be stopped later by the UI.');
+        if (! $this->instance_process instanceof InstanceProcess) {
+            $this->message('ERROR', 'Failed to save the process ID to the database, so that it can be stopped later by the UI.');
+
+            return;
         }
 
         $this->start_bot();
