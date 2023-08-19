@@ -105,8 +105,14 @@ class BannerVariableController extends Controller
         /**
          * VIRTUALSERVER SERVERGROUPS
          */
+        try {
+            $virtualserver_servergroups = $this->virtualserver->serverGroupList(['type' => 1]);
+        } catch (ServerQueryException) {
+            $virtualserver_servergroups = [];
+        }
+
         $servergroups = [];
-        foreach ($this->virtualserver->serverGroupList(['type' => 1]) as $servergroup) {
+        foreach ($virtualserver_servergroups as $servergroup) {
             $servergroups['servergroup_'.$servergroup->sgid.'_id'] = $servergroup->sgid;
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
             try {
