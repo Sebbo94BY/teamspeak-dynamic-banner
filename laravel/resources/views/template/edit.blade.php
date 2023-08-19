@@ -11,7 +11,7 @@
                     <form method="POST" action="{{ route('template.delete', ['template_id' => $template->id]) }}">
                         @method('delete')
                         @csrf
-                        <button type="submit" class="btn btn-danger">Delete</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
 

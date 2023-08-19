@@ -11,7 +11,7 @@
                     <form method="POST" action="{{ route('instance.delete', ['instance_id' => $instance->id]) }}">
                         @method('delete')
                         @csrf
-                        <button type="submit" class="btn btn-danger">Delete</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
 
@@ -56,7 +56,7 @@
 
                         <div class="mb-3">
                             <label for="validationVoicePort" class="form-label">Voice Port</label>
-                            <input class="form-control" id="validationVoicePort" type="number" name="voice_port" value="{{ old('voice_port', $instance->voice_port) }}" min="1" max="65535" step="1" value="9987" aria-describedby="voicePortHelp" required>
+                            <input class="form-control" id="validationVoicePort" type="number" name="voice_port" value="{{ old('voice_port', $instance->voice_port) }}" min="1" max="65535" step="1" aria-describedby="voicePortHelp" required>
                             <div id="voicePortHelp" class="form-text">The Voice port of the TeamSpeak server to connect at.</div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
                             <div class="invalid-feedback">{{ __("Please provide a valid port.") }}</div>
@@ -64,7 +64,7 @@
 
                         <div class="mb-3">
                             <label for="validationServerQueryPort" class="form-label">ServerQuery Port</label>
-                            <input class="form-control" id="validationServerQueryPort" type="number" name="serverquery_port" value="{{ old('serverquery_port', $instance->serverquery_port) }}" min="1" step="1" max="65535" value="10022" aria-describedby="serverQueryPortHelp" required>
+                            <input class="form-control" id="validationServerQueryPort" type="number" name="serverquery_port" value="{{ old('serverquery_port', $instance->serverquery_port) }}" min="1" step="1" max="65535" aria-describedby="serverQueryPortHelp" required>
                             <div id="serverQueryPortHelp" class="form-text">The ServerQuery port of the TeamSpeak server for executing commands and gathering data.</div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
                             <div class="invalid-feedback">{{ __("Please provide a valid port.") }}</div>
@@ -96,7 +96,7 @@
 
                         <div class="mb-3">
                             <label for="validationDefaultChannelId" class="form-label">Default Channel</label>
-                            <select class="form-select" name="default_channel_id" aria-describedby="defaultChannelIdHelp">
+                            <select class="form-select" name="default_channel_id" id="validationDefaultChannelId" aria-describedby="defaultChannelIdHelp">
                                 <option value="" selected>Default Channel</option>
                                 @foreach ($channel_list as $channel)
                                 @if (old('default_channel_id', $instance->default_channel_id) == $channel->cid) "selected"
@@ -135,7 +135,7 @@
                         'use strict'
 
                         // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                        var forms = document.querySelectorAll('.needs-validation')
+                        let forms = document.querySelectorAll('.needs-validation');
 
                         // Loop over them and prevent submission
                         Array.prototype.slice.call(forms)

@@ -54,7 +54,7 @@
                                     @foreach ($roles as $role)
                                     @if ($role == 'Super Admin')
                                     <span class="badge bg-danger">{{ $role }}</span>
-                                    @elseif (($role != 'Super Admin') and (preg_match('/Admin/i', $role)))
+                                    @elseif (preg_match('/Admin/i', $role))
                                     <span class="badge bg-warning">{{ $role }}</span>
                                     @else
                                     <span class="badge bg-primary">{{ $role }}</span>
@@ -78,7 +78,7 @@
                                     <form method="POST" action="{{ route('administration.user.delete', ['user_id' => $user->id]) }}">
                                         @method('delete')
                                         @csrf
-                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></a>
+                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
                                     </form>
                                     @endcan
                                     @endif

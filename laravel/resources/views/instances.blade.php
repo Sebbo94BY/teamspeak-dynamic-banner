@@ -120,7 +120,7 @@
                                         @csrf
                                         <button type="submit" class="btn btn-danger">
                                             <i class="fa-solid fa-trash-can"></i>
-                                        </a>
+                                        </button>
                                     </form>
                                     @endcan
                                 </td>

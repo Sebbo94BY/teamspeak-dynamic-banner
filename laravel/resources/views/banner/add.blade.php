@@ -41,7 +41,7 @@
 
                         <div class="mb-3">
                             <label for="validationInstanceId" class="form-label">Instance</label>
-                            <select class="form-select" name="instance_id" aria-describedby="instanceIdHelp" required>
+                            <select class="form-select" name="instance_id" id="validationInstanceId" aria-describedby="instanceIdHelp" required>
                                 @foreach ($instance_list as $instance)
                                 @if (old('instance_id', $instance->instance_id) == $instance->id) "selected"
                                 <option value="{{ $instance->id }}" selected>{{ $instance->virtualserver_name }} ({{ $instance->host }}:{{ $instance->voice_port }})</option>
