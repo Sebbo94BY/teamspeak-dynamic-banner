@@ -66,7 +66,7 @@ class TemplateController extends Controller
 
         DrawGridSystemOnTemplate::dispatch($template);
 
-        return Redirect::route('template.edit', ['template_id' => $template->id])->with([
+        return Redirect::route('templates')->with([
             'success' => 'template-add-successful',
             'message' => 'Successfully added the new template.',
         ]);
@@ -146,7 +146,7 @@ class TemplateController extends Controller
                 ]);
         }
 
-        return Redirect::route('template.edit', ['template_id' => $template->id])->with([
+        return Redirect::route('templates')->with([
             'success' => 'template-edit-successful',
             'message' => 'Successfully updated the template.',
         ]);
