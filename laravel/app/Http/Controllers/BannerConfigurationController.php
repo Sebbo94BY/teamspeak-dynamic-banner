@@ -30,9 +30,9 @@ class BannerConfigurationController extends Controller
      */
     public function edit(Request $request): View|RedirectResponse
     {
-        $banner_template = BannerTemplate::where(['banner_id' => $request->banner_id, 'template_id' => $request->template_id])->first();
-
-        if (is_null($banner_template)) {
+        try {
+            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
+        } catch (ModelNotFoundException) {
             return Redirect::route('banners')
                 ->withInput($request->all())
                 ->with([
@@ -138,7 +138,7 @@ class BannerConfigurationController extends Controller
         // Set headers to e. g. avoid caching
         $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
 
-        return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+        return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
             // The `Cache-Control` header is required here as the user otherwise sometimes see the old image after a form submission
             // and only after a Ctrl+F5, the expected image is visible.
             ->header('Cache-Control', 'no-cache')
@@ -173,9 +173,44 @@ class BannerConfigurationController extends Controller
             ]);
         }
 
-        return redirect()->back()->with([
-            'success' => 'banner-configuration-delete-successful',
-            'message' => 'Successfully deleted the banner configuration.',
-        ]);
+        try {
+            $banner_template = BannerTemplate::findOrFail($banner_configuration->bannerTemplate->id);
+        } catch (ModelNotFoundException) {
+            return Redirect::route('banners')
+                ->withInput($request->all())
+                ->with([
+                    'error' => 'banner-template-not-found',
+                    'message' => 'The banner template configuration, where you have tried to remove a configuration, does not exist.',
+                ]);
+        }
+
+        $draw_text_on_template_helper = new DrawTextOnTemplateController();
+
+        try {
+            $draw_text_on_template_helper->draw_text_to_image($banner_template, true, false, $request->ip());
+        } catch (Exception $exception) {
+            return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+                ->with([
+                    'banner_template' => $banner_template,
+                    'error' => 'banner-template-draw-text-to-image-error',
+                    'message' => "Failed to draw the text to the template: $exception",
+                ]);
+        }
+
+        // Set headers to e. g. avoid caching
+        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
+
+        return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
+            // The `Cache-Control` header is required here as the user otherwise sometimes see the old image after a form submission
+            // and only after a Ctrl+F5, the expected image is visible.
+            ->header('Cache-Control', 'no-cache')
+            ->header('Expires', '-1')
+            ->header('ETag', md5($current_rfc7231_datetime))
+            ->header('Last-Modified', $current_rfc7231_datetime)
+            ->with([
+                'banner_template' => $banner_template,
+                'success' => 'banner-configuration-delete-successful',
+                'message' => 'Successfully deleted the banner configuration.',
+            ]);
     }
 }

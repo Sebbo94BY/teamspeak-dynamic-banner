@@ -34,12 +34,12 @@ class DrawTextOnTemplateController extends Controller
     {
         if ($only_original) {
             $files_to_update = [
-                $banner_template->template->file_path_original => $banner_template->template->file_path_drawed_text,
+                $banner_template->template->file_path_original => $banner_template->file_path_drawed_text,
             ];
         } else {
             $files_to_update = [
-                $banner_template->template->file_path_original => $banner_template->template->file_path_drawed_text,
-                $banner_template->template->file_path_drawed_grid => $banner_template->template->file_path_drawed_grid_text,
+                $banner_template->template->file_path_original => $banner_template->file_path_drawed_text,
+                $banner_template->template->file_path_drawed_grid => $banner_template->file_path_drawed_grid_text,
             ];
         }
 

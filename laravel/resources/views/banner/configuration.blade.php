@@ -15,12 +15,9 @@
 
                         <div class="col-md-1 offset-md-5">
                             @if ($banner_template->enabled)
-                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.disable') }}" novalidate>
+                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}" novalidate>
                                     @method('patch')
                                     @csrf
-                                    <input type="hidden" name="banner_id" value="{{ $banner_template->banner_id }}">
-                                    <input type="hidden" name="template_id" value="{{ $banner_template->template_id }}">
-
                                     <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
                                         title="Disable this configuration."
                                         id="disable-configuration-badge">
@@ -28,11 +25,9 @@
                                     </span>
                                 </form>
                             @else
-                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.enable') }}" novalidate>
+                                <form class="d-flex flex-row align-items-center flex-wrap" method="POST" action="{{ route('banner.template.enable', ['banner_template_id' => $banner_template->id]) }}" novalidate>
                                     @method('patch')
                                     @csrf
-                                    <input type="hidden" name="banner_id" value="{{ $banner_template->banner_id }}">
-                                    <input type="hidden" name="template_id" value="{{ $banner_template->template_id }}">
 
                                     <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
                                         title="Enable this configuration."
@@ -69,12 +64,12 @@
                     <div class="col-md-12 row">
                         <div class="col-md-6">
                             <label for="templateWithGrid" class="form-label">Template with Grid System</label>
-                            <img id="templateWithGrid" class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" src="{{ asset($banner_template->template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+                            <img id="templateWithGrid" class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                         </div>
 
                         <div class="col-md-6">
                             <label for="renderedTemplate" class="form-label">Rendered Template Preview</label>
-                            <img id="renderedTemplate" class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" src="{{ asset($banner_template->template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+                            <img id="renderedTemplate" class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                         </div>
                     </div>
 
@@ -97,7 +92,7 @@
 
                     <hr>
 
-                    <form id="template-configuration" method="POST" action="{{ route('banner.template.configuration.upsert', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id]) }}" class="row g-3 needs-validation" novalidate>
+                    <form id="template-configuration" method="POST" action="{{ route('banner.template.configuration.upsert', ['banner_template_id' => $banner_template->id]) }}" class="row g-3 needs-validation" novalidate>
                         @method('patch')
                         @csrf
                         <input type="hidden" name="banner_template_id" value="{{ $banner_template->id }}">

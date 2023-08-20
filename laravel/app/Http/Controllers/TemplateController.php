@@ -21,10 +21,6 @@ class TemplateController extends Controller
 
     private string $upload_directory_drawed_grid = 'uploads/templates/drawed_grid';
 
-    private string $upload_directory_drawed_grid_text = 'uploads/templates/drawed_grid_text';
-
-    private string $upload_directory_drawed_text = 'uploads/templates/drawed_text';
-
     /**
      * Display the main page.
      */
@@ -53,25 +49,22 @@ class TemplateController extends Controller
 
         list($width, $height) = getimagesize($this->upload_directory_original.'/'.$filename);
 
-        $template = Template::create([
-            'alias' => $request->alias,
-            'filename' => $filename,
-            'file_path_original' => $this->upload_directory_original,
-            'file_path_drawed_grid' => $this->upload_directory_drawed_grid,
-            'file_path_drawed_grid_text' => $this->upload_directory_drawed_grid_text,
-            'file_path_drawed_text' => $this->upload_directory_drawed_text,
-            'width' => $width,
-            'height' => $height,
-        ]);
-
-        DrawGridSystemOnTemplate::dispatch($template);
+        $template = new Template;
+        $template->alias = $request->alias;
+        $template->filename = $filename;
+        $template->file_path_original = $this->upload_directory_original;
+        $template->file_path_drawed_grid = $this->upload_directory_drawed_grid;
+        $template->width = $width;
+        $template->height = $height;
 
         if (! $template->save()) {
             return Redirect::route('template.add')->withInput($request->all())->with([
                 'error' => 'template-add-error',
-                'message' => 'Failed to save the new data set into the database. Please try again.',
+                'message' => 'Failed to save the new template in the database. Please try again.',
             ]);
         }
+
+        DrawGridSystemOnTemplate::dispatch($template);
 
         return Redirect::route('template.edit', ['template_id' => $template->id])->with([
             'success' => 'template-add-successful',
@@ -130,16 +123,6 @@ class TemplateController extends Controller
                 unlink($upload_directory_drawed_grid);
             }
 
-            $file_path_drawed_grid_text = public_path($template->file_path_drawed_grid_text).'/'.$template->filename;
-            if (file_exists($file_path_drawed_grid_text)) {
-                unlink($file_path_drawed_grid_text);
-            }
-
-            $file_path_drawed_text = public_path($template->file_path_drawed_text).'/'.$template->filename;
-            if (file_exists($file_path_drawed_text)) {
-                unlink($file_path_drawed_text);
-            }
-
             $filename = time().'_'.$request->file->getClientOriginalName();
             $request->file->move(public_path($this->upload_directory_original), $filename);
 
@@ -148,8 +131,6 @@ class TemplateController extends Controller
             $template->filename = $filename;
             $template->file_path_original = $this->upload_directory_original;
             $template->file_path_drawed_grid = $this->upload_directory_drawed_grid;
-            $template->file_path_drawed_grid_text = $this->upload_directory_drawed_grid_text;
-            $template->file_path_drawed_text = $this->upload_directory_drawed_text;
             $template->width = $width;
             $template->height = $height;
 
@@ -195,14 +176,16 @@ class TemplateController extends Controller
             unlink($upload_directory_drawed_grid);
         }
 
-        $file_path_drawed_grid_text = public_path($template->file_path_drawed_grid_text).'/'.$template->filename;
-        if (file_exists($file_path_drawed_grid_text)) {
-            unlink($file_path_drawed_grid_text);
-        }
+        foreach ($template->banner_templates() as $banner_template) {
+            $file_path_drawed_grid_text = public_path($banner_template->file_path_drawed_grid_text).'/'.$template->filename;
+            if (file_exists($file_path_drawed_grid_text)) {
+                unlink($file_path_drawed_grid_text);
+            }
 
-        $file_path_drawed_text = public_path($template->file_path_drawed_text).'/'.$template->filename;
-        if (file_exists($file_path_drawed_text)) {
-            unlink($file_path_drawed_text);
+            $file_path_drawed_text = public_path($banner_template->file_path_drawed_text).'/'.$template->filename;
+            if (file_exists($file_path_drawed_text)) {
+                unlink($file_path_drawed_text);
+            }
         }
 
         if (! $template->delete()) {

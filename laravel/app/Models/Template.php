@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,8 +20,6 @@ class Template extends Model
         'filename',
         'file_path_original',
         'file_path_drawed_grid',
-        'file_path_drawed_grid_text',
-        'file_path_drawed_text',
         'width',
         'height',
     ];
@@ -55,5 +54,13 @@ class Template extends Model
         $banner_template = BannerTemplate::where(['banner_id' => $banner_id, 'template_id' => $this->id])->first();
 
         return (is_null($banner_template)) ? false : $banner_template->enabled;
+    }
+
+    /**
+     * Returns a collection of BannerTemplates, which use this template.
+     */
+    public function banner_templates(): Collection
+    {
+        return BannerTemplate::where(['template_id' => $this->id])->get();
     }
 }
