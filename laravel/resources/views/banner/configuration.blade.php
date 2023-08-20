@@ -112,6 +112,20 @@
 
                         <hr>
 
+                        <div class="col-md-12">
+                            <label for="validationDisableAt" class="form-label">Automatic Disabling</label>
+                            <div class="input-group">
+                                <input class="form-control" id="validationDisableAt" type="datetime-local" name="disable_at" value="{{ old('disable_at', (isset($banner_template)) ? $banner_template->disable_at : '') }}" aria-describedby="disableAtHelp">
+                            </div>
+                            <div id="disableAtHelp" class="form-text">Define an optional date and time, when this configuration should be automatically disabled. Leave it unset to not automatically disable it.</div>
+                            <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                            <div class="invalid-feedback">{{ __("Please provide a valid datetime.") }}</div>
+                        </div>
+
+                        <p>This function is for example useful when you announce an event on your banner for a specific date (and time). When you set here the respective date (and time) the dynamic banner will automatically disable this configured template for you afterwards, so that you don't have to disable it manually.</p>
+
+                        <hr>
+
                         @if ($banner_template->configurations->count() > 0)
                             @foreach ($banner_template->configurations as $configuration)
                                 <div id="config-row-{{ $configuration->id }}">
