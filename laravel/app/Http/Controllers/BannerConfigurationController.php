@@ -68,6 +68,7 @@ class BannerConfigurationController extends Controller
         }
 
         $banner_template->redirect_url = $request->redirect_url;
+        $banner_template->disable_at = (isset($request->disable_at)) ? Carbon::parse($request->disable_at) : null;
 
         if (! $banner_template->save()) {
             return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])

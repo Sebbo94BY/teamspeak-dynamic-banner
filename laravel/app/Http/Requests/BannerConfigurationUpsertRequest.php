@@ -27,6 +27,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'font_size.*' => ['sometimes', 'integer', 'min:1', 'max:'.$banner_template->template->height],
             'font_angle.*' => ['sometimes', 'integer', 'min:0', 'max:360'],
             'font_color_in_hexadecimal.*' => ['sometimes', 'string', 'regex:/^#[a-f0-9]{6}$/i'],
+            'disable_at' => ['nullable', 'date'],
         ];
     }
 }

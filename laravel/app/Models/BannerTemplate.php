@@ -22,6 +22,7 @@ class BannerTemplate extends Model
         'file_path_drawed_grid_text',
         'file_path_drawed_text',
         'redirect_url',
+        'disable_at',
         'enabled',
     ];
 
@@ -38,6 +39,7 @@ class BannerTemplate extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'disable_at' => 'datetime',
         'enabled' => 'boolean',
     ];
 
