@@ -29,17 +29,22 @@
                     <table id="templates" class="table table-striped" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Alias</th>
                                 <th>Template</th>
+                                <th>Information</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($templates as $template)
                             <tr>
-                                <td>{{ $template->alias }}</td>
                                 <td>
                                     <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
+                                </td>
+                                <td>
+                                    <p><b>{{ $template->alias }}</b></p>
+                                    <p>File Size: {{ ceil(filesize($template->file_path_original.'/'.$template->filename) / 1024) }} KiB</p>
+                                    <p>File Dimensions: {{ $template->width }}x{{ $template->height }} Pixel</p>
+                                    <p>Last Modified: {{ $template->updated_at }}</p>
                                 </td>
                                 <td>
                                     @can('edit templates')
