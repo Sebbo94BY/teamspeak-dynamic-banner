@@ -76,13 +76,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/banner/{banner_id}/variables', [BannerVariableController::class, 'overview'])->name('banner.variables');
 
     Route::get('/banner/{banner_id}/templates', [BannerTemplateController::class, 'edit'])->name('banner.templates')->middleware('permission:edit banners');
-    Route::post('/banner/template/add', [BannerTemplateController::class, 'add'])->name('banner.template.add')->middleware('permission:edit banners');
-    Route::delete('/banner/template/remove', [BannerTemplateController::class, 'remove'])->name('banner.template.remove')->middleware('permission:edit banners');
-    Route::patch('/banner/template/disable', [BannerTemplateController::class, 'disable'])->name('banner.template.disable')->middleware('permission:edit banners');
-    Route::patch('/banner/template/enable', [BannerTemplateController::class, 'enable'])->name('banner.template.enable')->middleware('permission:edit banners');
+    Route::get('/banner/{banner_id}/template/add', [BannerTemplateController::class, 'add_template'])->name('banner.template.add')->middleware('permission:edit banners');
+    Route::post('/banner/template/add', [BannerTemplateController::class, 'add'])->name('banner.add.template')->middleware('permission:edit banners');
+    Route::delete('/banner/template/{banner_template_id}/remove', [BannerTemplateController::class, 'remove'])->name('banner.template.remove')->middleware('permission:edit banners');
+    Route::patch('/banner/template/{banner_template_id}/disable', [BannerTemplateController::class, 'disable'])->name('banner.template.disable')->middleware('permission:edit banners');
+    Route::patch('/banner/template/{banner_template_id}/enable', [BannerTemplateController::class, 'enable'])->name('banner.template.enable')->middleware('permission:edit banners');
 
-    Route::get('/banner/{banner_id}/configuration/{template_id}', [BannerConfigurationController::class, 'edit'])->name('banner.template.configuration.edit');
-    Route::patch('/banner/{banner_id}/configuration/{template_id}', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
+    Route::get('/banner/configuration/{banner_template_id}', [BannerConfigurationController::class, 'edit'])->name('banner.template.configuration.edit');
+    Route::patch('/banner/configuration/{banner_template_id}/upsert', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
     Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
     Route::get('/administration/users', [UsersController::class, 'users'])->name('administration.users')->middleware('permission:view users');

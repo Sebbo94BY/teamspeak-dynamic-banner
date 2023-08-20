@@ -6,11 +6,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Templates') }}
-
-                    @can('add templates')
-                    <a href="{{ route('template.add') }}" class="btn btn-primary">Add</a>
-                    @endcan
+                    {{ __("Add a template to your banner.") }}
                 </div>
 
                 <div class="card-body">
@@ -24,12 +20,19 @@
                             {{ session('message') }}
                         </div>
                     @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                    @if (count($templates) > 0)
                     <table id="templates" class="table table-striped" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Alias</th>
                                 <th>Template</th>
                                 <th>Actions</th>
                             </tr>
@@ -37,34 +40,26 @@
                         <tbody>
                             @foreach($templates as $template)
                             <tr>
-                                <td>{{ $template->alias }}</td>
                                 <td>
-                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
+                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-100" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                                 </td>
                                 <td>
-                                    @can('edit templates')
-                                    <a href="{{ route('template.edit', ['template_id' => $template->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                    @endcan
-
-                                    @can('delete templates')
-                                    <form method="POST" action="{{ route('template.delete', ['template_id' => $template->id]) }}">
-                                        @method('delete')
+                                    <form method="POST" action="{{ route('banner.add.template') }}" novalidate>
                                         @csrf
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa-solid fa-trash-can"></i>
-                                        </button>
+                                        <input type="hidden" name="banner_id" value="{{ $banner->id }}">
+                                        <input type="hidden" name="template_id" value="{{ $template->id }}">
+
+                                        <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                            title="Add this template. Make it configurable."
+                                            id="add-badge">
+                                            <button type="submit" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
+                                        </span>
                                     </form>
-                                    @endcan
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    @else
-                    <p>You do not have any templates uploaded yet. Add your first template.</p>
-                    @endif
                 </div>
             </div>
 
@@ -72,6 +67,10 @@
                 $(document).ready(function () {
                     $('#templates').DataTable();
                 });
+
+                // Enable Bootstrap Tooltips
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             </script>
         </div>
     </div>

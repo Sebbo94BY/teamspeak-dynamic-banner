@@ -103,8 +103,5 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
                 throw new Exception("Could not save the template with the drawed grid system to `$target_directory`.");
             }
         }
-
-        CloneOriginalTemplate::dispatch($this->template, $this->template->file_path_drawed_grid_text, true);
-        CloneOriginalTemplate::dispatch($this->template, $this->template->file_path_drawed_text);
     }
 }

@@ -19,6 +19,8 @@ class BannerTemplate extends Model
     protected $fillable = [
         'banner_id',
         'template_id',
+        'file_path_drawed_grid_text',
+        'file_path_drawed_text',
         'redirect_url',
         'enabled',
     ];

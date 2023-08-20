@@ -7,6 +7,10 @@
             <div class="card">
                 <div class="card-header">
                     {{ __("Define the templates for this banner.") }}
+
+                    @can('edit banners')
+                    <a href="{{ route('banner.template.add', ['banner_id' => $banner->id]) }}" class="btn btn-primary">Add</a>
+                    @endcan
                 </div>
 
                 <div class="card-body">
@@ -38,78 +42,54 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($templates as $template)
+                            @foreach($banner->templates as $banner_template)
                             <tr>
                                 <td>
-                                    @if ($template->isUsedByBannerId($banner->id))
-                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($template->isEnabledForBannerId($banner->id)) ? 100 : 50 }}" style="max-height: 200px;" src="{{ asset($template->file_path_drawed_text.'/'.$template->filename) }}" alt="{{ $template->alias }}">
-                                    @else
-                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-50" style="max-height: 200px;" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
-                                    @endif
+                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" style="max-height: 200px;" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                                 </td>
                                 <td>
-                                    @if ($template->isUsedByBannerId($banner->id))
-                                        @if ($template->isEnabledForBannerId($banner->id))
-                                            <form method="POST" action="{{ route('banner.template.disable') }}" novalidate>
-                                                @method('patch')
-                                                @csrf
-                                                <input type="hidden" name="banner_id" value="{{ $banner->id }}">
-                                                <input type="hidden" name="template_id" value="{{ $template->id }}">
-
-                                                <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
-                                                    title="Disable this configuration."
-                                                    id="disable-configuration-badge">
-                                                    <button type="submit" class="btn btn-info"><i class="fa-solid fa-toggle-on"></i></button>
-                                                </span>
-                                            </form>
-                                        @else
-                                            <form method="POST" action="{{ route('banner.template.enable') }}" novalidate>
-                                                @method('patch')
-                                                @csrf
-                                                <input type="hidden" name="banner_id" value="{{ $banner->id }}">
-                                                <input type="hidden" name="template_id" value="{{ $template->id }}">
-
-                                                <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
-                                                    title="Enable this configuration."
-                                                    id="disable-configuration-badge">
-                                                    <button type="submit" class="btn btn-dark"><i class="fa-solid fa-toggle-off"></i></button>
-                                                </span>
-                                            </form>
-                                        @endif
-
-                                        <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
-                                            title="Edit this configuration."
-                                            id="configure-badge">
-                                            <a href="{{ route('banner.template.configuration.edit', ['banner_id' => $banner->id, 'template_id' => $template->id]) }}" class="btn btn-info">
-                                                <i class="fa-solid fa-gear"></i>
-                                            </a>
-                                        </span>
-
-                                        <form method="POST" action="{{ route('banner.template.remove') }}" novalidate>
-                                            @method('delete')
+                                    @if ($banner_template->enabled)
+                                        <form method="POST" action="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}" novalidate>
+                                            @method('patch')
                                             @csrf
-                                            <input type="hidden" name="banner_id" value="{{ $banner->id }}">
-                                            <input type="hidden" name="template_id" value="{{ $template->id }}">
 
                                             <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
-                                                title="Delete this configuration."
-                                                id="delete-badge">
-                                                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-minus"></i></button>
+                                                title="Disable this configuration."
+                                                id="disable-configuration-badge">
+                                                <button type="submit" class="btn btn-info"><i class="fa-solid fa-toggle-on"></i></button>
                                             </span>
                                         </form>
                                     @else
-                                        <form method="POST" action="{{ route('banner.template.add') }}" novalidate>
+                                        <form method="POST" action="{{ route('banner.template.enable', ['banner_template_id' => $banner_template->id]) }}" novalidate>
+                                            @method('patch')
                                             @csrf
-                                            <input type="hidden" name="banner_id" value="{{ $banner->id }}">
-                                            <input type="hidden" name="template_id" value="{{ $template->id }}">
 
                                             <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
-                                                title="Add this template. Make it configurable."
-                                                id="add-badge">
-                                                <button type="submit" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
+                                                title="Enable this configuration."
+                                                id="disable-configuration-badge">
+                                                <button type="submit" class="btn btn-dark"><i class="fa-solid fa-toggle-off"></i></button>
                                             </span>
                                         </form>
                                     @endif
+
+                                    <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                        title="Edit this configuration."
+                                        id="configure-badge">
+                                        <a href="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}" class="btn btn-info">
+                                            <i class="fa-solid fa-gear"></i>
+                                        </a>
+                                    </span>
+
+                                    <form method="POST" action="{{ route('banner.template.remove', ['banner_template_id' => $banner_template->id]) }}" novalidate>
+                                        @method('delete')
+                                        @csrf
+
+                                        <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
+                                            title="Delete this configuration."
+                                            id="delete-badge">
+                                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-minus"></i></button>
+                                        </span>
+                                    </form>
                                 </td>
                             </tr>
                             @endforeach

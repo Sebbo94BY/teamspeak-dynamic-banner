@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerTemplateAddRequest;
-use App\Http\Requests\BannerTemplateDisableEnableRequest;
-use App\Http\Requests\BannerTemplateRemoveRequest;
+use App\Jobs\CloneOriginalTemplate;
 use App\Models\Banner;
 use App\Models\BannerTemplate;
 use App\Models\Template;
@@ -16,6 +15,13 @@ use Illuminate\View\View;
 
 class BannerTemplateController extends Controller
 {
+    /**
+     * Properties / Settings
+     */
+    private string $upload_directory_drawed_grid_text = 'uploads/templates/drawed_grid_text';
+
+    private string $upload_directory_drawed_text = 'uploads/templates/drawed_text';
+
     /**
      * Display the edit view.
      */
@@ -39,25 +45,61 @@ class BannerTemplateController extends Controller
     }
 
     /**
+     * Display the view to add a template to the banner.
+     */
+    public function add_template(Request $request): View|RedirectResponse
+    {
+        try {
+            $banner = Banner::findOrFail($request->banner_id);
+        } catch (ModelNotFoundException) {
+            return Redirect::route('banners')
+                ->withInput($request->all())
+                ->with([
+                    'error' => 'banner-not-found',
+                    'message' => 'The banner templates, which you have tried to edit, does not exist.',
+                ]);
+        }
+
+        return view('banner.template_add', ['banner_id' => $banner->id])->with([
+            'banner' => $banner,
+            'templates' => Template::all(),
+        ]);
+    }
+
+    /**
      * Adds a template to a banner configuration.
      */
     public function add(BannerTemplateAddRequest $request): RedirectResponse
     {
         $request->validated();
 
-        $banner_template = BannerTemplate::create([
-            'banner_id' => $request->banner_id,
-            'template_id' => $request->template_id,
-        ]);
+        $banner_template = new BannerTemplate;
+        $banner_template->banner_id = $request->banner_id;
+        $banner_template->template_id = $request->template_id;
 
         if (! $banner_template->save()) {
-            return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+            return Redirect::route('banner.template.add', ['banner_id' => $request->banner_id])->with([
                 'error' => 'banner-template-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+        $banner_template->file_path_drawed_grid_text = $this->upload_directory_drawed_grid_text.'/'.$banner_template->id;
+        $banner_template->file_path_drawed_text = $this->upload_directory_drawed_text.'/'.$banner_template->id;
+
+        if (! $banner_template->save()) {
+            return Redirect::route('banner.template.add', ['banner_id' => $request->banner_id])->with([
+                'error' => 'banner-template-add-error',
+                'message' => 'Failed to save the new data set into the database. Please try again.',
+            ]);
+        }
+
+        // We need to dispatch these jobs synchronous as the view, which we will show afterwards
+        // will otherwise show a not existing image as the jobs may have not been finished.
+        CloneOriginalTemplate::dispatchSync($banner_template->template, $banner_template->file_path_drawed_grid_text, true);
+        CloneOriginalTemplate::dispatchSync($banner_template->template, $banner_template->file_path_drawed_text);
+
+        return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])->with([
             'success' => 'banner-template-add-successful',
             'message' => 'Successfully added the template to the banner.',
         ]);
@@ -66,23 +108,25 @@ class BannerTemplateController extends Controller
     /**
      * Removes a template from a banner configuration.
      */
-    public function remove(BannerTemplateRemoveRequest $request): RedirectResponse
+    public function remove(Request $request): RedirectResponse
     {
-        $request->validated();
-
-        $banner_template = BannerTemplate::where([
-            'banner_id' => $request->banner_id,
-            'template_id' => $request->template_id,
-        ])->first();
+        try {
+            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
+        } catch (ModelNotFoundException) {
+            return Redirect::route('banners')->with([
+                'error' => 'banner-template-remove-error',
+                'message' => 'The template, which you tried to remove from the banner does not exist.',
+            ]);
+        }
 
         if (! $banner_template->delete()) {
-            return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+            return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
                 'error' => 'banner-template-remove-error',
                 'message' => 'Failed to delete the data set from the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+        return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
             'success' => 'banner-template-remove-successful',
             'message' => 'Successfully removed the template from the banner.',
         ]);
@@ -91,25 +135,27 @@ class BannerTemplateController extends Controller
     /**
      * Disables a template of a banner configuration.
      */
-    public function disable(BannerTemplateDisableEnableRequest $request): RedirectResponse
+    public function disable(Request $request): RedirectResponse
     {
-        $request->validated();
-
-        $banner_template = BannerTemplate::where([
-            'banner_id' => $request->banner_id,
-            'template_id' => $request->template_id,
-        ])->first();
+        try {
+            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
+        } catch (ModelNotFoundException) {
+            return Redirect::route('banners')->with([
+                'error' => 'banner-template-disable-error',
+                'message' => 'The template, which you have tried to disable from the banner does not exist.',
+            ]);
+        }
 
         $banner_template->enabled = false;
 
         if (! $banner_template->save()) {
-            return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+            return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
                 'error' => 'banner-template-disable-error',
                 'message' => 'Failed to update the data set from the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+        return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
             'success' => 'banner-template-disable-successful',
             'message' => 'Successfully disabled the template of the banner.',
         ]);
@@ -118,25 +164,27 @@ class BannerTemplateController extends Controller
     /**
      * Enables a template of a banner configuration.
      */
-    public function enable(BannerTemplateDisableEnableRequest $request): RedirectResponse
+    public function enable(Request $request): RedirectResponse
     {
-        $request->validated();
-
-        $banner_template = BannerTemplate::where([
-            'banner_id' => $request->banner_id,
-            'template_id' => $request->template_id,
-        ])->first();
+        try {
+            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
+        } catch (ModelNotFoundException) {
+            return Redirect::route('banners')->with([
+                'error' => 'banner-template-enable-error',
+                'message' => 'The template, which you have tried to enable for the banner does not exist.',
+            ]);
+        }
 
         $banner_template->enabled = true;
 
         if (! $banner_template->save()) {
-            return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+            return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
                 'error' => 'banner-template-enable-error',
                 'message' => 'Failed to update the data set from the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('banner.templates', ['banner_id' => $request->banner_id])->with([
+        return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
             'success' => 'banner-template-enable-successful',
             'message' => 'Successfully enabled the template of the banner.',
         ]);
