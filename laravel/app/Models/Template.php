@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Template extends Model
 {
@@ -57,10 +57,10 @@ class Template extends Model
     }
 
     /**
-     * Returns a collection of BannerTemplates, which use this template.
+     * Get the banner templates associated with this template.
      */
-    public function banner_templates(): Collection
+    public function banner_templates(): HasMany
     {
-        return BannerTemplate::where(['template_id' => $this->id])->get();
+        return $this->hasMany(BannerTemplate::class);
     }
 }
