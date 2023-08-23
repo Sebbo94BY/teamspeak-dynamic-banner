@@ -38,7 +38,7 @@ class BannerVariableController extends Controller
      */
     public function get_current_time_data(): array
     {
-        $current_datetime = Carbon::now();
+        $current_datetime = Carbon::now()->addMinute();
 
         $datetimes = [
             'current_time_utc_hi' => $current_datetime->setTimezone('UTC')->format('H:i'),
