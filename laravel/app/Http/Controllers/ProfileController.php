@@ -25,7 +25,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): View|RedirectResponse
     {
         $request->user()->fill($request->validated());
 
@@ -42,7 +42,8 @@ class ProfileController extends Controller
                 ]);
         }
 
-        return Redirect::route('profile.edit')->with([
+        return view('profile.edit')->with([
+            'user' => $request->user(),
             'success' => 'user-profile-edit-successful',
             'message' => 'Successfully updated the profile.',
         ]);
@@ -51,13 +52,14 @@ class ProfileController extends Controller
     /**
      * Update the user's password.
      */
-    public function change_password(ChangePasswordRequest $request): RedirectResponse
+    public function change_password(ChangePasswordRequest $request): View
     {
         $request->validated();
 
         if (! Hash::check($request->current_password, $request->user()->password)) {
-            return Redirect::route('profile.edit')
+            return view('profile.edit')
                 ->with([
+                    'user' => $request->user(),
                     'error' => 'user-password-edit-error',
                     'message' => 'Your provided current password was incorrect.',
                 ]);
@@ -66,14 +68,16 @@ class ProfileController extends Controller
         $request->user()->password = Hash::make($request->password);
 
         if (! $request->user()->save()) {
-            return Redirect::route('profile.edit')
+            return view('profile.edit')
                 ->with([
+                    'user' => $request->user(),
                     'error' => 'user-password-edit-error',
                     'message' => 'Failed to update the password information in the database. Please try again.',
                 ]);
         }
 
-        return Redirect::route('profile.edit')->with([
+        return view('profile.edit')->with([
+            'user' => $request->user(),
             'success' => 'user-password-edit-successful',
             'message' => 'Successfully updated the password.',
         ]);
