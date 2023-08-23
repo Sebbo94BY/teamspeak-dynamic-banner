@@ -256,7 +256,7 @@ class TeamspeakBot extends Command
         try {
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
         } catch (TransportException $transport_exception) {
-            $this->message('ERROR', "Coult not connect to the host `$this->instance->host`: ".$transport_exception->getMessage());
+            $this->message('ERROR', "Could not connect to the host `$this->instance->host`: ".$transport_exception->getMessage());
 
             $this->cleanup_instance_process_id();
 
