@@ -21,7 +21,7 @@ class InstanceFactory extends Factory
             'host' => fake()->domainName(),
             'voice_port' => fake()->numberBetween(1024, 65535),
             'serverquery_port' => fake()->numberBetween(1024, 65535),
-            'is_ssh' => fake()->boolean(),
+            'is_ssh' => false, // TRUE would require the PECL ssh2 package in all test environments (locally, Github Workflows)
             'serverquery_username' => fake()->userName(),
             'serverquery_password' => fake()->password(),
             'client_nickname' => fake()->name(),
