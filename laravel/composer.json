@@ -17,6 +17,7 @@
         "spatie/laravel-permission": "^5.10"
     },
     "require-dev": {
+        "brianium/paratest": "^6.10",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.14",
         "laravel/pint": "^1.0",
@@ -52,7 +53,7 @@
         ],
         "phpunit-tests": [
             "@php artisan config:clear",
-            "@php artisan test --without-tty --env=testing"
+            "@php artisan test --without-tty --parallel --processes=8 --env=testing"
         ]
     },
     "extra": {

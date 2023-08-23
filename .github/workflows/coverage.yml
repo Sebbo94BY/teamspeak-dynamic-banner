@@ -53,7 +53,7 @@ jobs:
         working-directory: laravel
 
       - name: generate coverage report
-        run: php artisan test --without-tty --coverage --env=testing
+        run: php artisan test --without-tty --coverage --parallel --processes=8 --env=testing
         working-directory: laravel
 
       - name: upload code coverage report to codecov.io
