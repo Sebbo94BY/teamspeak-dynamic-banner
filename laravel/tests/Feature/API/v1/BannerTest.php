@@ -138,4 +138,56 @@ class BannerTest extends TestCase
         Storage::disk('public')->delete($banner_configuration->fontfile_path);
         unlink($image_file_path);
     }
+
+    /**
+     * Test that the redirect URL API returns an error when an not existing banner ID has been provided.
+     */
+    public function test_redirect_url_api_returns_an_error_when_an_not_existing_banner_id_has_been_provided(): void
+    {
+        $response = $this->get(route('api.banner.redirect_url', ['banner_id' => 'nonExistingId']));
+        $response->assertSeeText('Invalid Banner ID in the URL.');
+        $response->assertStatus(404);
+    }
+
+    /**
+     * Test that the redirect URL API redirects to the banner image when no URL has been configured.
+     */
+    public function test_redirect_url_api_redirects_to_the_banner_image_when_no_url_has_been_configured(): void
+    {
+        BannerConfiguration::factory()
+            ->for(
+                BannerTemplate::factory()
+                    ->for(
+                        $this->banner
+                    )->for(
+                        Template::factory()->create()
+                    )->create(['redirect_url' => null, 'enabled' => true])
+            )->create();
+
+        $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
+        $response->assertRedirectToRoute('api.banner', ['banner_id' => base_convert($this->banner->id, 35, 10)]);
+        $response->assertStatus(302);
+    }
+
+    /**
+     * Test that the redirect URL API redirects to the configured URL when an URL has been configured.
+     */
+    public function test_redirect_url_api_redirects_to_the_configure_url_when_an_url_has_been_configured(): void
+    {
+        $redirect_url = 'https://localhost/test-redirect';
+
+        BannerConfiguration::factory()
+            ->for(
+                BannerTemplate::factory()
+                    ->for(
+                        $this->banner
+                    )->for(
+                        Template::factory()->create()
+                    )->create(['redirect_url' => $redirect_url, 'enabled' => true])
+            )->create();
+
+        $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
+        $response->assertRedirect($redirect_url);
+        $response->assertStatus(302);
+    }
 }
