@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\DeleteTemporaryRenderedBannerTemplates;
 use App\Models\BannerTemplate;
+use Carbon\Carbon;
 use Exception;
 use GdImage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Predis\Connection\ConnectionException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DrawTextOnTemplateController extends Controller
 {
@@ -30,7 +34,7 @@ class DrawTextOnTemplateController extends Controller
     /**
      * Draws the configured text on the template(s) (image(s)) and either writes it to the storage or returns it from the memory without saving it.
      */
-    public function draw_text_to_image(BannerTemplate $banner_template, bool $write_to_filesystem, bool $only_original, string $ip_address)
+    public function draw_text_to_image(BannerTemplate $banner_template, bool $write_to_filesystem, bool $only_original, string $ip_address): BinaryFileResponse
     {
         if ($only_original) {
             $files_to_update = [
@@ -50,7 +54,7 @@ class DrawTextOnTemplateController extends Controller
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_servergrouplist'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_virtualserver_info'));
         } catch (ConnectionException $connection_exception) {
-            throw new Exception($connection_exception->getMessage());
+            Log::error('Redis connection error: '.$connection_exception->getMessage());
         }
 
         $banner_variable_helper = new BannerVariableController(null);
@@ -60,7 +64,7 @@ class DrawTextOnTemplateController extends Controller
             // Load template as GDImage to be able to modify it
             $source_image_filepath = $source_path.'/'.$banner_template->template->filename;
             $source_image_file_extension = strtolower(pathinfo($source_image_filepath, PATHINFO_EXTENSION));
-            $this->gd_image = ($source_image_file_extension == 'png') ? imagecreatefrompng($source_image_filepath) : imagecreatefromjpeg($source_image_filepath);
+            $this->gd_image = ($source_image_file_extension == 'png') ? imagecreatefrompng(public_path($source_image_filepath)) : imagecreatefromjpeg(public_path($source_image_filepath));
 
             if ($this->gd_image === false) {
                 throw new Exception('Failed to load the source template as image object.');
@@ -118,22 +122,26 @@ class DrawTextOnTemplateController extends Controller
             if ($write_to_filesystem) {
                 $image_file_path = public_path($target_path.'/'.$banner_template->template->filename);
             } else {
-                $image_file_path = null;
+                $image_file_path = tempnam(sys_get_temp_dir(), 'DynamicBanner_');
+                DeleteTemporaryRenderedBannerTemplates::dispatch($image_file_path)->delay(now()->addMinutes(1));
             }
 
             if ($source_image_file_extension == 'png') {
-                if ($only_original) {
-                    return imagepng($this->gd_image, $image_file_path, 0);
-                } else {
-                    imagepng($this->gd_image, $image_file_path, 0);
-                }
+                imagepng($this->gd_image, $image_file_path, 0);
             } else {
-                if ($only_original) {
-                    return imagejpeg($this->gd_image, $image_file_path, 100);
-                } else {
-                    imagejpeg($this->gd_image, $image_file_path, 100);
-                }
+                imagejpeg($this->gd_image, $image_file_path, 100);
             }
         }
+
+        // To avoid caching of the image(s), we explicitly set some headers with an expiry in the past.
+        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
+
+        return response()->file($image_file_path, [
+            'Cache-Control' => 'no-cache, private',
+            'Expires' => '-1',
+            'ETag' => md5($current_rfc7231_datetime),
+            'Last-Modified' => $current_rfc7231_datetime,
+            'Content-Type' => 'image/'.$source_image_file_extension,
+        ]);
     }
 }
