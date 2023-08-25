@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AdministrationUsersTest extends TestCase
@@ -52,5 +53,199 @@ class AdministrationUsersTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('administration.user.add');
         $response->assertViewHas('roles');
+    }
+
+    /**
+     * Test that trying to edit a user ID, which does not exist, returns an error.
+     */
+    public function test_edit_user_returns_an_error_when_the_given_uid_does_not_exist(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('administration.user.edit', ['user_id' => 1337]));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('users');
+        $response->assertViewHas('error');
+    }
+
+    /**
+     * Test that trying to edit a user ID, which exists, returns the respective view.
+     */
+    public function test_edit_user_returns_the_edit_form_when_the_given_uid_exists(): void
+    {
+        $other_user = User::factory()->create();
+
+        $response = $this->actingAs($this->user)->get(route('administration.user.edit', ['user_id' => $other_user->id]));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.user.edit');
+        $response->assertViewHas('user');
+        $response->assertViewHas('roles');
+    }
+
+    /**
+     * Test that adding a new user requires to match the request rules.
+     */
+    public function test_adding_a_new_user_requires_to_match_the_request_rules(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
+            'email' => fake()->email(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertSessionHasErrors(['name']);
+
+        $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+        ]);
+        $response->assertSessionHasErrors(['roles']);
+
+        $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
+            'name' => fake()->name(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    /**
+     * Test that adding a new user successfully assigns the respective roles.
+     */
+    public function test_adding_a_new_user_successfully_assigns_the_respective_roles(): void
+    {
+        $this->actingAs($this->user)->post(route('administration.user.create'), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'roles' => [
+                Role::where('name', '=', 'System Status Viewer')->first()->id,
+                Role::where('name', '=', 'PHP Info Viewer')->first()->id,
+            ],
+        ]);
+
+        $new_user = User::whereNotIn('id', [$this->user->id])->first();
+
+        $this->assertTrue($new_user->hasRole('System Status Viewer'));
+        $this->assertTrue($new_user->hasRole('PHP Info Viewer'));
+        $this->assertFalse($new_user->hasRole('Users Admin'));
+    }
+
+    /**
+     * Test that adding a new user successfully returns the view.
+     */
+    public function test_adding_a_new_user_successfully_returns_the_view(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'roles' => [
+                Role::where('name', '=', 'System Status Viewer')->first()->id,
+            ],
+        ]);
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('success');
+    }
+
+    /**
+     * Test that updating an existing user requires to match the request rules.
+     */
+    public function test_updating_an_existing_user_requires_to_match_the_request_rules(): void
+    {
+        $other_user = User::factory()->create();
+
+        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
+            'email' => fake()->email(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertSessionHasErrors(['name']);
+
+        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+        ]);
+        $response->assertSessionHasErrors(['roles']);
+
+        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
+            'name' => fake()->name(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    /**
+     * Test that trying to update a user ID, which does not exist, returns an error.
+     */
+    public function test_update_user_returns_an_error_when_the_given_uid_does_not_exist(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => 1337]), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('users');
+        $response->assertViewHas('error');
+    }
+
+    /**
+     * Test that updating an existing user successfully assigns the respective roles.
+     */
+    public function test_updating_an_existing_user_successfully_assigns_the_respective_roles(): void
+    {
+        $other_user = User::factory()->create();
+
+        $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'roles' => [
+                Role::where('name', '=', 'System Status Viewer')->first()->id,
+                Role::where('name', '=', 'PHP Info Viewer')->first()->id,
+            ],
+        ]);
+
+        $this->assertTrue($other_user->hasRole('System Status Viewer'));
+        $this->assertTrue($other_user->hasRole('PHP Info Viewer'));
+        $this->assertFalse($other_user->hasRole('Users Admin'));
+    }
+
+    /**
+     * Test that updating an existing user is working as expected.
+     */
+    public function test_updating_an_existing_user_is_working_as_expected(): void
+    {
+        $other_user = User::factory()->create();
+
+        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'roles' => [1, 2, 8],
+        ]);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('users');
+        $response->assertViewHas('success');
+    }
+
+    /**
+     * Test that trying to delete a user ID, which does not exist, returns an error.
+     */
+    public function test_delete_user_returns_an_error_when_the_given_uid_does_not_exist(): void
+    {
+        $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => 1337]));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('users');
+        $response->assertViewHas('error');
+    }
+
+    /**
+     * Test that trying to delete a user ID, which exists, returns the respective view.
+     */
+    public function test_delete_user_returns_the_edit_form_when_the_given_uid_exists(): void
+    {
+        $other_user = User::factory()->create();
+
+        $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => $other_user->id]));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.users');
+        $response->assertViewHas('users');
+        $response->assertViewHas('success');
     }
 }
