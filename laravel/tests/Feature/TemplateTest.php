@@ -13,6 +13,8 @@ class TemplateTest extends TestCase
 
     protected User $user;
 
+    protected Template $template;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -22,6 +24,8 @@ class TemplateTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->user->syncRoles('Templates Admin');
+
+        $this->template = Template::factory()->create();
     }
 
     /**
@@ -39,6 +43,8 @@ class TemplateTest extends TestCase
      */
     public function test_page_gets_displayed_when_authenticated(): void
     {
+        // delete the global default template for this test as we otherwise receive a ViewException since the actual image does not exist
+        $this->template->delete();
         $response = $this->actingAs($this->user)->get(route('templates'));
         $response->assertStatus(200);
         $response->assertViewIs('templates');
@@ -55,6 +61,17 @@ class TemplateTest extends TestCase
     }
 
     /**
+     * Test that adding a new template requires to match the request rules.
+     */
+    public function test_adding_a_new_template_requires_to_match_the_request_rules(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('template.save'), [
+            'alias' => fake()->name(),
+        ]);
+        $response->assertSessionHasErrors(['file']);
+    }
+
+    /**
      * Test, that the user gets redirected to the templates overview, when the requested template ID for the edit page does not exist.
      */
     public function test_edit_template_page_gets_redirected_to_overview_when_template_id_does_not_exist(): void
@@ -68,10 +85,19 @@ class TemplateTest extends TestCase
      */
     public function test_edit_template_page_gets_displayed_when_template_id_exists(): void
     {
-        $template = Template::factory()->create();
-
-        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => $template->id]));
+        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => $this->template->id]));
         $response->assertViewIs('template.edit');
         $response->assertViewHas('template');
+    }
+
+    /**
+     * Test that updating an existing template requires to match the request rules.
+     */
+    public function test_updating_an_existing_template_requires_to_match_the_request_rules(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('template.update', ['template_id' => $this->template->id]), [
+            'alias' => '',
+        ]);
+        $response->assertSessionHasErrors(['alias']);
     }
 }
