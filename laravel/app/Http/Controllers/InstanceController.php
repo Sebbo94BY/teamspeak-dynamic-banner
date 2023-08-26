@@ -226,20 +226,20 @@ class InstanceController extends Controller
         try {
             $instance = Instance::findOrFail($request->instance_id);
         } catch (ModelNotFoundException) {
-            return view('instance.main')->with([
+            return redirect(route('instances'), 302)->with([
                 'error' => 'instance-not-found',
                 'message' => 'The instance, which you have tried to delete, does not exist.',
             ]);
         }
 
         if (! $instance->delete()) {
-            return redirect()->back()->with([
+            return redirect(route('instances'), 302)->with([
                 'error' => 'instance-delete-error',
                 'message' => 'Failed to delete the instance from the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('instances')->with([
+        return redirect(route('instances'), 302)->with([
             'success' => 'instance-delete-successful',
             'message' => 'Successfully deleted the instance.',
         ]);
