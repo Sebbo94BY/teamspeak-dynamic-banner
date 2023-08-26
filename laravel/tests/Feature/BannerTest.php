@@ -14,6 +14,8 @@ class BannerTest extends TestCase
 
     protected User $user;
 
+    protected Banner $banner;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -23,6 +25,10 @@ class BannerTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->user->syncRoles('Banners Admin');
+
+        $this->banner = Banner::factory()->for(
+            Instance::factory()->create()
+        )->create();
     }
 
     /**
@@ -58,6 +64,17 @@ class BannerTest extends TestCase
     }
 
     /**
+     * Test that adding a new banner requires to match the request rules.
+     */
+    public function test_adding_a_new_banner_requires_to_match_the_request_rules(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('banner.save'), [
+            'name' => fake()->name(),
+        ]);
+        $response->assertSessionHasErrors(['instance_id']);
+    }
+
+    /**
      * Test, that the user gets redirected to the banners overview, when the requested banner ID for the edit page does not exist.
      */
     public function test_edit_banner_page_gets_redirected_to_overview_when_banner_id_does_not_exist(): void
@@ -71,14 +88,21 @@ class BannerTest extends TestCase
      */
     public function test_edit_banner_page_gets_displayed_when_banner_id_exists(): void
     {
-        $banner = Banner::factory()->for(
-            Instance::factory()->create()
-        )->create();
-
-        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => $banner->id]));
+        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => $this->banner->id]));
         $response->assertViewIs('banner.edit');
         $response->assertViewHas('banner');
         $response->assertViewHas('instance_list');
         $response->assertViewHas('banner_configurations');
+    }
+
+    /**
+     * Test that updating an existing banner requires to match the request rules.
+     */
+    public function test_updating_an_existing_banner_requires_to_match_the_request_rules(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('banner.update', ['banner_id' => $this->banner->id]), [
+            'name' => fake()->name(),
+        ]);
+        $response->assertSessionHasErrors(['instance_id']);
     }
 }
