@@ -40,17 +40,17 @@ class InstanceController extends Controller
     {
         $request->validated();
 
-        $instance = Instance::create([
-            'host' => $request->host,
-            'voice_port' => $request->voice_port,
-            'serverquery_port' => $request->serverquery_port,
-            'is_ssh' => true,
-            'serverquery_username' => $request->serverquery_username,
-            'serverquery_password' => $request->serverquery_password,
-            'client_nickname' => $request->client_nickname,
-        ]);
+        $instance = new Instance;
+        $instance->host = $request->host;
+        $instance->voice_port = $request->voice_port;
+        $instance->serverquery_port = $request->serverquery_port;
+        $instance->serverquery_username = $request->serverquery_username;
+        $instance->serverquery_password = $request->serverquery_password;
+        $instance->client_nickname = $request->client_nickname;
 
         // Try SSH first and fallback to RAW
+        $instance->is_ssh = true;
+
         try {
             $virtualserver_helper = new TeamSpeakVirtualserver($instance);
             $virtualserver = $virtualserver_helper->get_virtualserver_connection();
@@ -61,23 +61,17 @@ class InstanceController extends Controller
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
             } catch (TransportException $transport_exception) {
-                $instance->delete();
-
                 return Redirect::route('instance.add')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $transport_exception->getMessage(),
                 ]);
             } catch (ServerQueryException $serverquery_exception) {
-                $instance->delete();
-
                 return Redirect::route('instance.add')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $serverquery_exception->getMessage(),
                 ]);
             }
         } catch (ServerQueryException $serverquery_exception) {
-            $instance->delete();
-
             return Redirect::route('instance.add')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
                 'message' => $serverquery_exception->getMessage(),
