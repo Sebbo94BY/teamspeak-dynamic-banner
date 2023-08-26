@@ -180,10 +180,11 @@
         });
     });
 
-    // On page load, remove the `required` attributes for the hidden DIV to avoid
+    // On page load, remove the `name` and `required` attributes for the hidden DIV to avoid
     // issues by the form validation when it's not filled out.
     $(document).ready(function(){
         $('div.d-none > div > div > input').each(function() {
+            $(this).removeAttr("name");
             $(this).prop("required", false);
         });
     });
@@ -209,15 +210,30 @@
         })
     })();
 
+    /**
+     * Converts the `id` attribute of an HTML input to the respective snake-case for the input `name` attribute.
+     * 
+     * Example: id='validationXCoordinate' => name='x_coordinate'
+     */
+    function convert_input_id_to_snake_case_input_name(input_id_value) {
+        var input_id_without_validation_prefix = input_id_value.replace(/validation/, '');
+        var input_id_in_snake_case = input_id_without_validation_prefix.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        var input_id_in_snake_case_without_underscore_prefix = input_id_in_snake_case.replace(/^\_/, '');
+
+        return input_id_in_snake_case_without_underscore_prefix;
+    }
+
     // Add additional configuration row, if requested by the user
     $("#add-config-row").click(function () {
         // Find the last DIV with the ID "new-config-row-<NUMBER>"
         var $config_row = $('[id^="new-config-row"]:last');
 
         if ($config_row.prop("class").match(/d-none/g)) {
-            // Add the `required` attribute to enforce the form validation
+            // Add the `name` and `required` attributes to be able to submit the data and
+            // to enforce the form validation
             $('div.d-none > div > div > input').each(function() {
                 $(this).prop("required", true);
+                $(this).attr("name", "configuration[" + convert_input_id_to_snake_case_input_name($(this).attr('id')) + "][]");
             });
 
             // Unhide the row
