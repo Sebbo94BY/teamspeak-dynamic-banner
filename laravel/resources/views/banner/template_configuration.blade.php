@@ -69,7 +69,7 @@
 
     <div class="col-md-2">
         @if (isset($configuration))
-        <a class="form-control btn btn-danger" data-method="delete" href="{{ route('banner.template.configuration.delete', ['banner_configuration_id' => $configuration->id]) }}">{{ __('Delete') }}</a>
+        <a class="form-control btn btn-danger" href="{{ route('banner.template.configuration.delete', ['banner_configuration_id' => $configuration->id]) }}">{{ __('Delete') }}</a>
         @else
         <label for="remove-config-row" class="form-label"></label>
         <button type="button" class="form-control btn btn-danger" id="remove-config-row">Remove row</button>
