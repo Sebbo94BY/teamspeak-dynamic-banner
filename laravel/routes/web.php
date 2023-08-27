@@ -84,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/banner/configuration/{banner_template_id}', [BannerConfigurationController::class, 'edit'])->name('banner.template.configuration.edit');
     Route::patch('/banner/configuration/{banner_template_id}/upsert', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
-    Route::delete('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
+    Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
     Route::get('/administration/users', [UsersController::class, 'users'])->name('administration.users')->middleware('permission:view users');
     Route::get('/administration/user/add', [UsersController::class, 'add_user'])->name('administration.user.add')->middleware('permission:add users');

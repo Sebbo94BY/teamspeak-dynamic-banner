@@ -122,7 +122,7 @@ class BannerConfigurationTest extends TestCase
      */
     public function test_deleting_a_banner_configuration_returns_an_error_when_the_banner_configuration_id_does_not_exist(): void
     {
-        $response = $this->actingAs($this->user)->delete(route('banner.template.configuration.delete', ['banner_configuration_id' => 1337]));
+        $response = $this->actingAs($this->user)->get(route('banner.template.configuration.delete', ['banner_configuration_id' => 1337]));
         $response->assertRedirectToRoute('banners');
         $response->assertSessionHas('error');
     }
@@ -134,7 +134,7 @@ class BannerConfigurationTest extends TestCase
     {
         $banner_configuration = BannerConfiguration::factory()->for($this->banner_template)->create();
 
-        $response = $this->actingAs($this->user)->delete(route('banner.template.configuration.delete', ['banner_configuration_id' => $banner_configuration->id]));
+        $response = $this->actingAs($this->user)->get(route('banner.template.configuration.delete', ['banner_configuration_id' => $banner_configuration->id]));
         $response->assertRedirectToRoute('banner.template.configuration.edit', ['banner_template_id' => $this->banner_template->id]);
         $response->assertSessionHas('error');
     }
