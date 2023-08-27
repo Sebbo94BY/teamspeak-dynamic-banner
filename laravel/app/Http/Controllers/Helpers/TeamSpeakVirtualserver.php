@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Instance;
+use Exception;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\TransportException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
@@ -58,12 +59,10 @@ class TeamSpeakVirtualserver extends Controller
     }
 
     /**
-     * Connects to an instance and returns the virtualserver object.
+     * Returns the connection URI for the TS3PHPFramework
      */
-    public function get_virtualserver_connection(bool $blocking = true): Server
+    protected function get_connection_uri(bool $blocking = true, bool $append_random_number_to_nickname = false): string
     {
-        $TS3PHPFramework = new TeamSpeak3();
-
         $connection_uri = 'serverquery://'.rawurlencode($this->serverquery_username).':'.rawurlencode($this->serverquery_password).'@';
 
         if (filter_var($this->host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
@@ -74,7 +73,9 @@ class TeamSpeakVirtualserver extends Controller
             $connection_uri = $connection_uri.$this->host;
         }
 
-        $connection_uri = $connection_uri.":$this->serverquery_port/?server_port=$this->voice_port&nickname=".rawurlencode($this->client_nickname);
+        $connection_uri = $connection_uri.":$this->serverquery_port/?server_port=$this->voice_port";
+
+        $connection_uri = ($append_random_number_to_nickname) ? $connection_uri.'&nickname='.rawurlencode($this->client_nickname.rand(0, 9)) : $connection_uri.'&nickname='.rawurlencode($this->client_nickname);
 
         if ($this->is_ssh) {
             $connection_uri = $connection_uri.'&ssh=1';
@@ -86,17 +87,43 @@ class TeamSpeakVirtualserver extends Controller
 
         $connection_uri = $connection_uri.'#no_query_clients';
 
-        try {
-            $this->virtualserver = $TS3PHPFramework->factory($connection_uri);
-        } catch (TransportException $transport_exception) {
-            throw new TransportException($transport_exception->getMessage(), $transport_exception->getCode());
-        } catch (ServerQueryException $serverquery_exception) {
-            if ($serverquery_exception->getCode() == 513) {
-                // Error: nickname is already in use
-                // Do nothing. The library automatically adds an incremental number to the client nickname.
-            } else {
-                throw new ServerQueryException($serverquery_exception->getMessage(), $serverquery_exception->getCode());
+        return $connection_uri;
+    }
+
+    /**
+     * Connects to an instance and returns the virtualserver object.
+     */
+    public function get_virtualserver_connection(bool $blocking = true): Server
+    {
+        $TS3PHPFramework = new TeamSpeak3();
+
+        $connection_attempt = 1;
+        $maximum_connection_attempts = 3;
+        $serverquery_exception_nickname_already_in_use = false;
+        while ($connection_attempt < $maximum_connection_attempts) {
+            try {
+                $this->virtualserver = $TS3PHPFramework->factory($this->get_connection_uri($blocking, ($serverquery_exception_nickname_already_in_use) ? true : false));
+            } catch (TransportException $transport_exception) {
+                throw new TransportException($transport_exception->getMessage(), $transport_exception->getCode());
+            } catch (ServerQueryException $serverquery_exception) {
+                if ($serverquery_exception->getCode() == 513) {
+                    // Error: nickname is already in use
+                    $serverquery_exception_nickname_already_in_use = true;
+                } else {
+                    throw new ServerQueryException($serverquery_exception->getMessage(), $serverquery_exception->getCode());
+                }
+            } finally {
+                $connection_attempt++;
             }
+
+            // leave the loop once we have a connection
+            if (isset($this->virtualserver)) {
+                break;
+            }
+        }
+
+        if (! isset($this->virtualserver)) {
+            throw new Exception('Failed to establish a connection to the TeamSpeak host.');
         }
 
         if (! is_null($this->default_channel_id)) {
