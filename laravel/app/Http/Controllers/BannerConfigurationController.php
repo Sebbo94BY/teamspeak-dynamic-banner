@@ -77,11 +77,6 @@ class BannerConfigurationController extends Controller
                 unset($configuration);
             }
 
-            // ignore the hidden configuration input row, which is by default empty
-            if (is_null($request->validated('configuration')['text'][$i])) {
-                continue;
-            }
-
             $configuration['id'] = isset($request->validated('configuration')['banner_configuration_id'][$i]) ? $request->validated('configuration')['banner_configuration_id'][$i] : null;
             $configuration['banner_template_id'] = $request->validated('banner_template_id');
             $configuration['x_coordinate'] = $request->validated('configuration')['x_coordinate'][$i];
