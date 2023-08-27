@@ -159,13 +159,14 @@ class BannerVariableController extends Controller
             return $client_info;
         }
 
-        $client_by_ip_address_array_key = array_search($ip_address, $client_variables);
+        $client_variable_key_name = array_search($ip_address, $client_variables);
 
-        if ($client_by_ip_address_array_key === false) {
-            preg_match('/[0-9]+/', array_key_first($client_variables), $client_database_id);
-        } else {
-            preg_match('/[0-9]+/', $client_by_ip_address_array_key, $client_database_id);
+        if ($client_variable_key_name === false) {
+            $random_client_from_cache = array_key_first($client_variables);
+            $client_variable_key_name = (! is_null($random_client_from_cache)) ? $random_client_from_cache : '';
         }
+
+        preg_match('/[0-9]+/', $client_variable_key_name, $client_database_id);
 
         if (empty($client_database_id)) {
             return $client_info;

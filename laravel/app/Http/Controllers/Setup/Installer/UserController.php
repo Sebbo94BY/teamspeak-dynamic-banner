@@ -32,11 +32,10 @@ class UserController extends Controller
     {
         $request->validated();
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
 
         if (! $user->save()) {
             return Redirect::route('setup.installer.user')->withInput($request->all())->with([

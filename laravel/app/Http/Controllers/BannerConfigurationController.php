@@ -56,17 +56,7 @@ class BannerConfigurationController extends Controller
     {
         $request->validated();
 
-        try {
-            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-template-not-found',
-                    'message' => 'The banner template configuration, which you have tried to update, does not exist.',
-                ]);
-        }
-
+        $banner_template = BannerTemplate::find($request->banner_template_id);
         $banner_template->redirect_url = $request->redirect_url;
         $banner_template->disable_at = (isset($request->disable_at)) ? Carbon::parse($request->disable_at) : null;
 
@@ -82,24 +72,25 @@ class BannerConfigurationController extends Controller
 
         $banner_configurations = [];
 
-        for ($i = 0; $i < count($request->font_color_in_hexadecimal); $i++) {
+        for ($i = 0; $i < count($request->validated('configuration')['text']); $i++) {
             if (isset($configuration)) {
                 unset($configuration);
             }
 
-            if (is_null($request->x_coordinate[$i])) {
+            // ignore the hidden configuration input row, which is by default empty
+            if (is_null($request->validated('configuration')['text'][$i])) {
                 continue;
             }
 
-            $configuration['banner_template_id'] = $request->banner_template_id;
-            $configuration['x_coordinate'] = $request->x_coordinate[$i];
-            $configuration['y_coordinate'] = $request->y_coordinate[$i];
-            $configuration['text'] = $request->text[$i];
-            $configuration['fontfile_path'] = $request->fontfile_path[$i];
-            $configuration['font_size'] = $request->font_size[$i];
-            $configuration['font_angle'] = $request->font_angle[$i];
-            $configuration['font_color_in_hexadecimal'] = $request->font_color_in_hexadecimal[$i];
-            $configuration['id'] = isset($request->banner_configuration_id[$i]) ? $request->banner_configuration_id[$i] : null;
+            $configuration['id'] = isset($request->validated('configuration')['banner_configuration_id'][$i]) ? $request->validated('configuration')['banner_configuration_id'][$i] : null;
+            $configuration['banner_template_id'] = $request->validated('banner_template_id');
+            $configuration['x_coordinate'] = $request->validated('configuration')['x_coordinate'][$i];
+            $configuration['y_coordinate'] = $request->validated('configuration')['y_coordinate'][$i];
+            $configuration['text'] = $request->validated('configuration')['text'][$i];
+            $configuration['fontfile_path'] = $request->validated('configuration')['fontfile_path'][$i];
+            $configuration['font_size'] = $request->validated('configuration')['font_size'][$i];
+            $configuration['font_angle'] = $request->validated('configuration')['font_angle'][$i];
+            $configuration['font_color_in_hexadecimal'] = $request->validated('configuration')['font_color_in_hexadecimal'][$i];
 
             $banner_configurations[] = $configuration;
         }
@@ -114,7 +105,7 @@ class BannerConfigurationController extends Controller
             'font_angle',
             'font_color_in_hexadecimal',
         ])) {
-            return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+            return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
                 ->withInput($request->all())
                 ->with([
                     'banner_template' => $banner_template,
@@ -128,7 +119,7 @@ class BannerConfigurationController extends Controller
         try {
             $draw_text_on_template_helper->draw_text_to_image($banner_template, true, false, $request->ip());
         } catch (Exception $exception) {
-            return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+            return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
                 ->with([
                     'banner_template' => $banner_template,
                     'error' => 'banner-template-draw-text-to-image-error',
@@ -136,16 +127,7 @@ class BannerConfigurationController extends Controller
                 ]);
         }
 
-        // Set headers to e. g. avoid caching
-        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
-
         return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
-            // The `Cache-Control` header is required here as the user otherwise sometimes see the old image after a form submission
-            // and only after a Ctrl+F5, the expected image is visible.
-            ->header('Cache-Control', 'no-cache')
-            ->header('Expires', '-1')
-            ->header('ETag', md5($current_rfc7231_datetime))
-            ->header('Last-Modified', $current_rfc7231_datetime)
             ->with([
                 'banner_template' => $banner_template,
                 'success' => 'banner-template-upsert-success',
@@ -161,14 +143,14 @@ class BannerConfigurationController extends Controller
         try {
             $banner_configuration = BannerConfiguration::findOrFail($request->banner_configuration_id);
         } catch (ModelNotFoundException) {
-            return redirect()->back()->with([
+            return Redirect::route('banners')->with([
                 'error' => 'banner-configuration-not-found',
                 'message' => 'The banner configuration, which you have tried to delete, does not exist.',
             ]);
         }
 
         if (! $banner_configuration->delete()) {
-            return redirect()->back()->with([
+            return Redirect::route('banners')->with([
                 'error' => 'banner-configuration-delete-error',
                 'message' => 'Failed to delete the banner configuration from the database. Please try again.',
             ]);
@@ -190,7 +172,7 @@ class BannerConfigurationController extends Controller
         try {
             $draw_text_on_template_helper->draw_text_to_image($banner_template, true, false, $request->ip());
         } catch (Exception $exception) {
-            return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])
+            return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
                 ->with([
                     'banner_template' => $banner_template,
                     'error' => 'banner-template-draw-text-to-image-error',
@@ -198,16 +180,7 @@ class BannerConfigurationController extends Controller
                 ]);
         }
 
-        // Set headers to e. g. avoid caching
-        $current_rfc7231_datetime = Carbon::now()->subSeconds(5)->toRfc7231String();
-
         return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
-            // The `Cache-Control` header is required here as the user otherwise sometimes see the old image after a form submission
-            // and only after a Ctrl+F5, the expected image is visible.
-            ->header('Cache-Control', 'no-cache')
-            ->header('Expires', '-1')
-            ->header('ETag', md5($current_rfc7231_datetime))
-            ->header('Last-Modified', $current_rfc7231_datetime)
             ->with([
                 'banner_template' => $banner_template,
                 'success' => 'banner-configuration-delete-successful',

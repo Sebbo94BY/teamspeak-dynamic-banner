@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class BannerTest extends TestCase
+class BannerTemplateTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -36,7 +36,7 @@ class BannerTest extends TestCase
      */
     public function test_user_gets_redirected_to_login_when_unauthenticated(): void
     {
-        $response = $this->get(route('banners'));
+        $response = $this->get(route('banner.templates', ['banner_id' => $this->banner->id]));
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));
     }
@@ -46,32 +46,33 @@ class BannerTest extends TestCase
      */
     public function test_page_gets_displayed_when_authenticated(): void
     {
-        $response = $this->actingAs($this->user)->get(route('banners'));
+        $response = $this->actingAs($this->user)->get(route('banner.templates', ['banner_id' => $this->banner->id]));
         $response->assertStatus(200);
-        $response->assertViewIs('banners');
-        $response->assertViewHas('banners');
+        $response->assertViewIs('banner.template');
+        $response->assertViewHas('banner');
+        $response->assertViewHas('templates');
     }
 
     /**
-     * Test, that the user can access the "add banner" page, when he is authenticated.
+     * Test, that the user can access the "add banner template" page, when he is authenticated.
      */
-    public function test_add_banner_page_gets_displayed_when_authenticated(): void
+    public function test_add_banner_template_page_gets_displayed_when_authenticated(): void
     {
-        $response = $this->actingAs($this->user)->get(route('banner.add'));
+        $response = $this->actingAs($this->user)->get(route('banner.template.add', ['banner_id' => $this->banner->id]));
         $response->assertStatus(200);
-        $response->assertViewIs('banner.add');
-        $response->assertViewHas('instance_list');
+        $response->assertViewIs('banner.template_add');
+        $response->assertViewHas('templates');
     }
 
     /**
-     * Test that adding a new banner requires to match the request rules.
+     * Test that adding a new template to a banner requires to match the request rules.
      */
-    public function test_adding_a_new_banner_requires_to_match_the_request_rules(): void
+    public function test_adding_a_new_template_to_a_banner_requires_to_match_the_request_rules(): void
     {
-        $response = $this->actingAs($this->user)->post(route('banner.save'), [
-            'name' => fake()->name(),
+        $response = $this->actingAs($this->user)->post(route('banner.add.template'), [
+            'banner_id' => $this->banner->id,
         ]);
-        $response->assertSessionHasErrors(['instance_id']);
+        $response->assertSessionHasErrors(['template_id']);
     }
 
     /**
@@ -79,8 +80,9 @@ class BannerTest extends TestCase
      */
     public function test_edit_banner_page_gets_redirected_to_overview_when_banner_id_does_not_exist(): void
     {
-        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => 1337]));
+        $response = $this->actingAs($this->user)->get(route('banner.templates', ['banner_id' => 1337]));
         $response->assertRedirect(route('banners'));
+        $response->assertSessionHas('error');
     }
 
     /**
@@ -88,21 +90,9 @@ class BannerTest extends TestCase
      */
     public function test_edit_banner_page_gets_displayed_when_banner_id_exists(): void
     {
-        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => $this->banner->id]));
-        $response->assertViewIs('banner.edit');
+        $response = $this->actingAs($this->user)->get(route('banner.templates', ['banner_id' => $this->banner->id]));
+        $response->assertViewIs('banner.template');
         $response->assertViewHas('banner');
-        $response->assertViewHas('instance_list');
-        $response->assertViewHas('banner_configurations');
-    }
-
-    /**
-     * Test that updating an existing banner requires to match the request rules.
-     */
-    public function test_updating_an_existing_banner_requires_to_match_the_request_rules(): void
-    {
-        $response = $this->actingAs($this->user)->patch(route('banner.update', ['banner_id' => $this->banner->id]), [
-            'name' => fake()->name(),
-        ]);
-        $response->assertSessionHasErrors(['instance_id']);
+        $response->assertViewHas('templates');
     }
 }
