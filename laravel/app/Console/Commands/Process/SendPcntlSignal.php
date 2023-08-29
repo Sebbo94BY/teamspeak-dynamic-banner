@@ -29,7 +29,6 @@ class SendPcntlSignal extends Command
      */
     public function handle(): void
     {
-        $pcntl_signal_original = $this->argument('pcntl_signal');
         try {
             $pcntl_signal = constant($this->argument('pcntl_signal'));
         } catch (Error) {
@@ -43,16 +42,14 @@ class SendPcntlSignal extends Command
             return;
         }
 
-        if ($pcntl_signal != $pcntl_signal_original) {
-            $this->info("Sending the PCNLT signal `$pcntl_signal` ($pcntl_signal_original) to the process ID `$process_id`...");
-        } else {
-            $this->info("Sending the PCNLT signal `$pcntl_signal` to the process ID `$process_id`...");
+        $this->info("Sending the PCNLT signal `$pcntl_signal` to the process ID `$process_id`...");
+
+        if (! posix_kill($process_id, $pcntl_signal)) {
+            $this->error('The signal failed.');
+
+            return;
         }
 
-        if (posix_kill($process_id, $pcntl_signal)) {
-            $this->info('The signal was successful.');
-        } else {
-            $this->error('The signal failed.');
-        }
+        $this->info('The signal was successful.');
     }
 }
