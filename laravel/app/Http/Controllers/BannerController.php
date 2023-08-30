@@ -88,9 +88,9 @@ class BannerController extends Controller
         try {
             $banner = Banner::findOrFail($request->banner_id);
         } catch (ModelNotFoundException) {
-            return view('instance.main')->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to edit, does not exist.',
+            return Redirect::route('banners')->with([
+                'error' => 'banner-not-found',
+                'message' => 'The banner, which you have tried to edit, does not exist.',
             ]);
         }
 

@@ -14,6 +14,8 @@ class BannerTest extends TestCase
 
     protected User $user;
 
+    protected Instance $instance;
+
     protected Banner $banner;
 
     public function setUp(): void
@@ -26,8 +28,10 @@ class BannerTest extends TestCase
         $this->user = User::factory()->create();
         $this->user->syncRoles('Banners Admin');
 
+        $this->instance = Instance::factory()->create();
+
         $this->banner = Banner::factory()->for(
-            Instance::factory()->create()
+            $this->instance
         )->create();
     }
 
@@ -75,6 +79,21 @@ class BannerTest extends TestCase
     }
 
     /**
+     * Test that a new banner can be added.
+     */
+    public function test_adding_a_new_banner_is_possible(): void
+    {
+        $instance = Instance::factory()->create();
+
+        $response = $this->actingAs($this->user)->post(route('banner.save'), [
+            'name' => fake()->name(),
+            'instance_id' => $instance->id,
+        ]);
+        $response->assertRedirectToRoute('banner.edit', ['banner_id' => Banner::where('instance_id', '=', $instance->id)->first()->id]);
+        $response->assertSessionHas('success');
+    }
+
+    /**
      * Test, that the user gets redirected to the banners overview, when the requested banner ID for the edit page does not exist.
      */
     public function test_edit_banner_page_gets_redirected_to_overview_when_banner_id_does_not_exist(): void
@@ -104,5 +123,38 @@ class BannerTest extends TestCase
             'name' => fake()->name(),
         ]);
         $response->assertSessionHasErrors(['instance_id']);
+    }
+
+    /**
+     * Test that updating a non-existing banner returns an error.
+     */
+    public function test_updating_a_not_existing_banner_returns_an_error(): void
+    {
+        $instance = Instance::factory()->create();
+
+        $response = $this->actingAs($this->user)->patch(route('banner.update', ['banner_id' => 1337]), [
+            'name' => fake()->name(),
+            'instance_id' => $instance->id,
+        ]);
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
+     * Test that updating an existing banner is possible.
+     */
+    public function test_updating_an_existing_banner_is_possible(): void
+    {
+        $this->assertEquals($this->instance->id, Banner::find($this->banner->id)->instance->id);
+
+        $instance = Instance::factory()->create();
+
+        $response = $this->actingAs($this->user)->patch(route('banner.update', ['banner_id' => $this->banner->id]), [
+            'name' => fake()->name(),
+            'instance_id' => $instance->id,
+        ]);
+        $response->assertRedirectToRoute('banner.edit', ['banner_id' => $this->banner->id]);
+        $response->assertSessionHas('success');
+        $this->assertEquals($instance->id, Banner::find($this->banner->id)->instance->id);
     }
 }
