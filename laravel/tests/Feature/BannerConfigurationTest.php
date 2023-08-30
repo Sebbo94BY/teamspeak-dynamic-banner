@@ -62,6 +62,16 @@ class BannerConfigurationTest extends TestCase
     }
 
     /**
+     * Test that trying to edit a non-existing banner template configuration returns an error.
+     */
+    public function test_editing_a_non_existing_banner_template_configuration_returns_an_error(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('banner.template.configuration.edit', ['banner_template_id' => 1337]));
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
      * Test that upserting a banner configuration requires to match the request rules.
      */
     public function test_upserting_a_banner_configuration_requires_to_match_the_request_rules(): void
