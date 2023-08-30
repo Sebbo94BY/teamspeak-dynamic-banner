@@ -33,12 +33,10 @@ class BannerConfigurationController extends Controller
         try {
             $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
         } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-not-found',
-                    'message' => 'The banner configuration, which you have tried to edit, does not exist.',
-                ]);
+            return Redirect::route('banners')->with([
+                'error' => 'banner-template-not-found',
+                'message' => 'The banner template configuration, which you have tried to edit, does not exist.',
+            ]);
         }
 
         $installed_ttf_files = array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH);
