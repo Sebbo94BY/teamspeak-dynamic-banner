@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Banner;
+use App\Models\BannerTemplate;
 use App\Models\Instance;
+use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -65,6 +68,16 @@ class BannerTemplateTest extends TestCase
     }
 
     /**
+     * Test that trying to open the add template view for a non-existing banner returns an error.
+     */
+    public function test_opening_the_add_template_view_for_a_not_existing_banner_returns_an_error(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('banner.template.add', ['banner_id' => 1337]));
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
      * Test that adding a new template to a banner requires to match the request rules.
      */
     public function test_adding_a_new_template_to_a_banner_requires_to_match_the_request_rules(): void
@@ -94,5 +107,128 @@ class BannerTemplateTest extends TestCase
         $response->assertViewIs('banner.template');
         $response->assertViewHas('banner');
         $response->assertViewHas('templates');
+    }
+
+    /**
+     * Test that a template can be added to a banner.
+     */
+    public function test_a_template_can_be_added_to_a_banner(): void
+    {
+        $template = Template::factory()->create();
+
+        // Generate a temporary image to be able to test the API
+        $absolut_upload_directory = public_path($template->file_path_original);
+        $image_file_path = $absolut_upload_directory.'/'.$template->filename;
+        $gd_image = imagecreate(1024, 300);
+        imagecolorallocate($gd_image, 0, 0, 0);
+        if (! file_exists($absolut_upload_directory)) {
+            mkdir($absolut_upload_directory, 0777, true);
+        }
+        imagepng($gd_image, $image_file_path);
+        DrawGridSystemOnTemplate::dispatchSync($template);
+
+        $response = $this->actingAs($this->user)->post(route('banner.add.template'), [
+            'banner_id' => $this->banner->id,
+            'template_id' => $template->id,
+        ]);
+
+        $response->assertRedirectToRoute('banner.template.configuration.edit', ['banner_template_id' => BannerTemplate::latest('created_at')->first()->id]);
+        $response->assertSessionHas('success');
+        $this->assertEquals(1, count($this->banner->templates));
+    }
+
+    /**
+     * Test that trying to remove a non-existing template from a banner returns an error.
+     */
+    public function test_removing_a_not_existing_template_from_a_banner_returns_an_error(): void
+    {
+        $response = $this->actingAs($this->user)->delete(route('banner.template.remove', ['banner_template_id' => 1337]));
+
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
+     * Test that a template can be removed from a banner.
+     */
+    public function test_a_template_can_be_removed_from_a_banner(): void
+    {
+        $banner_template = BannerTemplate::factory()
+            ->for(
+                $this->banner
+            )
+            ->for(
+                Template::factory()->create()
+            )->create();
+
+        $response = $this->actingAs($this->user)->delete(route('banner.template.remove', ['banner_template_id' => $banner_template->id]));
+
+        $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
+        $response->assertSessionHas('success');
+        $this->assertEquals(0, count($this->banner->templates));
+    }
+
+    /**
+     * Test that trying to disable a non-existing template from a banner returns an error.
+     */
+    public function test_disabling_a_not_existing_template_from_a_banner_returns_an_error(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('banner.template.disable', ['banner_template_id' => 1337]));
+
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
+     * Test that a template of a banner can be disabled.
+     */
+    public function test_a_template_of_a_banner_can_be_disabled(): void
+    {
+        $banner_template = BannerTemplate::factory()
+            ->for(
+                $this->banner
+            )
+            ->for(
+                Template::factory()->create()
+            )->create(['enabled' => true]);
+
+        $this->assertTrue(BannerTemplate::find($banner_template->id)->enabled);
+        $response = $this->actingAs($this->user)->patch(route('banner.template.disable', ['banner_template_id' => $banner_template->id]));
+
+        $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
+        $response->assertSessionHas('success');
+        $this->assertFalse(BannerTemplate::find($banner_template->id)->enabled);
+    }
+
+    /**
+     * Test that trying to enable a non-existing template from a banner returns an error.
+     */
+    public function test_enabling_a_not_existing_template_from_a_banner_returns_an_error(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('banner.template.enable', ['banner_template_id' => 1337]));
+
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('error');
+    }
+
+    /**
+     * Test that a template of a banner can be enabled.
+     */
+    public function test_a_template_of_a_banner_can_be_enabled(): void
+    {
+        $banner_template = BannerTemplate::factory()
+            ->for(
+                $this->banner
+            )
+            ->for(
+                Template::factory()->create()
+            )->create(['enabled' => false]);
+
+        $this->assertFalse(BannerTemplate::find($banner_template->id)->enabled);
+        $response = $this->actingAs($this->user)->patch(route('banner.template.enable', ['banner_template_id' => $banner_template->id]));
+
+        $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
+        $response->assertSessionHas('success');
+        $this->assertTrue(BannerTemplate::find($banner_template->id)->enabled);
     }
 }

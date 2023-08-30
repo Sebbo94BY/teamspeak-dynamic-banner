@@ -52,12 +52,10 @@ class BannerTemplateController extends Controller
         try {
             $banner = Banner::findOrFail($request->banner_id);
         } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-not-found',
-                    'message' => 'The banner templates, which you have tried to edit, does not exist.',
-                ]);
+            return Redirect::route('banners')->with([
+                'error' => 'banner-not-found',
+                'message' => 'The banner templates, which you have tried to edit, does not exist.',
+            ]);
         }
 
         return view('banner.template_add', ['banner_id' => $banner->id])->with([
