@@ -49,12 +49,10 @@ class Kernel extends ConsoleKernel
 
         // INSTANCES: Autostart
         $schedule->call(function () {
-            $instances_with_autostart = Instance::where(['autostart_enabled' => true])->get(['id']);
-
-            foreach ($instances_with_autostart as $instance) {
+            foreach (Instance::where(['autostart_enabled' => true])->get(['id']) as $instance) {
                 if (is_null($instance->process)) {
                     Log::info("Starting instance $instance->id since autostart is enabled...");
-                    Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
+                    Process::start('php '.base_path().'/artisan instance:start-teamspeak-bot '.$instance->id.' --background');
                 }
             }
         })->environments(['staging', 'production'])->name('instances:autostart')->everyFiveMinutes();
