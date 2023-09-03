@@ -35,7 +35,7 @@ class CloneOriginalTemplate implements ShouldQueue, ShouldBeUnique
      *
      * @var bool
      */
-    protected string $use_grid_template;
+    protected bool $use_grid_template;
 
     /**
      * The number of seconds after which the job's unique lock will be released.
