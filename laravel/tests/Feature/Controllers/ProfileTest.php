@@ -39,8 +39,8 @@ class ProfileTest extends TestCase
         ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertViewIs('profile.edit');
-        $response->assertViewHas('success');
+        $response->assertRedirectToRoute('profile.edit');
+        $response->assertSessionHas('success');
     }
 
     /**
@@ -69,8 +69,8 @@ class ProfileTest extends TestCase
             'password_confirmation' => $this->new_password,
         ]);
 
-        $response->assertViewIs('profile.edit');
-        $response->assertViewHas('error');
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
     }
 
     /**
@@ -100,7 +100,7 @@ class ProfileTest extends TestCase
             'password_confirmation' => $this->new_password,
         ]);
 
-        $response->assertViewIs('profile.edit');
-        $response->assertViewHas('success');
+        $response->assertRedirectToRoute('profile.edit');
+        $response->assertSessionHas('success');
     }
 }
