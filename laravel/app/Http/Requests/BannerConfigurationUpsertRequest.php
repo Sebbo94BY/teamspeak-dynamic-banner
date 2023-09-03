@@ -39,7 +39,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'configuration.y_coordinate' => ['required', 'array', 'min:1'],
             'configuration.y_coordinate.*' => ['integer', 'min:0', 'max:'.$banner_template->template->height],
 
-            'configuration.text.*' => ['required', 'array', 'min:1'],
+            'configuration.text' => ['required', 'array', 'min:1'],
             'configuration.text.*' => ['string', 'max:255'],
 
             'configuration.fontfile_path' => ['required', 'array', 'min:1'],
