@@ -311,7 +311,7 @@ class SystemStatusController extends Controller
     /**
      * Returns a summary of the system status in JSON format.
      */
-    public function system_status_json($optional_information = true)
+    public function system_status_json($optional_information = true): bool|string
     {
         $system_status = [];
 
@@ -328,8 +328,6 @@ class SystemStatusController extends Controller
             $system_status['VARIOUS']['INFORMATION'] = $this->check_various_information();
         }
 
-        $system_status_json = json_encode($system_status);
-
-        return $system_status_json;
+        return json_encode($system_status);
     }
 }
