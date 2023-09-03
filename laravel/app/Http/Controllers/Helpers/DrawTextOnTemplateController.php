@@ -18,7 +18,9 @@ class DrawTextOnTemplateController extends Controller
     /**
      * Class properties
      */
-    private ?GdImage $gd_image = null;
+    protected string $upload_directory = 'uploads/fonts';
+
+    protected ?GdImage $gd_image = null;
 
     /**
      * The class destructor
@@ -96,7 +98,7 @@ class DrawTextOnTemplateController extends Controller
                 }
 
                 // Calculate required text width in pixel
-                $text_bounding_box = imagettfbbox($configuration->font_size, $configuration->font_angle, public_path($configuration->fontfile_path), $text);
+                $text_bounding_box = imagettfbbox($configuration->font_size, $configuration->font_angle, public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename), $text);
                 $total_text_width_in_pixel = $text_bounding_box[2];
 
                 // Avoid writing text outside of the template. Instead, automatically wrap the text.
@@ -111,7 +113,7 @@ class DrawTextOnTemplateController extends Controller
                     $configuration->x_coordinate,
                     $configuration->y_coordinate,
                     $font_color,
-                    public_path($configuration->fontfile_path),
+                    public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename),
                     $text
                 )) {
                     throw new Exception("Failed to write the text `$text` to the image.");

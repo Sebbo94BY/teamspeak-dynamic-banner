@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Template;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,6 +34,9 @@ class BannerConfigurationTest extends TestCase
                     )
                     ->for(Template::factory()->create())
                     ->create()
+            )
+            ->for(
+                Font::factory()->create()
             )
             ->create();
     }

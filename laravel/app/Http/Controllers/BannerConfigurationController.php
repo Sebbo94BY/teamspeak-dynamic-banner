@@ -8,23 +8,15 @@ use App\Http\Requests\BannerConfigurationEditRequest;
 use App\Http\Requests\BannerConfigurationUpsertRequest;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Font;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BannerConfigurationController extends Controller
 {
-    /**
-     * Callback function to only return TTF files.
-     */
-    public function is_ttf_file($filename): bool
-    {
-        return preg_match("/\.ttf$/", $filename);
-    }
-
     /**
      * Display the edit view.
      */
@@ -32,11 +24,7 @@ class BannerConfigurationController extends Controller
     {
         return view('banner.configuration')->with([
             'banner_template' => BannerTemplate::find($request->banner_template_id),
-            'installed_ttf_files' => array_filter(
-                Storage::disk('public')->files('fonts/'),
-                $this->is_ttf_file(...),
-                ARRAY_FILTER_USE_BOTH
-            ),
+            'fonts' => Font::all(),
         ]);
     }
 
@@ -71,7 +59,7 @@ class BannerConfigurationController extends Controller
             $configuration['x_coordinate'] = $request->validated('configuration')['x_coordinate'][$i];
             $configuration['y_coordinate'] = $request->validated('configuration')['y_coordinate'][$i];
             $configuration['text'] = $request->validated('configuration')['text'][$i];
-            $configuration['fontfile_path'] = $request->validated('configuration')['fontfile_path'][$i];
+            $configuration['font_id'] = $request->validated('configuration')['font_id'][$i];
             $configuration['font_size'] = $request->validated('configuration')['font_size'][$i];
             $configuration['font_angle'] = $request->validated('configuration')['font_angle'][$i];
             $configuration['font_color_in_hexadecimal'] = $request->validated('configuration')['font_color_in_hexadecimal'][$i];
@@ -84,7 +72,7 @@ class BannerConfigurationController extends Controller
             'x_coordinate',
             'y_coordinate',
             'text',
-            'fontfile_path',
+            'font_id',
             'font_size',
             'font_angle',
             'font_color_in_hexadecimal',

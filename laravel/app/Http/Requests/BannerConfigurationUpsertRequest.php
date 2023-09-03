@@ -43,7 +43,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'banner_template_id' => ['required', 'integer', 'exists:App\Models\BannerTemplate,id'],
             'redirect_url' => ['nullable', 'url'],
             'disable_at' => ['nullable', 'date'],
-            'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,fontfile_path,font_size,font_angle,font_color_in_hexadecimal'],
+            'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],
 
             'configuration.banner_configuration_id' => ['sometimes', 'array'],
             'configuration.banner_configuration_id.*' => ['integer', 'exists:App\Models\BannerConfiguration,id'],
@@ -57,8 +57,8 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'configuration.text' => ['required', 'array', 'min:1'],
             'configuration.text.*' => ['string', 'max:255'],
 
-            'configuration.fontfile_path' => ['required', 'array', 'min:1'],
-            'configuration.fontfile_path.*' => ['string'],
+            'configuration.font_id' => ['required', 'array', 'min:1'],
+            'configuration.font_id.*' => ['integer', 'exists:App\Models\Font,id'],
 
             'configuration.font_size' => ['required', 'array', 'min:1'],
             'configuration.font_size.*' => ['integer', 'min:1', 'max:'.$this->banner_template->template->height],

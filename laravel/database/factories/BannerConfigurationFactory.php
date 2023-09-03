@@ -20,7 +20,6 @@ class BannerConfigurationFactory extends Factory
             'x_coordinate' => fake()->numberBetween(60, 300),
             'y_coordinate' => fake()->numberBetween(468, 1024),
             'text' => fake()->text(32),
-            'fontfile_path' => 'fonts/'.str_replace(' ', '_', fake()->text(32)).'ttf',
             'font_size' => fake()->numberBetween(1, 5),
             'font_angle' => fake()->numberBetween(0, 360),
             'font_color_in_hexadecimal' => fake()->hexColor(),

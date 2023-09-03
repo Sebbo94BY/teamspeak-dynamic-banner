@@ -96,6 +96,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/administration/roles', [RolesController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
 
     Route::get('/administration/fonts', [FontsController::class, 'fonts'])->name('administration.fonts')->middleware('permission:view fonts');
+    Route::get('/administration/font/add', [FontsController::class, 'add_form'])->name('administration.font.add')->middleware('permission:add fonts');
+    Route::post('/administration/font/create', [FontsController::class, 'create'])->name('administration.font.create')->middleware('permission:add fonts');
+    Route::get('/administration/font/{font_id}/edit', [FontsController::class, 'edit_form'])->name('administration.font.edit')->middleware('permission:edit fonts');
+    Route::patch('/administration/font/{font_id}/update', [FontsController::class, 'update'])->name('administration.font.update')->middleware('permission:edit fonts');
+    Route::delete('/administration/font/{font_id}/delete', [FontsController::class, 'delete'])->name('administration.font.delete')->middleware('permission:delete fonts');
 
     Route::get('/administration/systemstatus', [SystemStatusController::class, 'system_status'])->name('administration.systemstatus')->middleware('permission:view system status');
 

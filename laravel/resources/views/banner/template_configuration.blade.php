@@ -29,12 +29,12 @@
 
     <div class="col-md-4">
         <label for="validationFont" class="form-label">Font</label>
-        <select class="form-select" name="configuration[fontfile_path][]" id="validationFont" aria-describedby="FontHelp" required>
-            @foreach ($installed_ttf_files as $fontfile_path)
-            @if (isset($configuration) AND $configuration->fontfile_path == $fontfile_path)
-            <option value="{{ $fontfile_path }}" selected>{{ preg_replace("/fonts\//", '', $fontfile_path) }}</option>
+        <select class="form-select" name="configuration[font_id][]" id="validationFont" aria-describedby="FontHelp" required>
+            @foreach ($fonts as $font)
+            @if (isset($configuration) AND $configuration->font->id == $font->id)
+            <option value="{{ $font->id }}" selected>{{ $font->filename }}</option>
             @else
-            <option value="{{ $fontfile_path }}">{{ preg_replace("/fonts\//", '', $fontfile_path) }}</option>
+            <option value="{{ $font->id }}">{{ $font->filename }}</option>
             @endif
             @endforeach
         </select>

@@ -20,7 +20,7 @@ class BannerConfiguration extends Model
         'x_coordinate',
         'y_coordinate',
         'text',
-        'fontfile_path',
+        'font_id',
         'font_size',
         'font_angle',
         'font_color_in_hexadecimal',
@@ -46,5 +46,13 @@ class BannerConfiguration extends Model
     public function bannerTemplate(): BelongsTo
     {
         return $this->belongsTo(BannerTemplate::class);
+    }
+
+    /**
+     * Get the font associated with the banner configuration.
+     */
+    public function font(): BelongsTo
+    {
+        return $this->belongsTo(Font::class);
     }
 }

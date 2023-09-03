@@ -5,6 +5,7 @@ namespace Tests\Feature\API\v1;
 use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Template;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +15,11 @@ use Tests\TestCase;
 class BannerTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Class properties
+     */
+    protected string $upload_directory = 'uploads/fonts';
 
     protected Banner $banner;
 
@@ -111,7 +117,9 @@ class BannerTest extends TestCase
                     )->for(
                         Template::factory()->create()
                     )->create(['enabled' => true])
-            )->create();
+            )
+            ->for(Font::factory()->create())
+            ->create();
 
         // Generate a temporary image to be able to test the API
         $absolut_upload_directory = public_path($banner_template->template->file_path_original);
@@ -124,7 +132,7 @@ class BannerTest extends TestCase
         imagepng($gd_image, $image_file_path);
 
         // Temporary download a TTF fontfile to be able test the API
-        Storage::disk('public')->put($banner_configuration->fontfile_path, file_get_contents('https://api.fontsource.org/v1/fonts/abel/latin-400-normal.ttf'));
+        Storage::disk('public')->put($this->upload_directory.DIRECTORY_SEPARATOR.$banner_configuration->font->filename, file_get_contents('https://api.fontsource.org/v1/fonts/abel/latin-400-normal.ttf'));
 
         $response = $this->get(route('api.banner', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertHeader('Cache-Control');
@@ -135,7 +143,7 @@ class BannerTest extends TestCase
         $response->assertStatus(200);
 
         // Delete temporary files again
-        Storage::disk('public')->delete($banner_configuration->fontfile_path);
+        Storage::disk('public')->delete($this->upload_directory.DIRECTORY_SEPARATOR.$banner_configuration->font->filename);
         unlink($image_file_path);
     }
 
@@ -162,7 +170,9 @@ class BannerTest extends TestCase
                     )->for(
                         Template::factory()->create()
                     )->create(['redirect_url' => null, 'enabled' => true])
-            )->create();
+            )
+            ->for(Font::factory()->create())
+            ->create();
 
         $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertRedirectToRoute('api.banner', ['banner_id' => base_convert($this->banner->id, 35, 10)]);
@@ -184,7 +194,9 @@ class BannerTest extends TestCase
                     )->for(
                         Template::factory()->create()
                     )->create(['redirect_url' => $redirect_url, 'enabled' => true])
-            )->create();
+            )
+            ->for(Font::factory()->create())
+            ->create();
 
         $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertRedirect($redirect_url);
