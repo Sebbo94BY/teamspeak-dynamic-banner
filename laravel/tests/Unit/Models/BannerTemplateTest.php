@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Template;
 use Carbon\Carbon;
@@ -94,6 +95,7 @@ class BannerTemplateTest extends TestCase
     {
         BannerConfiguration::factory(3)
             ->for($this->banner_template)
+            ->for(Font::factory()->create())
             ->create();
 
         $this->assertCount(3, $this->banner_template->configurations);

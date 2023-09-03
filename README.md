@@ -117,7 +117,6 @@ If you want to regulary backup this application, you should backup the following
 
 * `.env` file (or only the `APP_KEY` from this file)
 * Database
-* `laravel/public/fonts/` directory
 * `laravel/public/uploads/` directory
 
 

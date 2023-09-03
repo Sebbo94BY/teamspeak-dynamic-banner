@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
+use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Template;
 use App\Models\User;
@@ -58,7 +59,7 @@ class BannerConfigurationTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('banner.configuration');
         $response->assertViewHas('banner_template');
-        $response->assertViewHas('installed_ttf_files');
+        $response->assertViewHas('fonts');
     }
 
     /**
@@ -71,7 +72,7 @@ class BannerConfigurationTest extends TestCase
             'configuration' => [
                 'y_coordinate' => [$this->banner_template->template->height],
                 'text' => [fake()->text(32)],
-                'fontfile_path' => ['fonts/'.str_replace(' ', '_', fake()->text(32)).'ttf'],
+                'font_id' => [Font::factory()->create()->id],
                 'font_size' => [fake()->numberBetween(1, $this->banner_template->template->height)],
                 'font_angle' => [fake()->numberBetween(0, 360)],
                 'font_color_in_hexadecimal' => [fake()->hexColor()],
@@ -85,7 +86,7 @@ class BannerConfigurationTest extends TestCase
                 'x_coordinate' => [9999],
                 'y_coordinate' => [$this->banner_template->template->height],
                 'text' => [fake()->text(32)],
-                'fontfile_path' => ['fonts/'.str_replace(' ', '_', fake()->text(32)).'ttf'],
+                'font_id' => [Font::factory()->create()->id],
                 'font_size' => [fake()->numberBetween(1, $this->banner_template->template->height)],
                 'font_angle' => [fake()->numberBetween(0, 360)],
                 'font_color_in_hexadecimal' => [fake()->hexColor()],
@@ -105,7 +106,7 @@ class BannerConfigurationTest extends TestCase
                 'x_coordinate' => [$this->banner_template->template->width],
                 'y_coordinate' => [$this->banner_template->template->height],
                 'text' => [fake()->text(32)],
-                'fontfile_path' => ['fonts/'.str_replace(' ', '_', fake()->text(32)).'ttf'],
+                'font_id' => [Font::factory()->create()->id],
                 'font_size' => [fake()->numberBetween(1, $this->banner_template->template->height)],
                 'font_angle' => [fake()->numberBetween(0, 360)],
                 'font_color_in_hexadecimal' => [fake()->hexColor()],
@@ -122,7 +123,10 @@ class BannerConfigurationTest extends TestCase
      */
     public function test_deleting_a_banner_configuration_returns_an_error_when_the_updated_template_could_not_be_drawn(): void
     {
-        $banner_configuration = BannerConfiguration::factory()->for($this->banner_template)->create();
+        $banner_configuration = BannerConfiguration::factory()
+            ->for($this->banner_template)
+            ->for(Font::factory()->create())
+            ->create();
 
         $response = $this->actingAs($this->user)->get(route('banner.template.configuration.delete', ['banner_configuration_id' => $banner_configuration->id]));
         $response->assertRedirectToRoute('banner.template.configuration.edit', ['banner_template_id' => $this->banner_template->id]);

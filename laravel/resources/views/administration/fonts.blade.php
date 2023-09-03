@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">{{ __('Fonts') }}</div>
+                <div class="card-header">
+                    {{ __('Fonts') }}
+
+                    @can('add fonts')
+                    <a href="{{ route('administration.font.add') }}" class="btn btn-primary">Add</a>
+                    @endcan
+                </div>
 
                 <div class="card-body">
                     @if (session('success'))
@@ -19,35 +25,34 @@
                         </div>
                     @endif
 
-                    <div class="alert alert-primary" role="alert">
-                        <p>This project uses <i>TrueType Fonts (TTF)</i> for writing the text on the banner images.</p>
-
-                        <p>Installation instructions:</p>
-                        <ol>
-                            <li>Visit <a href="https://fontsource.org" target="_blank">Fontsource.org</a></li>
-                            <li>Specify filters or search for specific fonts</li>
-                            <li>Checkout the font previews to find a font, which you like and open the font details page</li>
-                            <li>Click on the download button for this specific font</li>
-                            <li>Unzip the recently downloaded ZIP file</li>
-                            <li>Upload the required <code>*.ttf</code> file(s) to this project under <code>laravel/public/fonts/</code></li>
-                            <li>Refresh this page to validate that your font has been properly installed</li>
-                        </ol>
-
-                        <p>You can upload and use any TTF file - it does not have to be from Fontsource.</p>
-                    </div>
-
                     <table id="fonts" class="table table-striped" style="width:100%">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>File</th>
+                                <th>Filename</th>
+                                <th>Last Modified</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($fonts as $key => $fontfile)
+                            @foreach($fonts as $font)
                             <tr>
-                                <td>{{ $key }}</td>
-                                <td>{{ preg_replace("/fonts\//", '', $fontfile) }}</td>
+                                <td>{{ $font->filename }}</td>
+                                <td>{{ $font->updated_at }}</td>
+                                <td>
+                                    @can('edit fonts')
+                                    <a href="{{ route('administration.font.edit', ['font_id' => $font->id]) }}" class="btn btn-info">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </a>
+                                    @endcan
+
+                                    @can('delete fonts')
+                                    <form method="POST" action="{{ route('administration.font.delete', ['font_id' => $font->id]) }}">
+                                        @method('delete')
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
+                                    </form>
+                                    @endcan
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
