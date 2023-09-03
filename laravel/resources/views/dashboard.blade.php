@@ -43,17 +43,6 @@
                 </div>
             </div>
         </div>
-        <div class="col d-flex">
-            <div class="card flex-fill">
-                <div class="card-body">
-                <h5 class="card-title">{{ $banner_configurations_count }} {{ \Illuminate\Support\Str::plural("Banner Configuration", $banner_configurations_count) }}</h5>
-                    <p class="card-text">The amount of configured texts, which get dynamically updated on your templates.</p>
-                    @can('view banners')
-                    <a href="{{ route('banners') }}" class="btn btn-primary">Banners</a>
-                    @endcan
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection
