@@ -94,15 +94,6 @@ class BannerTest extends TestCase
     }
 
     /**
-     * Test, that the user gets redirected to the banners overview, when the requested banner ID for the edit page does not exist.
-     */
-    public function test_edit_banner_page_gets_redirected_to_overview_when_banner_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => 1337]));
-        $response->assertRedirect(route('banners'));
-    }
-
-    /**
      * Test, that the user can access the "edit banner" page, when the requested banner ID for the edit page exists.
      */
     public function test_edit_banner_page_gets_displayed_when_banner_id_exists(): void
@@ -126,21 +117,6 @@ class BannerTest extends TestCase
     }
 
     /**
-     * Test that updating a non-existing banner returns an error.
-     */
-    public function test_updating_a_not_existing_banner_returns_an_error(): void
-    {
-        $instance = Instance::factory()->create();
-
-        $response = $this->actingAs($this->user)->patch(route('banner.update', ['banner_id' => 1337]), [
-            'name' => fake()->name(),
-            'instance_id' => $instance->id,
-        ]);
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that updating an existing banner is possible.
      */
     public function test_updating_an_existing_banner_is_possible(): void
@@ -156,5 +132,15 @@ class BannerTest extends TestCase
         $response->assertRedirectToRoute('banner.edit', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');
         $this->assertEquals($instance->id, Banner::find($this->banner->id)->instance->id);
+    }
+
+    /**
+     * Test that trying to delete a banner ID, which exists, returns the respective view.
+     */
+    public function test_deleting_an_existing_banner_is_possible(): void
+    {
+        $response = $this->actingAs($this->user)->delete(route('banner.delete', ['banner_id' => $this->banner->id]));
+        $response->assertRedirectToRoute('banners');
+        $response->assertSessionHas('success');
     }
 }

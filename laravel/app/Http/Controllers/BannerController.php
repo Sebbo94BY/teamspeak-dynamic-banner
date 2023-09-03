@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerAddRequest;
+use App\Http\Requests\BannerDeleteRequest;
+use App\Http\Requests\BannerEditRequest;
 use App\Http\Requests\BannerUpdateRequest;
 use App\Models\Banner;
 use App\Models\Instance;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -35,13 +35,10 @@ class BannerController extends Controller
      */
     public function save(BannerAddRequest $request): RedirectResponse
     {
-        $request->validated();
-
-        $banner = Banner::create([
-            'name' => $request->name,
-            'instance_id' => $request->instance_id,
-            'random_rotation' => ($request->has('random_rotation')) ? true : false,
-        ]);
+        $banner = new Banner;
+        $banner->name = $request->name;
+        $banner->instance_id = $request->instance_id;
+        $banner->random_rotation = ($request->has('random_rotation')) ? true : false;
 
         if (! $banner->save()) {
             return Redirect::route('banner.add')->withInput($request->all())->with([
@@ -59,17 +56,9 @@ class BannerController extends Controller
     /**
      * Display the edit view.
      */
-    public function edit(Request $request): View|RedirectResponse
+    public function edit(BannerEditRequest $request): View|RedirectResponse
     {
-        try {
-            $banner = Banner::findOrFail($request->banner_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->with([
-                    'error' => 'banner-not-found',
-                    'message' => 'The banner, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $banner = Banner::find($request->banner_id);
 
         return view('banner.edit', ['banner_id' => $banner->id])->with([
             'banner' => $banner,
@@ -83,16 +72,7 @@ class BannerController extends Controller
      */
     public function update(BannerUpdateRequest $request): RedirectResponse
     {
-        $request->validated();
-
-        try {
-            $banner = Banner::findOrFail($request->banner_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-not-found',
-                'message' => 'The banner, which you have tried to edit, does not exist.',
-            ]);
-        }
+        $banner = Banner::find($request->banner_id);
 
         $banner->name = $request->name;
         $banner->instance_id = $request->instance_id;
@@ -110,6 +90,26 @@ class BannerController extends Controller
         return Redirect::route('banner.edit', ['banner_id' => $banner->id])->with([
             'success' => 'banner-edit-successful',
             'message' => 'Successfully updated the banner.',
+        ]);
+    }
+
+    /**
+     * Deletes a specific banner.
+     */
+    public function delete(BannerDeleteRequest $request): RedirectResponse
+    {
+        $banner = Banner::find($request->banner_id);
+
+        if (! $banner->delete()) {
+            return Redirect::route('banners')->with([
+                'error' => 'banner-delete-error',
+                'message' => 'Failed to delete the banner from the database. Please try again.',
+            ]);
+        }
+
+        return Redirect::route('banners')->with([
+            'success' => 'banner-delete-successful',
+            'message' => 'Successfully deleted the banner.',
         ]);
     }
 }
