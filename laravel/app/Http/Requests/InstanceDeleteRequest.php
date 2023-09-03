@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class InstanceUpdateRequest extends FormRequest
+class InstanceDeleteRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
@@ -25,14 +25,6 @@ class InstanceUpdateRequest extends FormRequest
     {
         return [
             'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
-            'host' => ['required', 'string', 'max:255'],
-            'voice_port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'serverquery_port' => ['required', 'integer', 'min:1', 'max:65535'],
-            'serverquery_username' => ['required', 'string'],
-            'serverquery_password' => ['required', 'string'],
-            'client_nickname' => ['required', 'string', 'max:30'],
-            'default_channel_id' => ['nullable', 'integer'],
-            'autostart_enabled' => ['sometimes'],
         ];
     }
 }

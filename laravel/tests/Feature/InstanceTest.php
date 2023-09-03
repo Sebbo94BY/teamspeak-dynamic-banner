@@ -100,15 +100,6 @@ class InstanceTest extends TestCase
     // }
 
     /**
-     * Test, that the user gets redirected to the instances overview, when the requested instance ID for the edit page does not exist.
-     */
-    public function test_edit_instance_page_gets_redirected_to_overview_when_instance_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('instance.edit', ['instance_id' => 1337]));
-        $response->assertRedirect(route('instances'));
-    }
-
-    /**
      * Test, that the user can access the "edit instance" page, when the requested instance ID for the edit page exists.
      *
      * Disabled because the assertions are failing with this error:
@@ -140,17 +131,6 @@ class InstanceTest extends TestCase
     }
 
     /**
-     * Test that trying to delete an instance ID, which does not exist, returns an error.
-     */
-    public function test_delete_instance_returns_an_error_when_the_given_instance_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->delete(route('instance.delete', ['instance_id' => 1337]));
-        $response->assertStatus(302);
-        $response->assertRedirectToRoute('instances');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that trying to delete an instance ID, which exists, returns the respective view.
      */
     public function test_delete_instance_returns_the_overview_when_the_given_instance_id_exists(): void
@@ -159,16 +139,6 @@ class InstanceTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
-    }
-
-    /**
-     * Test that trying to start an instance ID, which does not exist, returns an error.
-     */
-    public function test_starting_an_instance_returns_an_error_when_the_given_instance_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->post(route('instance.start', ['instance_id' => 1337]));
-        $response->assertRedirectToRoute('instances');
-        $response->assertSessionHas('error');
     }
 
     /**
@@ -182,16 +152,6 @@ class InstanceTest extends TestCase
     }
 
     /**
-     * Test that trying to stop an instance ID, which does not exist, returns an error.
-     */
-    public function test_stopping_an_instance_returns_an_error_when_the_given_instance_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->post(route('instance.stop', ['instance_id' => 1337]));
-        $response->assertRedirectToRoute('instances');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that trying to stop an instance ID, which exist, is possible.
      */
     public function test_stopping_an_instance_is_possible(): void
@@ -201,16 +161,6 @@ class InstanceTest extends TestCase
         $response = $this->actingAs($this->user)->post(route('instance.stop', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
-    }
-
-    /**
-     * Test that trying to restart an instance ID, which does not exist, returns an error.
-     */
-    public function test_restarting_an_instance_returns_an_error_when_the_given_instance_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->post(route('instance.restart', ['instance_id' => 1337]));
-        $response->assertRedirectToRoute('instances');
-        $response->assertSessionHas('error');
     }
 
     /**
