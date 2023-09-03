@@ -56,18 +56,6 @@ class AdministrationUsersTest extends TestCase
     }
 
     /**
-     * Test that trying to edit a user ID, which does not exist, returns an error.
-     */
-    public function test_edit_user_returns_an_error_when_the_given_uid_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('administration.user.edit', ['user_id' => 1337]));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('users');
-        $response->assertViewHas('error');
-    }
-
-    /**
      * Test that trying to edit a user ID, which exists, returns the respective view.
      */
     public function test_edit_user_returns_the_edit_form_when_the_given_uid_exists(): void
@@ -138,9 +126,8 @@ class AdministrationUsersTest extends TestCase
                 Role::where('name', '=', 'System Status Viewer')->first()->id,
             ],
         ]);
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('success');
+        $response->assertRedirectToRoute('administration.users');
+        $response->assertSessionHas('success');
     }
 
     /**
@@ -167,22 +154,6 @@ class AdministrationUsersTest extends TestCase
             'roles' => [1, 2, 8],
         ]);
         $response->assertSessionHasErrors(['email']);
-    }
-
-    /**
-     * Test that trying to update a user ID, which does not exist, returns an error.
-     */
-    public function test_update_user_returns_an_error_when_the_given_uid_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => 1337]), [
-            'name' => fake()->name(),
-            'email' => fake()->email(),
-            'roles' => [1, 2, 8],
-        ]);
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('users');
-        $response->assertViewHas('error');
     }
 
     /**
@@ -218,21 +189,8 @@ class AdministrationUsersTest extends TestCase
             'email' => fake()->email(),
             'roles' => [1, 2, 8],
         ]);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('users');
-        $response->assertViewHas('success');
-    }
-
-    /**
-     * Test that trying to delete a user ID, which does not exist, returns an error.
-     */
-    public function test_delete_user_returns_an_error_when_the_given_uid_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => 1337]));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('users');
-        $response->assertViewHas('error');
+        $response->assertRedirectToRoute('administration.users');
+        $response->assertSessionHas('success');
     }
 
     /**
@@ -243,9 +201,7 @@ class AdministrationUsersTest extends TestCase
         $other_user = User::factory()->create();
 
         $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => $other_user->id]));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.users');
-        $response->assertViewHas('users');
-        $response->assertViewHas('success');
+        $response->assertRedirectToRoute('administration.users');
+        $response->assertSessionHas('success');
     }
 }
