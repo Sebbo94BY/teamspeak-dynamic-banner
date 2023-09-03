@@ -32,6 +32,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (! file_exists(public_path($this->upload_directory))) {
+            mkdir(public_path($this->upload_directory), 0755, true);
+        }
+
         foreach (array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH) as $fontfile_path) {
             // Move the manually uploaded file from the old into the new directory
             rename(
