@@ -77,9 +77,6 @@ class TeamspeakBot extends Command
     protected function message(string $log_level, string $message)
     {
         switch (strtoupper($log_level)) {
-            case 'DEBUG':
-                (boolval($this->option('background'))) ? Log::debug($message) : $this->warn($message);
-                break;
             case 'INFO':
                 (boolval($this->option('background'))) ? Log::info($message) : $this->info($message);
                 break;
