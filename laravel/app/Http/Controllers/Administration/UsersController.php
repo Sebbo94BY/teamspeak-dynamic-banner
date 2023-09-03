@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserAddRequest;
+use App\Http\Requests\UserDeleteRequest;
+use App\Http\Requests\UserEditRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -37,28 +39,19 @@ class UsersController extends Controller
     /**
      * Display the user edit form.
      */
-    public function edit_user(Request $request): View|RedirectResponse
+    public function edit_user(UserEditRequest $request): View
     {
-        try {
-            $user = User::findOrFail($request->user_id);
-        } catch (ModelNotFoundException) {
-            return view('administration.users', [
-                'users' => User::all(),
-                'error' => 'user-not-found',
-                'message' => 'The user, which you have tried to edit, does not exist.',
-            ]);
-        }
-
-        return view('administration.user.edit', ['user' => $user, 'roles' => Role::all()]);
+        return view('administration.user.edit', [
+            'user' => User::find($request->user_id),
+            'roles' => Role::all(),
+        ]);
     }
 
     /**
      * Creates a new user model in the database.
      */
-    public function create_user(UserAddRequest $request): RedirectResponse|View
+    public function create_user(UserAddRequest $request): RedirectResponse
     {
-        $request->validated();
-
         $initial_password = Str::random(16);
 
         $user = new User;
@@ -77,8 +70,7 @@ class UsersController extends Controller
             $user->assignRole($role_id);
         }
 
-        return view('administration.users', [
-            'users' => User::all(),
+        return Redirect::route('administration.users')->with([
             'success' => 'user-add-successful',
             'message' => "Successfully added the new user. Initial password: $initial_password",
         ]);
@@ -87,34 +79,25 @@ class UsersController extends Controller
     /**
      * Updates a single user.
      */
-    public function update_user(UserUpdateRequest $request): RedirectResponse|View
+    public function update_user(UserUpdateRequest $request): RedirectResponse
     {
-        $request->validated();
-
-        try {
-            $user = User::findOrFail($request->user_id);
-        } catch (ModelNotFoundException) {
-            return view('administration.users', [
-                'users' => User::all(),
-                'error' => 'user-not-found',
-                'message' => 'The user, which you have tried to update, does not exist.',
-            ]);
-        }
+        $user = User::find($request->user_id);
 
         $user->name = $request->name;
         $user->email = $request->email;
 
         if (! $user->save()) {
-            return Redirect::route('administration.user.edit', ['user_id' => $request->user_id])->withInput($request->all())->with([
-                'error' => 'user-update-error',
-                'message' => 'Failed to update the user in the database. Please try again.',
-            ]);
+            return Redirect::route('administration.user.edit', ['user_id' => $request->user_id])
+                ->withInput($request->all())
+                ->with([
+                    'error' => 'user-update-error',
+                    'message' => 'Failed to update the user in the database. Please try again.',
+                ]);
         }
 
         $user->syncRoles($request->roles);
 
-        return view('administration.users', [
-            'users' => User::all(),
+        return Redirect::route('administration.users')->with([
             'success' => 'user-update-successful',
             'message' => 'Successfully updated the user.',
         ]);
@@ -123,28 +106,18 @@ class UsersController extends Controller
     /**
      * Deletes a single user.
      */
-    public function delete_user(Request $request): View
+    public function delete_user(UserDeleteRequest $request): RedirectResponse
     {
-        try {
-            $user = User::findOrFail($request->user_id);
-        } catch (ModelNotFoundException) {
-            return view('administration.users', [
-                'users' => User::all(),
-                'error' => 'user-not-found',
-                'message' => 'The user, which you have tried to delete, does not exist.',
-            ]);
-        }
+        $user = User::find($request->user_id);
 
         if (! $user->delete()) {
-            return view('administration.users', [
-                'users' => User::all(),
+            return Redirect::route('administration.users')->with([
                 'error' => 'user-delete-error',
                 'message' => 'Failed to delete the user from the database. Please try again.',
             ]);
         }
 
-        return view('administration.users', [
-            'users' => User::all(),
+        return Redirect::route('administration.users')->with([
             'success' => 'user-delete-successful',
             'message' => 'Successfully deleted the user.',
         ]);

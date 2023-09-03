@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
+use App\Http\Requests\BannerConfigurationDeleteRequest;
+use App\Http\Requests\BannerConfigurationEditRequest;
 use App\Http\Requests\BannerConfigurationUpsertRequest;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -20,30 +20,23 @@ class BannerConfigurationController extends Controller
     /**
      * Callback function to only return TTF files.
      */
-    public function is_ttf_file($value, $key)
+    public function is_ttf_file($filename): bool
     {
-        return preg_match("/\.ttf$/", $value);
+        return preg_match("/\.ttf$/", $filename);
     }
 
     /**
      * Display the edit view.
      */
-    public function edit(Request $request): View|RedirectResponse
+    public function edit(BannerConfigurationEditRequest $request): View|RedirectResponse
     {
-        try {
-            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-template-not-found',
-                'message' => 'The banner template configuration, which you have tried to edit, does not exist.',
-            ]);
-        }
-
-        $installed_ttf_files = array_filter(Storage::disk('public')->files('fonts/'), $this->is_ttf_file(...), ARRAY_FILTER_USE_BOTH);
-
         return view('banner.configuration')->with([
-            'banner_template' => $banner_template,
-            'installed_ttf_files' => $installed_ttf_files,
+            'banner_template' => BannerTemplate::find($request->banner_template_id),
+            'installed_ttf_files' => array_filter(
+                Storage::disk('public')->files('fonts/'),
+                $this->is_ttf_file(...),
+                ARRAY_FILTER_USE_BOTH
+            ),
         ]);
     }
 
@@ -52,8 +45,6 @@ class BannerConfigurationController extends Controller
      */
     public function upsert(BannerConfigurationUpsertRequest $request): View|RedirectResponse
     {
-        $request->validated();
-
         $banner_template = BannerTemplate::find($request->banner_template_id);
         $banner_template->redirect_url = $request->redirect_url;
         $banner_template->disable_at = (isset($request->disable_at)) ? Carbon::parse($request->disable_at) : null;
@@ -131,16 +122,9 @@ class BannerConfigurationController extends Controller
     /**
      * Deletes a single banner configuration.
      */
-    public function delete(Request $request): RedirectResponse
+    public function delete(BannerConfigurationDeleteRequest $request): RedirectResponse
     {
-        try {
-            $banner_configuration = BannerConfiguration::findOrFail($request->banner_configuration_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-configuration-not-found',
-                'message' => 'The banner configuration, which you have tried to delete, does not exist.',
-            ]);
-        }
+        $banner_configuration = BannerConfiguration::find($request->banner_configuration_id);
 
         if (! $banner_configuration->delete()) {
             return Redirect::route('banners')->with([
@@ -149,33 +133,22 @@ class BannerConfigurationController extends Controller
             ]);
         }
 
-        try {
-            $banner_template = BannerTemplate::findOrFail($banner_configuration->bannerTemplate->id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-template-not-found',
-                    'message' => 'The banner template configuration, where you have tried to remove a configuration, does not exist.',
-                ]);
-        }
-
         $draw_text_on_template_helper = new DrawTextOnTemplateController();
 
         try {
-            $draw_text_on_template_helper->draw_text_to_image($banner_template, true, false, $request->ip());
+            $draw_text_on_template_helper->draw_text_to_image($banner_configuration->bannerTemplate, true, false, $request->ip());
         } catch (Exception $exception) {
-            return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
+            return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_configuration->bannerTemplate->id])
                 ->with([
-                    'banner_template' => $banner_template,
+                    'banner_template' => $banner_configuration->bannerTemplate,
                     'error' => 'banner-template-draw-text-to-image-error',
                     'message' => "Failed to draw the text to the template: $exception",
                 ]);
         }
 
-        return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id])
+        return Redirect::route('banner.template.configuration.edit', ['banner_template_id' => $banner_configuration->bannerTemplate->id])
             ->with([
-                'banner_template' => $banner_template,
+                'banner_template' => $banner_configuration->bannerTemplate,
                 'success' => 'banner-configuration-delete-successful',
                 'message' => 'Successfully deleted the banner configuration.',
             ]);

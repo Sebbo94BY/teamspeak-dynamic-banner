@@ -30,8 +30,6 @@ class UserController extends Controller
      */
     public function create(InstallerAddUserRequest $request): RedirectResponse
     {
-        $request->validated();
-
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;

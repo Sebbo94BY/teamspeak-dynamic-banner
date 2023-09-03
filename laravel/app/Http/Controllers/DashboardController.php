@@ -19,7 +19,6 @@ class DashboardController extends Controller
             'instances_count' => Instance::all()->count(),
             'templates_count' => Template::all()->count(),
             'banners_count' => Banner::all()->count(),
-            'banner_configurations_count' => BannerConfiguration::all()->count(),
         ]);
     }
 }

@@ -19,9 +19,15 @@
                             {{ session('message') }}
                         </div>
                     @endif
-                    @if (session('error'))
+                    @if (session('error') or $errors->any())
                         <div class="alert alert-danger" role="alert">
                             {{ session('message') }}
+
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     @endif
 

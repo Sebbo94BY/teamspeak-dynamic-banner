@@ -68,16 +68,6 @@ class BannerTemplateTest extends TestCase
     }
 
     /**
-     * Test that trying to open the add template view for a non-existing banner returns an error.
-     */
-    public function test_opening_the_add_template_view_for_a_not_existing_banner_returns_an_error(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.template.add', ['banner_id' => 1337]));
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that adding a new template to a banner requires to match the request rules.
      */
     public function test_adding_a_new_template_to_a_banner_requires_to_match_the_request_rules(): void
@@ -86,16 +76,6 @@ class BannerTemplateTest extends TestCase
             'banner_id' => $this->banner->id,
         ]);
         $response->assertSessionHasErrors(['template_id']);
-    }
-
-    /**
-     * Test, that the user gets redirected to the banners overview, when the requested banner ID for the edit page does not exist.
-     */
-    public function test_edit_banner_page_gets_redirected_to_overview_when_banner_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.templates', ['banner_id' => 1337]));
-        $response->assertRedirect(route('banners'));
-        $response->assertSessionHas('error');
     }
 
     /**
@@ -138,17 +118,6 @@ class BannerTemplateTest extends TestCase
     }
 
     /**
-     * Test that trying to remove a non-existing template from a banner returns an error.
-     */
-    public function test_removing_a_not_existing_template_from_a_banner_returns_an_error(): void
-    {
-        $response = $this->actingAs($this->user)->delete(route('banner.template.remove', ['banner_template_id' => 1337]));
-
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that a template can be removed from a banner.
      */
     public function test_a_template_can_be_removed_from_a_banner(): void
@@ -166,17 +135,6 @@ class BannerTemplateTest extends TestCase
         $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');
         $this->assertEquals(0, count($this->banner->templates));
-    }
-
-    /**
-     * Test that trying to disable a non-existing template from a banner returns an error.
-     */
-    public function test_disabling_a_not_existing_template_from_a_banner_returns_an_error(): void
-    {
-        $response = $this->actingAs($this->user)->patch(route('banner.template.disable', ['banner_template_id' => 1337]));
-
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
     }
 
     /**
@@ -198,17 +156,6 @@ class BannerTemplateTest extends TestCase
         $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');
         $this->assertFalse(BannerTemplate::find($banner_template->id)->enabled);
-    }
-
-    /**
-     * Test that trying to enable a non-existing template from a banner returns an error.
-     */
-    public function test_enabling_a_not_existing_template_from_a_banner_returns_an_error(): void
-    {
-        $response = $this->actingAs($this->user)->patch(route('banner.template.enable', ['banner_template_id' => 1337]));
-
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
     }
 
     /**

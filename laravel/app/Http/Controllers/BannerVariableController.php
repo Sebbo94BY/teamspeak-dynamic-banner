@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\BannerVariableController as HelpersBannerVariableController;
+use App\Http\Requests\BannerVariableOverviewRequest;
 use App\Models\Banner;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\View\View;
 use Predis\Connection\ConnectionException;
@@ -17,18 +15,9 @@ class BannerVariableController extends Controller
     /**
      * Display the overview page.
      */
-    public function overview(Request $request): View|RedirectResponse
+    public function overview(BannerVariableOverviewRequest $request): View|RedirectResponse
     {
-        try {
-            $banner = Banner::findOrFail($request->banner_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-not-found',
-                    'message' => 'The banner variables, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $banner = Banner::find($request->banner_id);
 
         $redis_connection_error = null;
         $variables_and_values = [];

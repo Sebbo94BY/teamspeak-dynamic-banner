@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -15,17 +15,17 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => Auth::user(),
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): View|RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
 
@@ -42,8 +42,7 @@ class ProfileController extends Controller
                 ]);
         }
 
-        return view('profile.edit')->with([
-            'user' => $request->user(),
+        return Redirect::route('profile.edit')->with([
             'success' => 'user-profile-edit-successful',
             'message' => 'Successfully updated the profile.',
         ]);
@@ -52,32 +51,25 @@ class ProfileController extends Controller
     /**
      * Update the user's password.
      */
-    public function change_password(ChangePasswordRequest $request): View
+    public function change_password(ChangePasswordRequest $request): RedirectResponse
     {
-        $request->validated();
-
         if (! Hash::check($request->current_password, $request->user()->password)) {
-            return view('profile.edit')
-                ->with([
-                    'user' => $request->user(),
-                    'error' => 'user-password-edit-error',
-                    'message' => 'Your provided current password was incorrect.',
-                ]);
+            return Redirect::route('profile.edit')->with([
+                'error' => 'user-password-edit-error',
+                'message' => 'Your provided current password was incorrect.',
+            ]);
         }
 
         $request->user()->password = Hash::make($request->password);
 
         if (! $request->user()->save()) {
-            return view('profile.edit')
-                ->with([
-                    'user' => $request->user(),
-                    'error' => 'user-password-edit-error',
-                    'message' => 'Failed to update the password information in the database. Please try again.',
-                ]);
+            return Redirect::route('profile.edit')->with([
+                'error' => 'user-password-edit-error',
+                'message' => 'Failed to update the password information in the database. Please try again.',
+            ]);
         }
 
-        return view('profile.edit')->with([
-            'user' => $request->user(),
+        return Redirect::route('profile.edit')->with([
             'success' => 'user-password-edit-successful',
             'message' => 'Successfully updated the password.',
         ]);

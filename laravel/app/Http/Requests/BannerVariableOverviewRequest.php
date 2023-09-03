@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BannerUpdateRequest extends FormRequest
+class BannerVariableOverviewRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
@@ -19,15 +19,12 @@ class BannerUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, mixed>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'banner_id' => ['required', 'integer', 'exists:App\Models\Banner,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
-            'random_rotation' => ['sometimes'],
         ];
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BannerUpdateRequest extends FormRequest
+class TemplateDeleteRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
@@ -12,7 +12,7 @@ class BannerUpdateRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'banner_id' => $this->route('banner_id'),
+            'template_id' => $this->route('template_id'),
         ]);
     }
 
@@ -24,10 +24,7 @@ class BannerUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'banner_id' => ['required', 'integer', 'exists:App\Models\Banner,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
-            'random_rotation' => ['sometimes'],
+            'template_id' => ['required', 'integer', 'exists:App\Models\Template,id'],
         ];
     }
 }

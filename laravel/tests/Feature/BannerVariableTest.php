@@ -41,15 +41,6 @@ class BannerVariableTest extends TestCase
     }
 
     /**
-     * Test, that the user gets redirected to the overview page, when the given banner ID does not exist.
-     */
-    public function test_user_gets_redirected_when_banner_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.variables', ['banner_id' => 1337]));
-        $response->assertRedirect(route('banners'));
-    }
-
-    /**
      * Test that the view gets displayed.
      */
     public function test_user_can_view_the_page(): void

@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Http\Requests\InstanceAddRequest;
+use App\Http\Requests\InstanceDeleteRequest;
+use App\Http\Requests\InstanceEditRequest;
+use App\Http\Requests\InstanceRestartRequest;
+use App\Http\Requests\InstanceStartRequest;
+use App\Http\Requests\InstanceStopRequest;
 use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -38,8 +41,6 @@ class InstanceController extends Controller
      */
     public function save(InstanceAddRequest $request): RedirectResponse
     {
-        $request->validated();
-
         $instance = new Instance;
         $instance->host = $request->host;
         $instance->voice_port = $request->voice_port;
@@ -96,18 +97,9 @@ class InstanceController extends Controller
     /**
      * Display the edit view.
      */
-    public function edit(Request $request): View|RedirectResponse
+    public function edit(InstanceEditRequest $request): View|RedirectResponse
     {
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('instances')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'instance-not-found',
-                    'message' => 'The instance, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $instance = Instance::find($request->instance_id);
 
         try {
             $virtualserver_helper = new TeamSpeakVirtualserver($instance);
@@ -150,16 +142,7 @@ class InstanceController extends Controller
      */
     public function update(InstanceUpdateRequest $request): RedirectResponse
     {
-        $request->validated();
-
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('instances')->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to edit, does not exist.',
-            ]);
-        }
+        $instance = Instance::find($request->instance_id);
 
         $instance->host = $request->host;
         $instance->voice_port = $request->voice_port;
@@ -215,16 +198,9 @@ class InstanceController extends Controller
     /**
      * Delete the instance.
      */
-    public function delete(Request $request): RedirectResponse
+    public function delete(InstanceDeleteRequest $request): RedirectResponse
     {
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return redirect(route('instances'), 302)->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to delete, does not exist.',
-            ]);
-        }
+        $instance = Instance::find($request->instance_id);
 
         if (! $instance->delete()) {
             return redirect(route('instances'), 302)->with([
@@ -242,16 +218,9 @@ class InstanceController extends Controller
     /**
      * Starts the bot for the instance.
      */
-    public function start(Request $request): RedirectResponse
+    public function start(InstanceStartRequest $request): RedirectResponse
     {
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('instances')->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to stop, does not exist.',
-            ]);
-        }
+        $instance = Instance::find($request->instance_id);
 
         $process = Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
 
@@ -271,16 +240,9 @@ class InstanceController extends Controller
     /**
      * Stops the bot for the instance.
      */
-    public function stop(Request $request): RedirectResponse
+    public function stop(InstanceStopRequest $request): RedirectResponse
     {
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('instances')->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to stop, does not exist.',
-            ]);
-        }
+        $instance = Instance::find($request->instance_id);
 
         $process_id = $instance->process->process_id;
         $process = Process::run('php '.base_path()."/artisan process:send-signal SIGTERM $process_id");
@@ -308,16 +270,9 @@ class InstanceController extends Controller
     /**
      * Restarts the bot for the instance.
      */
-    public function restart(Request $request): RedirectResponse
+    public function restart(InstanceRestartRequest $request): RedirectResponse
     {
-        try {
-            $instance = Instance::findOrFail($request->instance_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('instances')->with([
-                'error' => 'instance-not-found',
-                'message' => 'The instance, which you have tried to restart, does not exist.',
-            ]);
-        }
+        $instance = Instance::findOrFail($request->instance_id);
 
         $process_id = $instance->process->process_id;
         $process = Process::run('php '.base_path()."/artisan process:send-signal SIGTERM $process_id");

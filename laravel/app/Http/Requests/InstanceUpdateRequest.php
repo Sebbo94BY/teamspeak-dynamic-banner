@@ -7,6 +7,16 @@ use Illuminate\Foundation\Http\FormRequest;
 class InstanceUpdateRequest extends FormRequest
 {
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'instance_id' => $this->route('instance_id'),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
@@ -14,6 +24,7 @@ class InstanceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
             'host' => ['required', 'string', 'max:255'],
             'voice_port' => ['required', 'integer', 'min:1', 'max:65535'],
             'serverquery_port' => ['required', 'integer', 'min:1', 'max:65535'],

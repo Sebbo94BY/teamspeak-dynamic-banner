@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserUpdateRequest extends FormRequest
+class InstanceRestartRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
@@ -12,7 +12,7 @@ class UserUpdateRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'user_id' => $this->route('user_id'),
+            'instance_id' => $this->route('instance_id'),
         ]);
     }
 
@@ -24,10 +24,7 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'integer', 'exists:App\Models\User,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$this->user_id],
-            'roles' => ['required', 'array', 'min:1'],
+            'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
         ];
     }
 }

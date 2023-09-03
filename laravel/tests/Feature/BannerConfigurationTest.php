@@ -62,16 +62,6 @@ class BannerConfigurationTest extends TestCase
     }
 
     /**
-     * Test that trying to edit a non-existing banner template configuration returns an error.
-     */
-    public function test_editing_a_non_existing_banner_template_configuration_returns_an_error(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.template.configuration.edit', ['banner_template_id' => 1337]));
-        $response->assertRedirectToRoute('banners');
-        $response->assertSessionHas('error');
-    }
-
-    /**
      * Test that upserting a banner configuration requires to match the request rules.
      */
     public function test_upserting_a_banner_configuration_requires_to_match_the_request_rules(): void
@@ -124,16 +114,6 @@ class BannerConfigurationTest extends TestCase
 
         $response->assertRedirectToRoute('banner.template.configuration.edit', ['banner_template_id' => $this->banner_template->id]);
         $response->assertSessionHas('banner_template');
-        $response->assertSessionHas('error');
-    }
-
-    /**
-     * Test that deleting a banner configuration returns an error when the banner configuration ID does not exist.
-     */
-    public function test_deleting_a_banner_configuration_returns_an_error_when_the_banner_configuration_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.template.configuration.delete', ['banner_configuration_id' => 1337]));
-        $response->assertRedirectToRoute('banners');
         $response->assertSessionHas('error');
     }
 

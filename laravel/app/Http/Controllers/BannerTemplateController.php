@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerTemplateAddRequest;
+use App\Http\Requests\BannerTemplateAddTemplateRequest;
+use App\Http\Requests\BannerTemplateDisableRequest;
+use App\Http\Requests\BannerTemplateEditRequest;
+use App\Http\Requests\BannerTemplateEnableRequest;
+use App\Http\Requests\BannerTemplateRemoveRequest;
 use App\Jobs\CloneOriginalTemplate;
 use App\Models\Banner;
 use App\Models\BannerTemplate;
 use App\Models\Template;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -25,18 +28,9 @@ class BannerTemplateController extends Controller
     /**
      * Display the edit view.
      */
-    public function edit(Request $request): View|RedirectResponse
+    public function edit(BannerTemplateEditRequest $request): View
     {
-        try {
-            $banner = Banner::findOrFail($request->banner_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'banner-not-found',
-                    'message' => 'The banner templates, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $banner = Banner::find($request->banner_id);
 
         return view('banner.template', ['banner_id' => $banner->id])->with([
             'banner' => $banner,
@@ -47,16 +41,9 @@ class BannerTemplateController extends Controller
     /**
      * Display the view to add a template to the banner.
      */
-    public function add_template(Request $request): View|RedirectResponse
+    public function add_template(BannerTemplateAddTemplateRequest $request): View
     {
-        try {
-            $banner = Banner::findOrFail($request->banner_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-not-found',
-                'message' => 'The banner templates, which you have tried to edit, does not exist.',
-            ]);
-        }
+        $banner = Banner::find($request->banner_id);
 
         return view('banner.template_add', ['banner_id' => $banner->id])->with([
             'banner' => $banner,
@@ -69,8 +56,6 @@ class BannerTemplateController extends Controller
      */
     public function add(BannerTemplateAddRequest $request): RedirectResponse
     {
-        $request->validated();
-
         $banner_template = new BannerTemplate;
         $banner_template->banner_id = $request->banner_id;
         $banner_template->template_id = $request->template_id;
@@ -106,16 +91,9 @@ class BannerTemplateController extends Controller
     /**
      * Removes a template from a banner configuration.
      */
-    public function remove(Request $request): RedirectResponse
+    public function remove(BannerTemplateRemoveRequest $request): RedirectResponse
     {
-        try {
-            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-template-remove-error',
-                'message' => 'The template, which you tried to remove from the banner does not exist.',
-            ]);
-        }
+        $banner_template = BannerTemplate::find($request->banner_template_id);
 
         if (! $banner_template->delete()) {
             return Redirect::route('banner.templates', ['banner_id' => $banner_template->banner_id])->with([
@@ -133,16 +111,9 @@ class BannerTemplateController extends Controller
     /**
      * Disables a template of a banner configuration.
      */
-    public function disable(Request $request): RedirectResponse
+    public function disable(BannerTemplateDisableRequest $request): RedirectResponse
     {
-        try {
-            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-template-disable-error',
-                'message' => 'The template, which you have tried to disable from the banner does not exist.',
-            ]);
-        }
+        $banner_template = BannerTemplate::find($request->banner_template_id);
 
         $banner_template->enabled = false;
 
@@ -162,16 +133,9 @@ class BannerTemplateController extends Controller
     /**
      * Enables a template of a banner configuration.
      */
-    public function enable(Request $request): RedirectResponse
+    public function enable(BannerTemplateEnableRequest $request): RedirectResponse
     {
-        try {
-            $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('banners')->with([
-                'error' => 'banner-template-enable-error',
-                'message' => 'The template, which you have tried to enable for the banner does not exist.',
-            ]);
-        }
+        $banner_template = BannerTemplate::findOrFail($request->banner_template_id);
 
         $banner_template->enabled = true;
 
