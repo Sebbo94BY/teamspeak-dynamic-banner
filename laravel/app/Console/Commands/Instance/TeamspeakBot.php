@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Adapter\ServerQuery;
 use PlanetTeamSpeak\TeamSpeak3Framework\Adapter\ServerQuery\Event;
+use PlanetTeamSpeak\TeamSpeak3Framework\Exception\AdapterException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\TransportException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Helper\Signal;
@@ -76,9 +77,6 @@ class TeamspeakBot extends Command
     protected function message(string $log_level, string $message)
     {
         switch (strtoupper($log_level)) {
-            case 'DEBUG':
-                (boolval($this->option('background'))) ? Log::debug($message) : $this->warn($message);
-                break;
             case 'INFO':
                 (boolval($this->option('background'))) ? Log::info($message) : $this->info($message);
                 break;
@@ -97,8 +95,11 @@ class TeamspeakBot extends Command
     /**
      * Callback method for 'serverqueryWaitTimeout' signals.
      *
-     * @param int $seconds
+     * @param  int  $idle_seconds
+     * @param  ServerQuery  $serverquery
      * @return void
+     * @throws ServerQueryException
+     * @throws AdapterException
      */
     public function onWaitTimeout(int $idle_seconds, ServerQuery $serverquery)
     {
@@ -139,7 +140,8 @@ class TeamspeakBot extends Command
     /**
      * Callback method for 'notifyEvent' signals.
      *
-     * @param int $seconds
+     * @param  Event  $event
+     * @param  Host  $host
      * @return void
      */
     public function onEvent(Event $event, Host $host)

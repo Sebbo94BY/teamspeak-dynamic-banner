@@ -19,7 +19,7 @@ class CloneOriginalTemplate implements ShouldQueue, ShouldBeUnique
     /**
      * The template model to be used here.
      *
-     * @var \App\Models\Template
+     * @var Template
      */
     protected Template $template;
 
@@ -42,7 +42,7 @@ class CloneOriginalTemplate implements ShouldQueue, ShouldBeUnique
      *
      * @var int
      */
-    public $uniqueFor = 10;
+    public int $uniqueFor = 10;
 
     /**
      * The unique ID of the job.
@@ -57,7 +57,7 @@ class CloneOriginalTemplate implements ShouldQueue, ShouldBeUnique
      *
      * @var bool
      */
-    public $deleteWhenMissingModels = true;
+    public bool $deleteWhenMissingModels = true;
 
     /**
      * Create a new job instance.
