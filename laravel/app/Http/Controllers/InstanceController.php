@@ -155,7 +155,7 @@ class InstanceController extends Controller
         try {
             $instance = Instance::findOrFail($request->instance_id);
         } catch (ModelNotFoundException) {
-            return view('instance.main')->with([
+            return Redirect::route('instances')->with([
                 'error' => 'instance-not-found',
                 'message' => 'The instance, which you have tried to edit, does not exist.',
             ]);
