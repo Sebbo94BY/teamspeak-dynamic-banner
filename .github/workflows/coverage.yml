@@ -23,7 +23,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: json ctype openssl ssh2
+          extensions: json ctype openssl ssh2 gd pcntl
           coverage: xdebug
           tools: none
 
