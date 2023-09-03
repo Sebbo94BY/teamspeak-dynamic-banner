@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TemplateUpdateRequest extends FormRequest
+class TemplateEditRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
@@ -25,8 +25,6 @@ class TemplateUpdateRequest extends FormRequest
     {
         return [
             'template_id' => ['required', 'integer', 'exists:App\Models\Template,id'],
-            'alias' => ['required', 'string'],
-            'file' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'dimensions:min_width=468,min_height=60,max_width=1024,max_height=300', 'max:5120'],
         ];
     }
 }

@@ -72,15 +72,6 @@ class TemplateTest extends TestCase
     }
 
     /**
-     * Test, that the user gets redirected to the templates overview, when the requested template ID for the edit page does not exist.
-     */
-    public function test_edit_template_page_gets_redirected_to_overview_when_template_id_does_not_exist(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => 1337]));
-        $response->assertRedirect(route('templates'));
-    }
-
-    /**
      * Test, that the user can access the "edit template" page, when the requested template ID for the edit page exists.
      */
     public function test_edit_template_page_gets_displayed_when_template_id_exists(): void

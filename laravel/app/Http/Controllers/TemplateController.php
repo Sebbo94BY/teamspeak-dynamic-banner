@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TemplateAddRequest;
+use App\Http\Requests\TemplateDeleteRequest;
+use App\Http\Requests\TemplateEditRequest;
 use App\Http\Requests\TemplateUpdateRequest;
 use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Template;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -42,8 +42,6 @@ class TemplateController extends Controller
      */
     public function save(TemplateAddRequest $request): RedirectResponse
     {
-        $request->validated();
-
         $filename = time().'_'.$request->file->getClientOriginalName();
         $request->file->move(public_path($this->upload_directory_original), $filename);
 
@@ -75,18 +73,9 @@ class TemplateController extends Controller
     /**
      * Display the edit view.
      */
-    public function edit(Request $request): View|RedirectResponse
+    public function edit(TemplateEditRequest $request): View|RedirectResponse
     {
-        try {
-            $template = Template::findOrFail($request->template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('templates')
-                ->withInput($request->all())
-                ->with([
-                    'error' => 'template-not-found',
-                    'message' => 'The template, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $template = Template::find($request->template_id);
 
         return view('template.edit', ['template_id' => $template->id])->with([
             'template' => $template,
@@ -98,17 +87,7 @@ class TemplateController extends Controller
      */
     public function update(TemplateUpdateRequest $request): RedirectResponse
     {
-        $request->validated();
-
-        try {
-            $template = Template::findOrFail($request->template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('templates')
-                ->with([
-                    'error' => 'template-not-found',
-                    'message' => 'The template, which you have tried to edit, does not exist.',
-                ]);
-        }
+        $template = Template::find($request->template_id);
 
         $template->alias = $request->alias;
 
@@ -155,16 +134,9 @@ class TemplateController extends Controller
     /**
      * Delete the template.
      */
-    public function delete(Request $request): RedirectResponse
+    public function delete(TemplateDeleteRequest $request): RedirectResponse
     {
-        try {
-            $template = Template::findOrFail($request->template_id);
-        } catch (ModelNotFoundException) {
-            return Redirect::route('templates')->with([
-                'error' => 'template-not-found',
-                'message' => 'The template, which you have tried to delete, does not exist.',
-            ]);
-        }
+        $template = Template::find($request->template_id);
 
         $file_path_original = public_path($template->file_path_original).'/'.$template->filename;
         if (file_exists($file_path_original)) {
