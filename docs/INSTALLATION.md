@@ -50,7 +50,7 @@ cd laravel/
 ```
 
 ```shell
-npm install
+npm install --omit=dev
 ```
 
 ```shell
