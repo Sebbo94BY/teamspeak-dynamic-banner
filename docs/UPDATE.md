@@ -47,7 +47,7 @@ If necessary, apply the necessary changes for the breaking changes from the rele
 Ensure, you have installed the required dependencies:
 
 ```shell
-npm install
+npm install --omit=dev
 ```
 
 ```shell
