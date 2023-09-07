@@ -53,6 +53,23 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
 
 ## Requirements
 
+### Hardware (minimum)
+
+> **Note**
+>
+> Depending on the configured and running TeamSpeak instance bots, available servergroups, currently connected clients on your TeamSpeak server(s) and the amount of clients which are requesting the banner(s), you might need more CPU cores and/or memory.
+>
+> In average, every TeamSpeak instance bot requires 50 MB memory while it is actively running.
+> 
+> Additional, you should calculate with another 50 MB memory for the actual application to e. g. generate the new rendered banners or when an administrator clicks through the application and changes configurations.
+>
+> So 128 MB memory should be sufficient in the most cases, but your operating system and other process also require some memory, so you should rather have at least 256 MB memory.
+
+* 1 CPU Core
+* 256 MB Memory
+
+### Software
+
 * Web server (e.g. apache, nginx)
 * PHP 8.1 or 8.2 with the following extensions:
     * see [Laravel PHP requirements](https://laravel.com/docs/10.x/deployment#server-requirements)
