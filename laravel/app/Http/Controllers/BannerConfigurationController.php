@@ -6,9 +6,11 @@ use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
 use App\Http\Requests\BannerConfigurationDeleteRequest;
 use App\Http\Requests\BannerConfigurationEditRequest;
 use App\Http\Requests\BannerConfigurationUpsertRequest;
+use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
 use App\Models\Font;
+use App\Models\Instance;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -22,9 +24,11 @@ class BannerConfigurationController extends Controller
      */
     public function edit(BannerConfigurationEditRequest $request): View|RedirectResponse
     {
+        $bannerID = Banner::query()->where('id','=',BannerTemplate::query()->where('template_id','=',$request->banner_template_id)->first()->banner_id)->get()->first();
         return view('banner.configuration')->with([
             'banner_template' => BannerTemplate::find($request->banner_template_id),
             'fonts' => Font::all(),
+            'instance'=>Instance::query()->where('id','=',$bannerID->instance_id)->get(),
         ]);
     }
 
