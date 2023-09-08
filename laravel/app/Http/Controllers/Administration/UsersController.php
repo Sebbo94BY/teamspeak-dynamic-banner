@@ -25,7 +25,10 @@ class UsersController extends Controller
      */
     public function users(): View
     {
-        return view('administration.users', ['users' => User::all()]);
+        return view('administration.users', [
+            'users' => User::all(),
+            'roles' => Role::all(),
+        ]);
     }
 
     /**
@@ -33,6 +36,7 @@ class UsersController extends Controller
      */
     public function add_user(): View
     {
+        //todo obsolete
         return view('administration.user.add', ['roles' => Role::all()]);
     }
 
@@ -41,6 +45,7 @@ class UsersController extends Controller
      */
     public function edit_user(UserEditRequest $request): View
     {
+        //todo obsolete
         return view('administration.user.edit', [
             'user' => User::find($request->user_id),
             'roles' => Role::all(),

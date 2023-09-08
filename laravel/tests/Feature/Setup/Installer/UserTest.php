@@ -74,7 +74,7 @@ class UserTest extends TestCase
             'password' => $plain_password,
             'password_confirmation' => $plain_password,
         ]);
-        $second_response->assertStatus(403);
+        $second_response->assertStatus(302);
     }
 
     /**

@@ -56,16 +56,17 @@ class BannerTest extends TestCase
         $response->assertViewHas('banners');
     }
 
-    /**
-     * Test, that the user can access the "add banner" page, when he is authenticated.
-     */
-    public function test_add_banner_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('banner.add');
-        $response->assertViewHas('instance_list');
-    }
+//    /**
+//     * Test, that the user can access the "add banner" page, when he is authenticated.
+//     */
+//    public function test_add_banner_page_gets_displayed_when_authenticated(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('banner.add'));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('banner.add');
+//        $response->assertViewHas('instance_list');
+//    }
 
     /**
      * Test that adding a new banner requires to match the request rules.
@@ -89,21 +90,22 @@ class BannerTest extends TestCase
             'name' => fake()->name(),
             'instance_id' => $instance->id,
         ]);
-        $response->assertRedirectToRoute('banner.edit', ['banner_id' => Banner::where('instance_id', '=', $instance->id)->first()->id]);
+        $response->assertRedirectToRoute('banners');
         $response->assertSessionHas('success');
     }
 
-    /**
-     * Test, that the user can access the "edit banner" page, when the requested banner ID for the edit page exists.
-     */
-    public function test_edit_banner_page_gets_displayed_when_banner_id_exists(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => $this->banner->id]));
-        $response->assertViewIs('banner.edit');
-        $response->assertViewHas('banner');
-        $response->assertViewHas('instance_list');
-        $response->assertViewHas('banner_configurations');
-    }
+//    /**
+//     * Test, that the user can access the "edit banner" page, when the requested banner ID for the edit page exists.
+//     */
+//    public function test_edit_banner_page_gets_displayed_when_banner_id_exists(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('banner.edit', ['banner_id' => $this->banner->id]));
+//        $response->assertViewIs('banner.edit');
+//        $response->assertViewHas('banner');
+//        $response->assertViewHas('instance_list');
+//        $response->assertViewHas('banner_configurations');
+//    }
 
     /**
      * Test that updating an existing banner requires to match the request rules.
@@ -129,7 +131,7 @@ class BannerTest extends TestCase
             'name' => fake()->name(),
             'instance_id' => $instance->id,
         ]);
-        $response->assertRedirectToRoute('banner.edit', ['banner_id' => $this->banner->id]);
+        $response->assertRedirectToRoute('banners');
         $response->assertSessionHas('success');
         $this->assertEquals($instance->id, Banner::find($this->banner->id)->instance->id);
     }

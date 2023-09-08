@@ -1,10 +1,19 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    PHP Info | Dynamic Banner
+@endsection
+
+@section('nav_link_active_php_info')
+    active
+@endsection
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-12">
-            {!! phpinfo() !!}
+        <div class="col-lg-12" id="phpinfo">
+            {!! $style !!}
+            {!! $phpinfo !!}
         </div>
     </div>
 </div>

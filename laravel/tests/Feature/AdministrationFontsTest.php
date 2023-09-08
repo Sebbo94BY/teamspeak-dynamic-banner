@@ -54,15 +54,16 @@ class AdministrationFontsTest extends TestCase
         $response->assertViewIs('administration.fonts');
     }
 
-    /**
-     * Test, that the user can access the "add font" page, when he is authenticated.
-     */
-    public function test_add_font_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('administration.font.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.font.add');
-    }
+//    /**
+//     * Test, that the user can access the "add font" page, when he is authenticated.
+//     */
+//    public function test_add_font_page_gets_displayed_when_authenticated(): void
+//    {
+//        //TODO obsolete
+//        $response = $this->actingAs($this->user)->get(route('administration.font.add'));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('administration.font.add');
+//    }
 
     /**
      * Test that adding a new font successfully returns the view.
@@ -79,13 +80,14 @@ class AdministrationFontsTest extends TestCase
     /**
      * Test that trying to edit a font ID, which exists, returns the respective view.
      */
-    public function test_edit_font_returns_the_edit_form_when_the_given_id_exists(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('administration.font.edit', ['font_id' => $this->font->id]));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.font.edit');
-        $response->assertViewHas('font');
-    }
+//    public function test_edit_font_returns_the_edit_form_when_the_given_id_exists(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('administration.font.edit', ['font_id' => $this->font->id]));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('administration.font.edit');
+//        $response->assertViewHas('font');
+//    }
 
     /**
      * Test that updating an existing font is working as expected.

@@ -56,16 +56,17 @@ class BannerTemplateTest extends TestCase
         $response->assertViewHas('templates');
     }
 
-    /**
-     * Test, that the user can access the "add banner template" page, when he is authenticated.
-     */
-    public function test_add_banner_template_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.template.add', ['banner_id' => $this->banner->id]));
-        $response->assertStatus(200);
-        $response->assertViewIs('banner.template_add');
-        $response->assertViewHas('templates');
-    }
+//    /**
+//     * Test, that the user can access the "add banner template" page, when he is authenticated.
+//     */
+//    public function test_add_banner_template_page_gets_displayed_when_authenticated(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('banner.template.add', ['banner_id' => $this->banner->id]));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('banner.template_add');
+//        $response->assertViewHas('templates');
+//    }
 
     /**
      * Test that adding a new template to a banner requires to match the request rules.

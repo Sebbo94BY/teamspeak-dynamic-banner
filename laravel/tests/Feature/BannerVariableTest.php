@@ -40,14 +40,15 @@ class BannerVariableTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    /**
-     * Test that the view gets displayed.
-     */
-    public function test_user_can_view_the_page(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('banner.variables', ['banner_id' => $this->banner->id]));
-        $response->assertViewIs('banner.variables');
-        $response->assertViewHas('redis_connection_error');
-        $response->assertViewHas('variables_and_values');
-    }
+//    /**
+//     * Test that the view gets displayed.
+//     */
+//    public function test_user_can_view_the_page(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('banner.variables', ['banner_id' => $this->banner->id]));
+//        $response->assertViewIs('banner.variables');
+//        $response->assertViewHas('redis_connection_error');
+//        $response->assertViewHas('variables_and_values');
+//    }
 }

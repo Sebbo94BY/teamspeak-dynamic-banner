@@ -1,195 +1,461 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    Systemstatus | Dynamic Banner
+@endsection
+
+@section('nav_link_active_system_status')
+    active
+@endsection
 
 @section('content')
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="fw-bold fs-3">{{$headline}}</h1>
+        </div>
+    </div>
+    <hr>
+</div>
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">{{ __("System Status") }}</div>
-
-                <div class="card-body">
-                    <p>{{ __("This page provides you some status information to ensure, that your application is working as expected and does not have any issues.") }}</p>
-
-                    @if ($system_status_warning_count + $system_status_danger_count == 0)
-                        <div class="alert alert-success" role="alert">
-                            There are no problems with your installation.
-                        </div>
-                    @endif
-
-                    @if ($system_status_warning_count > 0)
-                        <div class="alert alert-warning" role="alert">
-                            Your installation has {{ $system_status_warning_count }} {{ \Illuminate\Support\Str::plural("warning", $system_status_warning_count) }}, which you might want to fix for the best software experience.
-                        </div>
-                    @endif
-
-                    @if ($system_status_danger_count > 0)
-                        <div class="alert alert-danger" role="alert">
-                            Your installation has {{ $system_status_danger_count }} critical {{ \Illuminate\Support\Str::plural("issue", $system_status_danger_count) }}, which you need to fix that everything works properly.
-                        </div>
-                    @endif
-
-                    <table id="system-status" class="table table-striped" style="width:100%">
-                        <tbody>
-                            @php
-                                $previous_section_name = null;                                
-                            @endphp
-
-                            @foreach ($system_status as $section => $section_checks)
-                                <tr>
-                                    <td colspan="3" class="divider">
-                                        <hr />
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <b>{{ strtoupper($section) }}</b>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="3" class="divider">
-                                        <hr />
-                                    </td>
-                                </tr>
-
-                                @php
-                                    $previous_nested_check_key = null;
-                                @endphp
-
-                                @foreach ($section_checks as $nested_checks)
-                                    @foreach ($nested_checks as $subcheck)
-                                        @if (isset($subcheck->current_value))
-                                            <tr>
-                                                <td>
-                                                    {{ (isset($subcheck->name)) ? $subcheck->name : $subcheck }}
-                                                    @if (isset($subcheck->required_value))
-                                                    <code>{{ $subcheck->required_value }}</code>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if (strtoupper($subcheck->severity) == 'INFO')
-                                                    <i class="fa-solid fa-circle-info text-info"></i>
-                                                    @elseif (strtoupper($subcheck->severity) == 'SUCCESS')
-                                                    <i class="fa-solid fa-circle-check text-success"></i>
-                                                    @elseif (strtoupper($subcheck->severity) == 'WARNING')
-                                                    <i class="fa-solid fa-triangle-exclamation text-warning"></i>
-                                                    @elseif (strtoupper($subcheck->severity) == 'DANGER')
-                                                    <i class="fa-solid fa-circle-xmark text-danger"></i>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    {{ (isset($subcheck->current_value)) ? $subcheck->current_value : "NO CURRENT VALUE" }}
-                                                </td>
-                                            </tr>
-                                        @else
-                                            @if (! isset($nested_checks->name))
-                                                @continue
-                                            @endif
-
-                                            @if ($nested_checks->name == $previous_nested_check_key)
-                                                @continue
-                                            @endif
-
-                                            @php
-                                                $previous_nested_check_key = $nested_checks->name;
-                                            @endphp
-
-                                            <tr>
-                                                <td>
-                                                    {{ $nested_checks->name }}
-                                                    @if (isset($nested_checks->required_value))
-                                                    <code>{{ $nested_checks->required_value }}</code>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <ul class="list-unstyled">
-                                                        @foreach ($nested_checks as $subcheck)
-                                                        @if (! is_string($subcheck))
-                                                        <li>
-                                                            @if (strtoupper($subcheck->severity) == 'INFO')
-                                                            <i class="fa-solid fa-circle-info text-info"></i>
-                                                            @elseif (strtoupper($subcheck->severity) == 'SUCCESS')
-                                                            <i class="fa-solid fa-circle-check text-success"></i>
-                                                            @elseif (strtoupper($subcheck->severity) == 'WARNING')
-                                                            <i class="fa-solid fa-triangle-exclamation text-warning"></i>
-                                                            @elseif (strtoupper($subcheck->severity) == 'DANGER')
-                                                            <i class="fa-solid fa-circle-xmark text-danger"></i>
-                                                            @endif
-                                                        </li>
-                                                        @endif
-                                                        @endforeach
-                                                    </ul>
-                                                </td>
-                                                <td>
-                                                    <ul class="list-unstyled">
-                                                        @foreach ($nested_checks as $subcheck)
-                                                        @if (! is_string($subcheck))
-                                                        <li>{{ (isset($subcheck->name)) ? $subcheck->name : "NO NAME" }}</li>
-                                                        @endif
-                                                        @endforeach
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @endforeach
-
-                                @if (
-                                    (strtoupper($section) != strtoupper($previous_section_name)) AND
-                                    (strtoupper($section) == strtoupper("Versions"))
-                                )
-                                    <tr>
-                                        <td>Bootstrap Version</td>
-                                        <td>
-                                            <i class="fa-solid fa-circle-info text-info"></i>
-                                        </td>
-                                        <td id="bootstrap_version"></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>Datatable Version</td>
-                                        <td>
-                                            <i class="fa-solid fa-circle-info text-info"></i>
-                                        </td>
-                                        <td id="datatable_version"></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>jQuery Version</td>
-                                        <td>
-                                            <i class="fa-solid fa-circle-info text-info"></i>
-                                        </td>
-                                        <td id="jquery_version"></td>
-                                    </tr>
-                                @endif
-
-                                @php
-                                    $previous_section_name = strtoupper($section);
-                                @endphp
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                    <p>
-                        <i>
-                            Legend:
-                            <i class="fa-solid fa-circle-check text-success"></i> Good (no issues),
-                            <i class="fa-solid fa-triangle-exclamation text-warning"></i> Warning (limited functionality),
-                            <i class="fa-solid fa-circle-xmark text-danger"></i> Misconfiguration (something will not work),
-                            <i class="fa-solid fa-circle-info text-info"></i> Information (just for your information)
-                        </i>
-                    </p>
+    @if ($system_status_warning_count + $system_status_danger_count == 0)
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="alert alert-success" role="alert">
+                    There are no problems with your installation.
                 </div>
             </div>
+        </div>
+    @endif
 
-            <script type="module">
-                $(document).ready(function () {
-                    $("#bootstrap_version").html(bootstrap.Tooltip.VERSION);
-                    $("#datatable_version").html($.fn.dataTable.version);
-                    $("#jquery_version").html($.fn.jquery);
-                });
-            </script>
+    @if ($system_status_warning_count > 0)
+        <div class="row mt-2">
+            <div class="col-lg-12">
+                <div class="alert alert-warning" role="alert">
+                    Your installation has {{ $system_status_warning_count }} {{ \Illuminate\Support\Str::plural("warning", $system_status_warning_count) }}, which you might want to fix for the best software experience.
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if ($system_status_danger_count > 0)
+        <div class="row mt-2">
+            <div class="col-lg-12">
+                <div class="alert alert-danger" role="alert">
+                    Your installation has {{ $system_status_danger_count }} critical {{ \Illuminate\Support\Str::plural("issue", $system_status_danger_count) }}, which you need to fix that everything works properly.
+                </div>
+            </div>
+        </div>
+    @endif
+    @if($installer == true)
+        @if ($system_status_danger_count == 0)
+            <div class="mb-3">
+                <a href="{{ route('setup.installer.user') }}" class="btn btn-primary">Next</a>
+            </div>
+        @else
+            <div class="mb-3">
+                <a href="{{ route(Route::currentRouteName()) }}" class="btn btn-primary">Refresh</a>
+            </div>
+        @endif
+    @endif
+    <hr>
+    <div class="accordion" id="accordionSystemStatus">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusPHPHeading">
+                <a class="accordion-button @if($php_warning_count == 0  && $php_error_count == 0 ) collapsed @endif fw-bold bg-light text-decoration-none" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusPHP" aria-expanded="false" aria-controls="accordionSystemStatusPHP">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">PHP</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($php_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($php_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusPHP" class="accordion-collapse collapse @if($php_warning_count > 0  || $php_error_count > 0 ) show @endif " aria-labelledby="accordionSystemStatusPHPHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($php_status['VERSION'] as $phpVersion)
+                            <tr>
+                                <td class="border-0">{{$phpVersion->name}} <code>{{$phpVersion->required_value}}</code></td>
+                                <td class="border-0">
+                                    @switch($phpVersion->severity)
+                                        @case('success')
+                                            <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                            @break
+                                        @default
+                                            <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                    @endswitch
+                                        {{$phpVersion->current_value}}
+                                </td>
+                            </tr>
+                            @endforeach
+                            @foreach($php_status_extension as $key => $extension)
+                                <tr>
+                                    <td class="border-0"></td>
+                                    <td class="border-0">
+                                        @switch($extension->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$extension->name}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            @foreach($php_status_ini_settings as $key => $iniSettings)
+                                <tr>
+                                    <td class="border-0">{{$iniSettings->name}} <code>{{$iniSettings->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($iniSettings->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$iniSettings->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusDatabaseHeading">
+                <a class="accordion-button @if($db_warning_count == 0  && $db_error_count == 0 ) collapsed @endif fw-bold bg-light text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusDatabase" aria-expanded="true" aria-controls="accordionSystemStatusDatabase">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">Database</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($db_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($db_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusDatabase" class="accordion-collapse collapse @if($db_warning_count > 0  || $db_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusDatabaseHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($db_status_connection as $key => $dbStatus)
+                                <tr>
+                                    <td class="border-0">{{$dbStatus->name}} <code>{{$dbStatus->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($dbStatus->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$dbStatus->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            @foreach($db_status_Settings as $key => $dbSettings)
+                                <tr>
+                                    <td class="border-0">{{$dbSettings->name}} <code>{{$dbSettings->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($dbSettings->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$dbSettings->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusPermissionHeading">
+                <a class="accordion-button fw-bold bg-light text-decoration-none @if($permission_warning_count == 0  && $permission_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusPermission" aria-expanded="true" aria-controls="accordionSystemStatusPermission">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">Permissions</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($permission_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($permission_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusPermission" class="accordion-collapse collapse @if($permission_warning_count > 0  || $permission_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusPermissionHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($permission_status_dir  as $key => $permissions)
+                                <tr>
+                                    <td class="border-0">Directories <code>{{$permissions->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($permissions->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$permissions->name}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusRedisHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($redis_warning_count == 0  && $redis_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusRedis" aria-expanded="false" aria-controls="accordionSystemStatusRedis">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">Redis</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($redis_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($redis_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusRedis" class="accordion-collapse collapse @if($redis_warning_count > 0  || $redis_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusRedisHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($redis_status_connection as $key => $redisConnection)
+                                <tr>
+                                    <td class="border-0">{{$redisConnection->name}} <code>{{$redisConnection->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($redisConnection->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$redisConnection->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusVersionHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($version_warning_count == 0  && $version_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusVersion" aria-expanded="false" aria-controls="accordionSystemStatusVersion">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">Version</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($version_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($version_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusVersion" class="accordion-collapse collapse @if($version_warning_count > 0  || $version_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusVersionHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($version_status_software as $key => $versionSoftware)
+                                <tr>
+                                    <td class="border-0">{{$versionSoftware->name}}</td>
+                                    <td class="border-0">
+                                        @switch($versionSoftware->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$versionSoftware->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusVariousHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($various_warning_count == 0  && $various_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusVarious" aria-expanded="false" aria-controls="accordionSystemStatusVarious">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">Various</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($various_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                        @elseif($various_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusVarious" class="accordion-collapse collapse @if($various_warning_count > 0  || $various_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusVariousHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($various_status_information as $key => $variousInformation)
+                                <tr>
+                                    <td class="border-0">{{$variousInformation->name}} <code>{{$variousInformation->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($variousInformation->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$variousInformation->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <p><span class="fw-bold">Legende:</span>
+                <i class="fa-solid fa-circle-check text-success"></i> Good (no issues),
+                <i class="fa-solid fa-triangle-exclamation text-warning"></i> Warning (limited functionality),
+                <i class="fa-solid fa-circle-xmark text-danger"></i> Misconfiguration (something will not work),
+                <i class="fa-solid fa-circle-info text-info"></i> Information (just for your information)
+            </p>
         </div>
     </div>
 </div>

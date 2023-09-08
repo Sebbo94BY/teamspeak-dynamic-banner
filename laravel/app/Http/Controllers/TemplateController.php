@@ -75,6 +75,7 @@ class TemplateController extends Controller
      */
     public function edit(TemplateEditRequest $request): View|RedirectResponse
     {
+        //todo obsolete
         $template = Template::find($request->template_id);
 
         return view('template.edit', ['template_id' => $template->id])->with([

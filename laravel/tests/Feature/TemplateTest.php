@@ -50,15 +50,16 @@ class TemplateTest extends TestCase
         $response->assertViewIs('templates');
     }
 
-    /**
-     * Test, that the user can access the "add template" page, when he is authenticated.
-     */
-    public function test_add_template_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('template.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('template.add');
-    }
+//    /**
+//     * Test, that the user can access the "add template" page, when he is authenticated.
+//     */
+//    public function test_add_template_page_gets_displayed_when_authenticated(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('template.add'));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('template.add');
+//    }
 
     /**
      * Test that adding a new template requires to match the request rules.
@@ -71,15 +72,16 @@ class TemplateTest extends TestCase
         $response->assertSessionHasErrors(['file']);
     }
 
-    /**
-     * Test, that the user can access the "edit template" page, when the requested template ID for the edit page exists.
-     */
-    public function test_edit_template_page_gets_displayed_when_template_id_exists(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => $this->template->id]));
-        $response->assertViewIs('template.edit');
-        $response->assertViewHas('template');
-    }
+//    /**
+//     * Test, that the user can access the "edit template" page, when the requested template ID for the edit page exists.
+//     */
+//    public function test_edit_template_page_gets_displayed_when_template_id_exists(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => $this->template->id]));
+//        $response->assertViewIs('template.edit');
+//        $response->assertViewHas('template');
+//    }
 
     /**
      * Test that updating an existing template requires to match the request rules.

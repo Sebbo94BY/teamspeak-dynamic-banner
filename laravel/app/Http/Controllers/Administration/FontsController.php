@@ -33,6 +33,7 @@ class FontsController extends Controller
      */
     public function add_form(): View
     {
+        //TODO obsolete
         return view('administration.font.add');
     }
 
@@ -64,6 +65,7 @@ class FontsController extends Controller
      */
     public function edit_form(FontEditRequest $request): View
     {
+        //todo obsolete
         return view('administration.font.edit', ['font' => Font::find($request->font_id)]);
     }
 

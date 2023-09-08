@@ -1,71 +1,79 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    Fonts | Dynamic Banner
+@endsection
+
+@section('dataTables_script')
+    <script>
+        $(document).ready( function () {
+            $('#fonts').DataTable({
+                "oLanguage": {
+                    "sLengthMenu": "_MENU_",
+                }
+            });
+        } );
+    </script>
+@endsection
+
+@section('nav_link_active_fonts')
+    active
+@endsection
 
 @section('content')
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="fw-bold fs-3">Fonts</h1>
+        </div>
+    </div>
+    <hr>
+</div>
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    {{ __('Fonts') }}
-
-                    @can('add fonts')
-                    <a href="{{ route('administration.font.add') }}" class="btn btn-primary">Add</a>
-                    @endcan
-                </div>
-
-                <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
-
-                    <table id="fonts" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Filename</th>
-                                <th>Last Modified</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($fonts as $font)
-                            <tr>
-                                <td>{{ $font->filename }}</td>
-                                <td>{{ $font->updated_at }}</td>
-                                <td>
-                                    @can('edit fonts')
-                                    <a href="{{ route('administration.font.edit', ['font_id' => $font->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                    @endcan
-
-                                    @can('delete fonts')
-                                    <form method="POST" action="{{ route('administration.font.delete', ['font_id' => $font->id]) }}">
-                                        @method('delete')
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
-                                    </form>
-                                    @endcan
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addFont">
+                Add Font
+            </button>
+        </div>
+    </div>
+    <hr>
+</div>
+<div class="container">
+    @include('inc.standard-alerts')
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped" id="fonts">
+                <thead>
+                <tr>
+                    <th class="col-lg-8">Filename</th>
+                    <th class="col-lg-2">Last Modified</th>
+                    <th class="col-lg-2"></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($fonts as $font)
+                <tr>
+                    <td>{{ $font->filename }}</td>
+                    <td>{{ $font->updated_at }}</td>
+                    <td class="text-end">
+                        @can('edit fonts')
+                            <a href="#editFont-{{$font->id}}" data-bs-toggle="modal" data-bs-target="#editFont-{{$font->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
+                        @endcan
+                        @can('delete fonts')
+                            <a href="{{ route('administration.font.delete', ['font_id' => $font->id]) }}"><i class="fa-solid fa-trash text-danger fa-lg me-1"></i></a>
+                        @endcan
+                    </td>
+                </tr>
+                @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+@include('modals.fonts.modal-add')
 
-<script type="module">
-    $(document).ready(function () {
-        $('#fonts').DataTable();
-    });
-</script>
+@foreach($fonts as $fontEdit)
+    @include('modals.fonts.modal-edit')
+@endforeach
 @endsection

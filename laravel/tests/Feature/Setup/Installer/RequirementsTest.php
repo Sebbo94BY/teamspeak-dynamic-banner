@@ -28,6 +28,6 @@ class RequirementsTest extends TestCase
     {
         $response = $this->get(route('setup.installer.requirements'));
         $response->assertStatus(200);
-        $response->assertViewIs('setup.installer.requirements');
+        $response->assertViewIs('administration.systemstatus');
     }
 }

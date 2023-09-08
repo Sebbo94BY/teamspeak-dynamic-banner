@@ -33,6 +33,7 @@ class InstanceController extends Controller
      */
     public function add(): View
     {
+        //todo obsolete
         return view('instance.add');
     }
 
@@ -82,13 +83,13 @@ class InstanceController extends Controller
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
 
         if (! $instance->save()) {
-            return Redirect::route('instance.add')->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('instance.edit', ['instance_id' => $instance->id])->with([
+        return Redirect::route('instances', ['instance_id' => $instance->id])->with([
             'success' => 'instance-add-successful',
             'message' => 'Successfully added the new instance.',
         ]);
@@ -99,6 +100,7 @@ class InstanceController extends Controller
      */
     public function edit(InstanceEditRequest $request): View|RedirectResponse
     {
+        //TODO obsolete
         $instance = Instance::find($request->instance_id);
 
         try {
@@ -181,7 +183,7 @@ class InstanceController extends Controller
         $instance->autostart_enabled = ($request->has('autostart_enabled')) ? true : false;
 
         if (! $instance->save()) {
-            return Redirect::route('instance.edit', ['instance_id' => $instance->id])
+            return Redirect::route('instances')
                 ->withInput($request->all())
                 ->with([
                     'error' => 'instance-edit-error',
@@ -189,7 +191,7 @@ class InstanceController extends Controller
                 ]);
         }
 
-        return Redirect::route('instance.edit', ['instance_id' => $instance->id])->with([
+        return Redirect::route('instances')->with([
             'success' => 'instance-edit-successful',
             'message' => 'Successfully updated the instance.',
         ]);

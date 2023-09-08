@@ -43,6 +43,7 @@ class BannerTemplateController extends Controller
      */
     public function add_template(BannerTemplateAddTemplateRequest $request): View
     {
+        //todo obsolete
         $banner = Banner::find($request->banner_id);
 
         return view('banner.template_add', ['banner_id' => $banner->id])->with([

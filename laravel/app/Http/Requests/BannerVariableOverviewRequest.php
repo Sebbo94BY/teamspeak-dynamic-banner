@@ -12,7 +12,7 @@ class BannerVariableOverviewRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'banner_id' => $this->route('banner_id'),
+            'instance_id' => $this->route('instance_id'),
         ]);
     }
 
@@ -24,7 +24,7 @@ class BannerVariableOverviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'banner_id' => ['required', 'integer', 'exists:App\Models\Banner,id'],
+            'instance_id' => ['required', 'integer', 'exists:App\Models\Instance,id'],
         ];
     }
 }

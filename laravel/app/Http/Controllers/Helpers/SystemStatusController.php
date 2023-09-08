@@ -45,9 +45,6 @@ class SystemStatusController extends Controller
     {
         $requirements = [];
 
-        $requirements['name'] = 'PHP Extensions';
-        $requirements['required_value'] = 'should be enabled';
-
         /**
          * Laravel specific requirements
          */
@@ -186,11 +183,13 @@ class SystemStatusController extends Controller
 
         $requirements['DB_NAME']['name'] = 'Database Name';
         $requirements['DB_NAME']['current_value'] = $db_name;
+        $requirements['DB_NAME']['required_value'] = null;
         $requirements['DB_NAME']['severity'] = (is_string($db_name)) ? SystemStatusSeverity::Info : SystemStatusSeverity::Danger;
 
         $username = config('database.connections.'.Config::get('database.default').'.username');
         $requirements['DB_USER']['name'] = 'Database User';
         $requirements['DB_USER']['current_value'] = $username;
+        $requirements['DB_USER']['required_value'] = null;
         $requirements['DB_USER']['severity'] = SystemStatusSeverity::Info;
 
         $charset = config('database.connections.'.Config::get('database.default').'.charset');
@@ -214,9 +213,6 @@ class SystemStatusController extends Controller
     protected function check_directories(): array
     {
         $requirements = [];
-
-        $requirements['name'] = 'Directories';
-        $requirements['required_value'] = 'should be writeable';
 
         $requirements['STORAGE_FRAMEWORK_DIR']['name'] = storage_path('framework');
         $requirements['STORAGE_FRAMEWORK_DIR']['required_value'] = 'must be writeable';
@@ -283,6 +279,7 @@ class SystemStatusController extends Controller
 
         $requirements['IS_GIT_DEPLOYMENT']['name'] = 'Is Git Deployment';
         $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../.git/')) ? 'Yes' : 'No';
+        $requirements['IS_GIT_DEPLOYMENT']['required_value'] = null;
         $requirements['IS_GIT_DEPLOYMENT']['severity'] = SystemStatusSeverity::Info;
 
         $requirements['APP_ENVIRONMENT']['name'] = 'Application Environment';
@@ -298,11 +295,13 @@ class SystemStatusController extends Controller
         if (isset($_SERVER['SERVER_SOFTWARE'])) {
             $requirements['SERVER_SOFTWARE']['name'] = 'Server Software';
             $requirements['SERVER_SOFTWARE']['current_value'] = $_SERVER['SERVER_SOFTWARE'];
+            $requirements['SERVER_SOFTWARE']['required_value'] = null;
             $requirements['SERVER_SOFTWARE']['severity'] = SystemStatusSeverity::Info;
         }
 
         $requirements['PHP_BINARY']['name'] = 'PHP Binary';
         $requirements['PHP_BINARY']['current_value'] = PHP_BINARY;
+        $requirements['PHP_BINARY']['required_value'] = null;
         $requirements['PHP_BINARY']['severity'] = SystemStatusSeverity::Info;
 
         return $requirements;

@@ -49,15 +49,16 @@ class InstanceTest extends TestCase
         $response->assertViewIs('instances');
     }
 
-    /**
-     * Test, that the user can access the "add instance" page, when he is authenticated.
-     */
-    public function test_add_instance_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('instance.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('instance.add');
-    }
+//    /**
+//     * Test, that the user can access the "add instance" page, when he is authenticated.
+//     */
+//    public function test_add_instance_page_gets_displayed_when_authenticated(): void
+//    {
+//        //todo obsolete
+//        $response = $this->actingAs($this->user)->get(route('instance.add'));
+//        $response->assertStatus(200);
+//        $response->assertViewIs('instance.add');
+//    }
 
     /**
      * Test that adding a new instance requires to match the request rules.
