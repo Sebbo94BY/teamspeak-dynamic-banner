@@ -16,6 +16,7 @@
 <div class="container">
     <div class="row justify-content-between">
         <div class="col-lg-2">
+            <!--TODO need instance ID for this Template id -->
             <a class="btn btn-primary btn-sm fw-bold" href="#modalAvailableVariables-{{$instance->first()->id}}" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$instance->first()->id}}"><i class="fa-solid fa-square-root-variable fa-lg me-2"></i></a>
         </div>
         <div class="col-lg-1 d-grid">
@@ -183,8 +184,9 @@
 @include('inc.bs-tooltip')
 @include('inc.banner-config-script')
 @include('inc.form-validation')
-@foreach($instance as $instanceVariableModal)
-    @include('modals.modal-variables')
-@endforeach
+<!--TODO how we get the instance id from this view -->
+{{--@foreach($instance as $instanceVariableModal)--}}
+{{--    @include('modals.modal-variables')--}}
+{{--@endforeach--}}
 
 @endsection

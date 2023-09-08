@@ -24,11 +24,10 @@ class BannerConfigurationController extends Controller
      */
     public function edit(BannerConfigurationEditRequest $request): View|RedirectResponse
     {
-        $bannerID = Banner::query()->where('id','=',BannerTemplate::query()->where('template_id','=',$request->banner_template_id)->first()->banner_id)->get()->first();
         return view('banner.configuration')->with([
             'banner_template' => BannerTemplate::find($request->banner_template_id),
             'fonts' => Font::all(),
-            'instance'=>Instance::query()->where('id','=',$bannerID->instance_id)->get(),
+            'instance'=>Instance::all(),
         ]);
     }
 
