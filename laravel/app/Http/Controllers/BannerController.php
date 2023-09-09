@@ -49,16 +49,6 @@ class BannerController extends Controller
     }
 
     /**
-     * Display the edit view.
-     */
-    public function edit(BannerEditRequest $request): View|RedirectResponse
-    {
-        Banner::find($request->banner_id);
-
-        return redirect()->route('banners');
-    }
-
-    /**
      * Update an existing data set.
      */
     public function update(BannerUpdateRequest $request): RedirectResponse

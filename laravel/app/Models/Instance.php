@@ -58,7 +58,7 @@ class Instance extends Model
     }
 
     /**
-     * @return array
+     * Get the instance variables
      */
     public function instanceVariables(): array
     {
