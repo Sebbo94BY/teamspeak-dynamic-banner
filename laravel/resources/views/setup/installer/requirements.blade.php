@@ -12,6 +12,19 @@
             </div>
         </div>
         <hr>
+        <div class="row">
+            <div class="col-lg-12">
+                @if ($system_status_danger_count == 0)
+                    <div class="mb-3">
+                        <a href="{{ route('setup.installer.user') }}" class="btn btn-primary">Next</a>
+                    </div>
+                @else
+                    <div class="mb-3">
+                        <a href="{{ route(Route::currentRouteName()) }}" class="btn btn-primary">Refresh</a>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 @include('inc.system.systemstatus')
 @endsection
