@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Administration Roles and Permission | Dynamic Banner
+    Administration Roles and Permission
 @endsection
 
 @section('nav_link_active_roles')

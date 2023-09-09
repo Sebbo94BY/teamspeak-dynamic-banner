@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Administration - Users | Dynamic Banner
+    Administration Users
 @endsection
 
 @section('nav_link_active_user')

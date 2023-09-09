@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Instances | Dynamic Banner
+    Instances
 @endsection
 
 @section('nav_link_active_instances')

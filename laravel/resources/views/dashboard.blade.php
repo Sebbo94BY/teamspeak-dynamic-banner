@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Dashboard | Dynamic Banner
+    Dashboard
 @endsection
 
 @section('nav_link_active_dashboard')

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Banners | Dynamic Banner
+    Banners
 @endsection
 
 @section('nav_link_active_banners')

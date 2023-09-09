@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    PHP Info | Dynamic Banner
+    PHP Info
 @endsection
 
 @section('nav_link_active_php_info')

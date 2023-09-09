@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Login | Dynamic Banner
+    Login
 @endsection
 
 @section('content')

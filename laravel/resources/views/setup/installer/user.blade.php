@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Setup - Super Admin
+    Setup Super Admin
 @endsection
 
 @section('content')

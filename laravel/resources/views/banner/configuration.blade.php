@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Banner configuration | Dynamic Banner
+    Banner configuration
 @endsection
 
 @section('content')

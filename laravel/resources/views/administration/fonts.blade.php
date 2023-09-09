@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Fonts | Dynamic Banner
+    Fonts
 @endsection
 
 @section('dataTables_script')

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Edit Profile | Dynamic Banner
+    Edit Profile
 @endsection
 
 @section('nav_link_active_edit_profile')
