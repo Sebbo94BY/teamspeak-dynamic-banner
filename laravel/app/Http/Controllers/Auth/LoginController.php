@@ -29,6 +29,13 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     /**
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
+    protected $redirectTo = RouteServiceProvider::HOME;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
@@ -36,43 +43,5 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
-    }
-
-    /**
-     * @return Application|Factory|View|\Illuminate\Foundation\Application
-     */
-    public function viewLogin(): \Illuminate\Foundation\Application|View|Factory|Application
-    {
-        return view('auth.login');
-    }
-
-    /**
-     * @param  Request  $request
-     * @return RedirectResponse
-     */
-    public function login(Request $request): RedirectResponse
-    {
-        if (Auth::attempt(['email'=>$request->input('email'),'password'=>$request->input('password')]))
-        {
-            return redirect()->route('dashboard');
-        }else
-        {
-            return redirect()->back()->withErrors(['errors'=>'E-Mail or Password wrong. Pleas try again']);
-        }
-    }
-
-    /**
-     * @param  Request  $request
-     * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector
-     */
-    public function logout(Request $request): \Illuminate\Foundation\Application|Redirector|RedirectResponse|Application
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return redirect('/');
     }
 }

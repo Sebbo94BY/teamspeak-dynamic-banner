@@ -42,16 +42,9 @@ Route::get('/', function () {
 });
 
 Route::middleware(['guest'])->group(function (){
-    Route::get('/login',[LoginController::class,'viewLogin'])->name('login');
-    Route::post('/logging-in',[LoginController::class,'login'])->name('loggingIn');
-
     Route::get('/setup/installer/requirements', [RequirementsController::class, 'show_view'])->name('setup.installer.requirements');
     Route::get('/setup/installer/user', [UserController::class, 'show_view'])->name('setup.installer.user');
     Route::post('/setup/installer/user/add', [UserController::class, 'create'])->name('setup.installer.user.create');
-});
-
-Route::middleware(['auth'])->group(function (){
-    Route::get('/logout',[LoginController::class,'logout'])->name('logout');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
