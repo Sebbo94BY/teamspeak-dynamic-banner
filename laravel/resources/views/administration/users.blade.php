@@ -79,12 +79,12 @@
                         @endforeach
                     </td>
                     <td class="col-lg-2">
-                        {{date('d.m.Y',strtotime($user->created_at))}}
+                        {{ \Illuminate\Support\Carbon::parse($user->created_at)->format('d.m.Y') }}
                     </td>
                     <td class="col-lg-2">
                         <a href="#roleRolesAndPermission-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#roleRolesAndPermission-{{$user->id}}"><i class="fa-solid fa-key text-primary fa-lg me-1"></i></a>
                         <a href="#editUser-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#editUser-{{$user->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
-                        <a href="{{Route('delete_user', ['user_id'=>$user->id])}}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
+                        <a href="{{Route('administration.user.delete', ['user_id'=>$user->id])}}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
                     </td>
                 </tr>
                 @endforeach
