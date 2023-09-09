@@ -60,7 +60,7 @@ class Instance extends Model
     /**
      * Get the instance variables
      */
-    public function instanceVariables(): array
+    public function variables(): array
     {
         $varController = new BannerVariableController();
         return $varController->getInstanceVariables($this->id);

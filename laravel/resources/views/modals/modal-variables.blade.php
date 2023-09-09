@@ -6,9 +6,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if (! is_null($instanceVariableModal->instanceVariables()['redis_connection_error']))
+                @if (! is_null($instanceVariableModal->variables()['redis_connection_error']))
                     <div class="alert alert-warning" role="alert">
-                        {{$instanceVariableModal->instanceVariables()['redis_connection_error']}}
+                        {{$instanceVariableModal->variables()['redis_connection_error']}}
                     </div>
                 @else
                 <div class="col-lg-12">
@@ -20,7 +20,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($instanceVariableModal->instanceVariables()['variables_and_values'] as $key => $value)
+                        @foreach($instanceVariableModal->variables()['variables_and_values'] as $key => $value)
                             <tr>
                                 <td><code>%{{ $key }}%</code></td>
                                 <td>{{ $value }}</td>
