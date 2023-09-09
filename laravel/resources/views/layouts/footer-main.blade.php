@@ -6,15 +6,15 @@
                 <a href="https://github.com/Sebbo94BY" target="_blank">Sebbo94BY</a> and
                 <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/graphs/contributors" target="_blank">Contributors</a>
                 Powered by
-                <i class="fa-brands fa-html5"></i>
-                <i class="fa-brands fa-php"></i>
-                <i class="fa-brands fa-laravel"></i>
-                <i class="fa-brands fa-bootstrap"></i>
-                <i class="fa-solid fa-font-awesome"></i>
-                <i class="fa-brands fa-github"></i> |
+                <i class="fa-brands fa-html5 text-primary"></i>
+                <i class="fa-brands fa-php text-primary"></i>
+                <i class="fa-brands fa-laravel text-primary"></i>
+                <i class="fa-brands fa-bootstrap text-primary"></i>
+                <i class="fa-solid fa-font-awesome text-primary"></i>
+                <i class="fa-brands fa-github text-primary"></i>
             </span>
             <span>
-                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">Open feature request or report issue</a>
+                <i class="fa-solid fa-bullseye fa-fade text-danger"></i> <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">Open feature request or report issue</a>
             </span>
         </div>
     </footer>
