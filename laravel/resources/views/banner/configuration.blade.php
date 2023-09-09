@@ -28,11 +28,11 @@
     @include('inc.standard-alerts')
     <div class="row">
         <div class="col-lg-6">
-            <p class="fs-5 m-0 mb-3 fw-bold">Grid System</p>
+            <p class="fs-5 m-0 mb-3 fw-bold">Preview with Grid System</p>
             <img class="img-fluid" id="templateWithGrid" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
         <div class="col-lg-6">
-            <p class="fs-5 m-0 mb-3 fw-bold">Live Preview</p>
+            <p class="fs-5 m-0 mb-3 fw-bold">Preview</p>
             <img class="img-fluid" id="renderedTemplate" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
     </div>
