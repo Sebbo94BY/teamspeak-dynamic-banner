@@ -25,6 +25,7 @@
     </div>
     <hr>
 </div>
+@can('add fonts')
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
@@ -35,6 +36,7 @@
     </div>
     <hr>
 </div>
+@endcan
 <div class="container">
     @include('inc.standard-alerts')
     @if($fonts->count() == 0)
