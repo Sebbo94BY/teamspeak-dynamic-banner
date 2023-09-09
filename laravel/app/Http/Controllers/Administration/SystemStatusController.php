@@ -15,40 +15,25 @@ class SystemStatusController extends Controller
     {
         $system_status_helper = new HelpersSystemStatusController();
         $system_status = collect(json_decode($system_status_helper->system_status_json()));
-        //get groups from system_status
         $php_status = collect($system_status['PHP']);
-        //get php extensions
         $php_extensions = collect($php_status['EXTENSIONS']);
-        //get php ini_settings
         $php_ini_settings = collect($php_status['INI_SETTINGS']);
 
-        //get Database
         $db_status = collect($system_status['DATABASE']);
-        //get db connection
         $db_status_connection =collect($db_status['CONNECTION']);
-        //get db settings
         $db_status_settings = collect($db_status['SETTINGS']);
 
-        //get permissions
         $permission_status = collect($system_status['PERMISSIONS']);
-        //get directory
         $permission_status_dir = collect($permission_status['DIRECTORIES']);
 
-        //get redis
         $redis_staus = collect($system_status['REDIS']);
-        //get redis connection
         $redis_staus_connection = collect($redis_staus['CONNECTION']);
 
-        //get versions
         $versions_status = collect($system_status['VERSIONS']);
-        //get software
         $versions_status_software = collect($versions_status['SOFTWARE']);
 
-        //get various
         $various_status = collect($system_status['VARIOUS']);
-        //get information
         $various_status_information = collect($various_status['INFORMATION']);
-
 
         return view('administration.systemstatus', [
             'installer'=>$installer,
