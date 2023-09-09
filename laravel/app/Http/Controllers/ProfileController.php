@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Localization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +20,7 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => Auth::user(),
+            'localizations' => Localization::orderBy('language_name', 'ASC')->get(),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Font;
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -28,7 +29,7 @@ class AdministrationFontsTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
         $this->user->syncRoles('Fonts Admin');
 
         $this->font = Font::factory()->create();

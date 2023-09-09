@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Setup\Installer;
 
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,7 +16,7 @@ class RequirementsTest extends TestCase
      */
     public function test_redirect_to_dashboard_when_at_least_one_user_exists(): void
     {
-        User::factory()->create();
+        User::factory()->for(Localization::factory()->create())->create();
 
         $response = $this->get(route('setup.installer.requirements'));
         $response->assertRedirect(route('dashboard'));

@@ -58,6 +58,22 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
     * All fetched data will be stored in the Redis to speed up the entire application
 
 
+## Supported Languages
+
+This project has multi-language support for the UI.
+
+For a current list of supported languages, please check the respective folder: [laravel/lang/](/laravel/lang/)
+
+
+## Matomo Tracking
+
+If you're interested in some statistics of this application, you can configure a Matomo tracking code, which sends the respective tracking data to your Matomo installation.
+
+Simply configure the Matomo tracking in your DotEnv file (`.env`) with the respective variables. See the configuration file `laravel/config/matomo.php` for the available environment variables and a detailed explanation.
+
+After configuring it, don't forget to cache your configuration: `php artisan config:cache`
+
+
 ## Requirements
 
 ### Hardware (minimum)
@@ -113,22 +129,6 @@ This project requires the following permissions on your TeamSpeak server:
 | `b_client_remoteaddress_view` | Allow the bot to get the IP addresses of the clients. This is technically necessary to identify users when they request the banner. |
 
 
-## Supported Languages
-
-The application UI is currently available in the following languages:
-
-* English
-
-
-## Matomo Tracking
-
-If you're interested in some statistics of this application, you can configure a Matomo tracking code, which sends the respective tracking data to your Matomo installation.
-
-Simply configure the Matomo tracking in your DotEnv file (`.env`) with the respective variables. See the configuration file `laravel/config/matomo.php` for the available environment variables and a detailed explanation.
-
-After configuring it, don't forget to cache your configuration: `php artisan config:cache`
-
-
 ## Architecture
 
 [Open Architecture README](/docs/ARCHITECTURE.md)
@@ -159,5 +159,7 @@ Open a Github issue [here](https://github.com/Sebbo94BY/teamspeak-dynamic-banner
 
 
 ## Contribute
+
+[Open Translation README](/docs/TRANSLATION.md)
 
 [Open Contribute README](/docs/CONTRIBUTE.md)

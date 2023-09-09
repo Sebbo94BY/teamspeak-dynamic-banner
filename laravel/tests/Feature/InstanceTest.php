@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Instance;
 use App\Models\InstanceProcess;
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -23,7 +24,7 @@ class InstanceTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
         $this->user->syncRoles('Instances Admin');
 
         $this->instance = Instance::factory()->create();

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -17,7 +18,7 @@ class ProfileTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
     }
 
     /**

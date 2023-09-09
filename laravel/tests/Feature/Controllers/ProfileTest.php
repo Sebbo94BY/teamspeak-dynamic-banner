@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +17,8 @@ class ProfileTest extends TestCase
 
     protected string $new_password = 'veryS$cretP4ssw0rd!';
 
+    protected Localization $localization;
+
     protected User $user;
 
     /**
@@ -25,7 +28,9 @@ class ProfileTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create(['password' => Hash::make($this->initial_user_password)]);
+        $this->localization = Localization::factory()->create();
+
+        $this->user = User::factory()->for($this->localization)->create(['password' => Hash::make($this->initial_user_password)]);
     }
 
     /**
@@ -36,6 +41,7 @@ class ProfileTest extends TestCase
         $response = $this->actingAs($this->user)->patch(route('profile.update'), [
             'name' => 'John Doe',
             'email' => fake()->email(),
+            'localization_id' => $this->localization->id,
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -48,11 +54,12 @@ class ProfileTest extends TestCase
      */
     public function test_user_can_not_update_his_email_to_an_identical_one_of_a_different_user(): void
     {
-        $other_user = User::factory()->create();
+        $other_user = User::factory()->for($this->localization)->create();
 
         $response = $this->actingAs($other_user)->patch(route('profile.update'), [
             'name' => $other_user->name,
             'email' => $this->user->email,
+            'localization_id' => $this->localization->id,
         ]);
 
         $response->assertSessionHasErrors(['email']);

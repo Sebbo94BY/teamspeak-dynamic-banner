@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Middleware;
 
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,7 +16,7 @@ class AuthenticateTest extends TestCase
      */
     public function test_redirect_to_login_if_unauthenticated(): void
     {
-        User::factory()->create();
+        User::factory()->for(Localization::factory()->create())->create();
 
         $response = $this->get(route('dashboard'));
         $response->assertRedirect(route('login'));

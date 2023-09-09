@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Localization;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +24,7 @@ class UserTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
     }
 
     /**
