@@ -13,7 +13,7 @@
                         <h1 class="fw-bold fs-3 ms-3">Login Dynamic Banner</h1>
                     </div>
                     <div class="col-lg-4">
-                        <img class="card-img pe-3" src="{{asset('img/design/lock-4441691_1280.png')}}" alt="Logo" oncontextmenu="return false">
+                        <img class="card-img pe-3" src="{{asset('img/design/lock.png')}}" alt="Logo" oncontextmenu="return false">
                     </div>
                 </div>
             </div>
