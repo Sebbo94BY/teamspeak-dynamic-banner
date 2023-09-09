@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setup\Installer;
 
 use App\Http\Controllers\Administration\SystemStatusController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helpers\SystemStatusController as HelpersSystemStatusController;
 use App\Models\User;
 use Illuminate\Support\Facades\Redirect;
 
@@ -18,7 +19,7 @@ class RequirementsController extends Controller
             return Redirect::route('dashboard');
         }
 
-        $systemstatus = new SystemStatusController();
-        return $systemstatus->system_status('Installer: Requirements', true);
+        $system_status_helper = new HelpersSystemStatusController();
+        return view('setup.installer.requirements',$system_status_helper->system_status());
     }
 }

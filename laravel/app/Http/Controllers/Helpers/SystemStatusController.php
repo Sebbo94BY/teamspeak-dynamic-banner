@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helpers\SystemStatusController as HelpersSystemStatusController;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\View\View;
 use Predis\Connection\ConnectionException;
 
 /**
@@ -310,7 +312,7 @@ class SystemStatusController extends Controller
     /**
      * Returns a summary of the system status in JSON format.
      */
-    public function system_status_json($optional_information = true): bool|string
+    public function system_status_json($optional_information = true): array
     {
         $system_status = [];
 
@@ -327,6 +329,56 @@ class SystemStatusController extends Controller
             $system_status['VARIOUS']['INFORMATION'] = $this->check_various_information();
         }
 
-        return json_encode($system_status);
+        return $system_status;
+    }
+
+    public function system_status(): array
+    {
+        $system_status = collect(json_decode(json_encode($this->system_status_json())));
+        $php_status = collect($system_status['PHP']);
+        $php_extensions = collect($php_status['EXTENSIONS']);
+        $php_ini_settings = collect($php_status['INI_SETTINGS']);
+
+        $db_status = collect($system_status['DATABASE']);
+        $db_status_connection =collect($db_status['CONNECTION']);
+        $db_status_settings = collect($db_status['SETTINGS']);
+
+        $permission_status = collect($system_status['PERMISSIONS']);
+        $permission_status_dir = collect($permission_status['DIRECTORIES']);
+
+        $redis_staus = collect($system_status['REDIS']);
+        $redis_staus_connection = collect($redis_staus['CONNECTION']);
+
+        $versions_status = collect($system_status['VERSIONS']);
+        $versions_status_software = collect($versions_status['SOFTWARE']);
+
+        $various_status = collect($system_status['VARIOUS']);
+        $various_status_information = collect($various_status['INFORMATION']);
+
+        return array(
+            'php_status'=>$php_status,
+            'php_status_extension'=>$php_extensions,
+            'php_status_ini_settings'=>$php_ini_settings,
+            'php_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $php_status),
+            'php_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $php_status),
+            'db_status_connection'=>$db_status_connection,
+            'db_status_Settings'=>$db_status_settings,
+            'db_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $db_status),
+            'db_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $db_status),
+            'permission_status_dir' => $permission_status_dir,
+            'permission_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $permission_status),
+            'permission_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $permission_status),
+            'redis_status_connection'=>$redis_staus_connection,
+            'redis_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
+            'redis_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),
+            'version_status_software'=>$versions_status_software,
+            'version_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
+            'version_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),
+            'various_status_information'=>$various_status_information,
+            'various_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $various_status),
+            'various_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $various_status),
+            'system_status_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $system_status),
+            'system_status_danger_count' => preg_match_all("/\"severity\"\:\"danger\"/", $system_status),
+        );
     }
 }
