@@ -116,7 +116,7 @@ class BannerTest extends TestCase
      */
     public function test_deleting_an_existing_banner_is_possible(): void
     {
-        $response = $this->actingAs($this->user)->delete(route('banner.delete', ['banner_id' => $this->banner->id]));
+        $response = $this->actingAs($this->user)->get(route('banner.delete', ['banner_id' => $this->banner->id]));
         $response->assertRedirectToRoute('banners');
         $response->assertSessionHas('success');
     }

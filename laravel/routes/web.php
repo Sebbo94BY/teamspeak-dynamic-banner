@@ -5,7 +5,6 @@ use App\Http\Controllers\Administration\PhpInfoController;
 use App\Http\Controllers\Administration\RolesController;
 use App\Http\Controllers\Administration\SystemStatusController;
 use App\Http\Controllers\Administration\UsersController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BannerConfigurationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BannerTemplateController;

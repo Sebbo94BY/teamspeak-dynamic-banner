@@ -13,7 +13,7 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
-    protected function redirectTo($request)
+    protected function redirectTo(\Illuminate\Http\Request $request)
     {
         if (! $request->expectsJson()) {
             if (User::all()->count() > 0) {

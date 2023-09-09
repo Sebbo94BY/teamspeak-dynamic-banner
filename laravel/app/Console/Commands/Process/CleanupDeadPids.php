@@ -31,7 +31,8 @@ class CleanupDeadPids extends Command
         $this->info('Checking '.$instance_processes->count().' PIDs from the database...');
 
         foreach ($instance_processes as $process) {
-            if (file_exists("/proc/$process->process_id") and (strpos(file_get_contents("/proc/$process->process_id/cmdline"), 'instance:start-teamspeak-bot') !== false)) {
+            if (file_exists("/proc/$process->process_id") and (str_contains(file_get_contents("/proc/$process->process_id/cmdline"),
+                    'instance:start-teamspeak-bot'))) {
                 $this->info("PID $process->process_id is still active. Skipping.");
                 continue;
             }

@@ -19,7 +19,7 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
     /**
      * Class properties
      *
-     * @var \App\Models\Template
+     * @var Template
      */
     protected Template $template;
 
@@ -28,7 +28,7 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
      *
      * @var int
      */
-    public $uniqueFor = 10;
+    public int $uniqueFor = 10;
 
     /**
      * The unique ID of the job.

@@ -42,4 +42,14 @@ class AdministrationSystemstatusTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('administration.systemstatus');
     }
+
+    /**
+     * Test, that the systemstatus page can be displayed.
+     */
+    public function test_view_systemstatus_gets_displayed(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('administration.systemstatus'));
+        $response->assertStatus(200);
+        $response->assertViewIs('administration.systemstatus');
+    }
 }

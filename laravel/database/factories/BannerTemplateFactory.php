@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BannerTemplate>
+ * @extends Factory<\App\Models\BannerTemplate>
  */
 class BannerTemplateFactory extends Factory
 {
