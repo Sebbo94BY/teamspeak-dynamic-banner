@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerAddRequest;
 use App\Http\Requests\BannerDeleteRequest;
-use App\Http\Requests\BannerEditRequest;
 use App\Http\Requests\BannerUpdateRequest;
 use App\Models\Banner;
 use App\Models\Instance;
