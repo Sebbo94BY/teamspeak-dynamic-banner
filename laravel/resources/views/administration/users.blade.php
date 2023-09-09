@@ -83,7 +83,9 @@
                     </td>
                     <td class="col-lg-2">
                         <a href="#roleRolesAndPermission-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#roleRolesAndPermission-{{$user->id}}"><i class="fa-solid fa-key text-primary fa-lg me-1"></i></a>
+                        @can('edit users')
                         <a href="#editUser-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#editUser-{{$user->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
+                        @endcan
                         @if (Auth::user()->id != $user->id)
                         @can('delete users')
                         <a href="#delUser-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#delUser-{{$user->id}}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
@@ -112,9 +114,11 @@
     @include('modals.administration.modal-edit', ['userEdit'=>$userEdit])
 @endforeach
 
-@foreach($users as $userViewRoles)
-    @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userViewRoles])
-@endforeach
+@can('edit users')
+    @foreach($users as $userViewRoles)
+        @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userViewRoles])
+    @endforeach
+@endcan
 
 @can('delete users')
     @foreach($users as $userDeleteModal)
