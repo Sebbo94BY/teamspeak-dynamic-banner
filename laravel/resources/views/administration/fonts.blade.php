@@ -41,6 +41,19 @@
 </div>
 <div class="container">
     @include('inc.standard-alerts')
+    @if($fonts->count() == 0)
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-primary" role="alert">
+                        There are no Fonts Uploaded! <a href="#addFont" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
     <div class="row">
         <div class="col-lg-12">
             <table class="table table-striped" id="fonts">
@@ -70,6 +83,7 @@
             </table>
         </div>
     </div>
+    @endif
 </div>
 @include('modals.fonts.modal-add')
 
