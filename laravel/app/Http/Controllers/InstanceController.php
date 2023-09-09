@@ -89,7 +89,7 @@ class InstanceController extends Controller
             ]);
         }
 
-        return Redirect::route('instances', ['instance_id' => $instance->id])->with([
+        return Redirect::route('instances')->with([
             'success' => 'instance-add-successful',
             'message' => 'Successfully added the new instance.',
         ]);
