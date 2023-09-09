@@ -72,7 +72,7 @@
                             <a href="#editFont-{{$font->id}}" data-bs-toggle="modal" data-bs-target="#editFont-{{$font->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
                         @endcan
                         @can('delete fonts')
-                            <a href="{{ route('administration.font.delete', ['font_id' => $font->id]) }}"><i class="fa-solid fa-trash text-danger fa-lg me-1"></i></a>
+                            <a href="#delFont-{{$font->id}}" data-bs-toggle="modal" data-bs-target="#delFont-{{$font->id}}"><i class="fa-solid fa-trash text-danger fa-lg me-1"></i></a>
                         @endcan
                     </td>
                 </tr>
@@ -88,4 +88,11 @@
 @foreach($fonts as $fontForEdit)
     @include('modals.fonts.modal-edit', ['fontForEdit'=>$fontForEdit])
 @endforeach
+
+@can('delete fonts')
+    @foreach($fonts as $fontDeleteModal)
+        @include('modals.soft-delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontDeleteModal])
+    @endforeach
+@endcan
+
 @endsection

@@ -89,7 +89,7 @@
                         @endcan
                         <a href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary me-2 fa-lg"></i></a>
                         @can('delete banners')
-                        <a href="{{ route('banner.delete', ['banner_id' => $banner->id]) }}"><i class="fa fa-trash text-danger me-2 fa-lg"></i></a>
+                        <a href="#delBanner-{{$banner->id}}" data-bs-toggle="modal" data-bs-target="#delBanner-{{$banner->id}}"><i class="fa fa-trash text-danger me-2 fa-lg"></i></a>
                         @endcan
                     </td>
                 </tr>
@@ -112,4 +112,11 @@
 @foreach($instance_list as $instanceVariableModal)
     @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
+
+@can('delete banners')
+    @foreach($banners as $bannerDeleteModal)
+        @include('modals.soft-delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerDeleteModal])
+    @endforeach
+@endcan
+
 @endsection

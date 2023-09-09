@@ -120,7 +120,7 @@
                             <a href="#modalEditInstance-{{$instance->id}}" data-bs-toggle="modal" data-bs-target="#modalEditInstance-{{$instance->id}}"><i class="fa-solid fa-pencil text-primary me-2 fa-lg"></i></a>
                         @endcan
                         @can('delete instances')
-                            <a href="{{ route('instance.delete', ['instance_id' => $instance->id]) }}"><i class="fa-solid fa-trash text-danger me-2 fa-lg"></i></a>
+                            <a href="#delInstance-{{$instance->id}}" data-bs-toggle="modal" data-bs-target="#delInstance-{{$instance->id}}"><i class="fa-solid fa-trash text-danger me-2 fa-lg"></i></a>
                         @endcan
                     </td>
                 </tr>
@@ -140,4 +140,10 @@
         @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal])
     @endcan
 @endforeach
+
+@can('delete instances')
+    @foreach($instances as $instanceDeleteModal)
+        @include('modals.soft-delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceDeleteModal])
+    @endforeach
+@endcan
 @endsection

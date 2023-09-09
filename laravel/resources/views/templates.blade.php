@@ -79,7 +79,7 @@
                             <a href="#editTemplate-{{$template->id}}" data-bs-toggle="modal" data-bs-target="#editTemplate-{{$template->id}}"><i class="fa-solid fa-pen-to-square text-primary fa-lg me-1"></i></a>
                         @endcan
                         @can('delete templates')
-                            <a href="{{ route('template.delete', ['template_id' => $template->id]) }}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
+                            <a href="#delTemplate-{{$template->id}}" data-bs-toggle="modal" data-bs-target="#delTemplate-{{$template->id}}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
                         @endcan
                     </td>
                 </tr>
@@ -96,6 +96,12 @@
 @can('edit templates')
     @foreach($templates as $templateModal)
         @include('modals.templates.modal-edit', ['templateModal'=>$templateModal])
+    @endforeach
+@endcan
+
+@can('delete templates')
+    @foreach($templates as $templateDeleteModal)
+        @include('modals.soft-delete-feedback.modal-delete-template', ['templateDeleteModal'=>$templateDeleteModal])
     @endforeach
 @endcan
 
