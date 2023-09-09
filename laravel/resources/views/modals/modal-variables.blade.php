@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if($instanceVariableModal->instanceVariables()['redis_connection_error'] != null)
+                @if (! is_null($instanceVariableModal->instanceVariables()['redis_connection_error']))
                     <div class="alert alert-warning" role="alert">
                         {{$instanceVariableModal->instanceVariables()['redis_connection_error']}}
                     </div>
