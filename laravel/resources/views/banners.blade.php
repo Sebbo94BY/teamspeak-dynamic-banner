@@ -106,10 +106,10 @@
 
 @can('edit banners')
     @foreach($banners as $bannerEditModal)
-        @include('modals.banners.modal-edit')
+        @include('modals.banners.modal-edit',['bannerEditModal'=>$bannerEditModal])
     @endforeach
 @endcan
 @foreach($instance_list as $instanceVariableModal)
-    @include('modals.modal-variables')
+    @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
 @endsection

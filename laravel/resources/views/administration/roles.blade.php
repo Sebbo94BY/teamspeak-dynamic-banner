@@ -61,12 +61,12 @@
     </div>
 </div>
 
-@foreach($roles as $rolePermission)
-    @include('modals.administration.modal-view-role-permissions')
+@foreach($roles as $role)
+    @include('modals.administration.modal-view-role-permissions', ['role'=>$role])
 @endforeach
 
-@foreach($roles as $roleUsers)
-    @include('modals.administration.modal-view-role-users')
+@foreach($roles as $role)
+    @include('modals.administration.modal-view-role-users', ['role'=>$role])
 @endforeach
 
 @endsection

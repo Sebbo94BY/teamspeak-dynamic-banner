@@ -1,8 +1,8 @@
-<div class="modal fade" id="editUser-{{$userEdit->id}}" tabindex="-1" aria-labelledby="editUser-{{$userEdit->id}}-Label" aria-hidden="true">
+<div class="modal fade" id="editUser-{{$user->id}}" tabindex="-1" aria-labelledby="editUser-{{$user->id}}-Label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="editUser--{{$userEdit->id}}-Label">Edit user <code>{{$userEdit->name}}</code></h1>
+                <h1 class="modal-title fs-5 fw-bold" id="editUser--{{$user->id}}-Label">Edit user <code>{{$user->name}}</code></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="{{ route('administration.user.update', ['user_id' => $user->id]) }}" class="row g-3 needs-validation" novalidate>

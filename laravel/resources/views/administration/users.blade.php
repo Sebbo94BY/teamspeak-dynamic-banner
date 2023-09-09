@@ -104,12 +104,12 @@
     </div>
 </div>
 
-@foreach($users as $userEdit)
-    @include('modals.administration.modal-edit')
+@foreach($users as $user)
+    @include('modals.administration.modal-edit', ['user'=>$user])
 @endforeach
 
 @foreach($users as $userViewRoles)
-    @include('modals.administration.modal-view-user-roles')
+    @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userViewRoles])
 @endforeach
 
 @include('modals.administration.modal-add')

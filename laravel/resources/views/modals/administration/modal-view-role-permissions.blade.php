@@ -1,14 +1,14 @@
-<div class="modal fade" id="rolePermission-{{$rolePermission->id}}" tabindex="-1" aria-labelledby="rolePermission-{{$rolePermission->id}}-Label" aria-hidden="true">
+<div class="modal fade" id="rolePermission-{{$role->id}}" tabindex="-1" aria-labelledby="rolePermission-{{$role->id}}-Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="rolePermission-{{$rolePermission->id}}-Label">Role Permission <code>{{$rolePermission->name}}</code></h1>
+                <h1 class="modal-title fs-5 fw-bold" id="rolePermission-{{$role->id}}-Label">Role Permission <code>{{$role->name}}</code></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="col-lg-12">
                     <ul class="list-group list-group-flush">
-                        @if($rolePermission->name == 'Super Admin')
+                        @if($role->name == 'Super Admin')
                             <li class="list-group-item">All permissions</li>
                         @else
                             @foreach($role->permissions->pluck('name') as $permission)

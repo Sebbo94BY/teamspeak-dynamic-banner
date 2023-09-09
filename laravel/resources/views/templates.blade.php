@@ -95,7 +95,7 @@
 
 @can('edit templates')
     @foreach($templates as $templateModal)
-        @include('modals.templates.modal-edit')
+        @include('modals.templates.modal-edit', ['templateModal'=>$templateModal])
     @endforeach
 @endcan
 

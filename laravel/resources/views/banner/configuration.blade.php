@@ -184,6 +184,6 @@
 @include('inc.banner-config-script')
 @include('inc.form-validation')
 @foreach($instance as $instanceVariableModal)
-    @include('modals.modal-variables')
+    @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
 @endsection

@@ -85,7 +85,7 @@
 </div>
 @include('modals.fonts.modal-add')
 
-@foreach($fonts as $fontEdit)
-    @include('modals.fonts.modal-edit')
+@foreach($fonts as $fontForEdit)
+    @include('modals.fonts.modal-edit', ['fontForEdit'=>$fontForEdit])
 @endforeach
 @endsection

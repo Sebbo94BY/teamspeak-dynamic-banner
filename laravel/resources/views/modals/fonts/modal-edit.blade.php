@@ -1,11 +1,11 @@
-<div class="modal fade" id="editFont-{{$fontEdit->id}}" tabindex="-1" aria-labelledby="editFont-{{$fontEdit->id}}-Label" aria-hidden="true">
+<div class="modal fade" id="editFont-{{$fontForEdit->id}}" tabindex="-1" aria-labelledby="editFont-{{$fontForEdit->id}}-Label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="editFont-{{$fontEdit->id}}-Label">Edit Font: {{$fontEdit->filename}}</h1>
+                <h1 class="modal-title fs-5 fw-bold" id="editFont-{{$fontForEdit->id}}-Label">Edit Font: {{$fontForEdit->filename}}</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ route('administration.font.update', ['font_id' => $font->id]) }}" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
+            <form method="POST" action="{{ route('administration.font.update', ['font_id' => $fontForEdit->id]) }}" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
                 @method('patch')
                 @csrf
                 <div class="modal-body">
