@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerTemplateAddRequest;
-use App\Http\Requests\BannerTemplateAddTemplateRequest;
 use App\Http\Requests\BannerTemplateDisableRequest;
 use App\Http\Requests\BannerTemplateEditRequest;
 use App\Http\Requests\BannerTemplateEnableRequest;
@@ -33,20 +32,6 @@ class BannerTemplateController extends Controller
         $banner = Banner::find($request->banner_id);
 
         return view('banner.template', ['banner_id' => $banner->id])->with([
-            'banner' => $banner,
-            'templates' => Template::all(),
-        ]);
-    }
-
-    /**
-     * Display the view to add a template to the banner.
-     */
-    public function add_template(BannerTemplateAddTemplateRequest $request): View
-    {
-        //todo obsolete
-        $banner = Banner::find($request->banner_id);
-
-        return view('banner.template_add', ['banner_id' => $banner->id])->with([
             'banner' => $banner,
             'templates' => Template::all(),
         ]);

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FontAddRequest;
 use App\Http\Requests\FontDeleteRequest;
-use App\Http\Requests\FontEditRequest;
 use App\Http\Requests\FontUpdateRequest;
 use App\Models\Font;
 use Carbon\Carbon;
