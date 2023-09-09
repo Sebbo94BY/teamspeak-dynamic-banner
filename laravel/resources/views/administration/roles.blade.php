@@ -14,7 +14,7 @@
                 columnDefs:[
                     {
                         orderable: false,
-                        targets: 3,
+                        targets: 2,
                     }
                 ],
             });
@@ -38,7 +38,6 @@
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col">Guard Name</th>
                     <th scope="col">Members</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -47,7 +46,6 @@
                 @foreach($roles as $role)
                 <tr>
                     <td class="col-lg-2">{{ $role->name }}</td>
-                    <td class="col-lg-2">{{ $role->guard_name }}</td>
                     <td class="col-lg-2">
                         <span class="badge text-bg-secondary">{{ $role->users->count() }}</span>
                     </td>
