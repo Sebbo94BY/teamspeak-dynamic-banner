@@ -29,15 +29,6 @@ class FontsController extends Controller
     }
 
     /**
-     * Display the font add form.
-     */
-    public function add_form(): View
-    {
-        //TODO obsolete
-        return view('administration.font.add');
-    }
-
-    /**
      * Saves a new font.
      */
     public function create(FontAddRequest $request): RedirectResponse
@@ -58,15 +49,6 @@ class FontsController extends Controller
             'success' => 'font-add-successful',
             'message' => 'Successfully added the new font.',
         ]);
-    }
-
-    /**
-     * Display the font edit form.
-     */
-    public function edit_form(FontEditRequest $request): View
-    {
-        //todo obsolete
-        return view('administration.font.edit', ['font' => Font::find($request->font_id)]);
     }
 
     /**

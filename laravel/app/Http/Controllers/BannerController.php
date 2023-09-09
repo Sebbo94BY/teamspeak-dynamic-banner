@@ -33,9 +33,8 @@ class BannerController extends Controller
         $banner = new Banner;
         $banner->name = $request->name;
         $banner->instance_id = $request->instance_id;
-        $banner->random_rotation = ($request->has('random_rotation')) ? true : false;
+        $banner->random_rotation = $request->has('random_rotation');
 
-        //todo in both scenarios the retrun goes back to banners route
         if (! $banner->save()) {
             return Redirect::route('banners')->withInput($request->all())->with([
                 'error' => 'banner-add-error',

@@ -44,33 +44,6 @@ class AdministrationUsersTest extends TestCase
         $response->assertViewIs('administration.users');
     }
 
-//    /**
-//     * Test, that the user can access the "add user" page, when he is authenticated.
-//     */
-//    public function test_add_user_page_gets_displayed_when_authenticated(): void
-//    {
-//        //todo obsolete
-//        $response = $this->actingAs($this->user)->get(route('administration.user.add'));
-//        $response->assertStatus(200);
-//        $response->assertViewIs('administration.user.add');
-//        $response->assertViewHas('roles');
-//    }
-
-//    /**
-//     * Test that trying to edit a user ID, which exists, returns the respective view.
-//     */
-//    public function test_edit_user_returns_the_edit_form_when_the_given_uid_exists(): void
-//    {
-//        //todo obsolete
-//        $other_user = User::factory()->create();
-//
-//        $response = $this->actingAs($this->user)->get(route('administration.user.edit', ['user_id' => $other_user->id]));
-//        $response->assertStatus(200);
-//        $response->assertViewIs('administration.user.edit');
-//        $response->assertViewHas('user');
-//        $response->assertViewHas('roles');
-//    }
-
     /**
      * Test that adding a new user requires to match the request rules.
      */

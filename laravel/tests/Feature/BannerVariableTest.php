@@ -35,20 +35,9 @@ class BannerVariableTest extends TestCase
      */
     public function test_user_gets_redirected_to_login_when_unauthenticated(): void
     {
+        //TODO $this->banner->id is polymorphic
         $response = $this->get(route('banner.variables', ['banner_id' => $this->banner->id]));
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));
     }
-
-//    /**
-//     * Test that the view gets displayed.
-//     */
-//    public function test_user_can_view_the_page(): void
-//    {
-//        //todo obsolete
-//        $response = $this->actingAs($this->user)->get(route('banner.variables', ['banner_id' => $this->banner->id]));
-//        $response->assertViewIs('banner.variables');
-//        $response->assertViewHas('redis_connection_error');
-//        $response->assertViewHas('variables_and_values');
-//    }
 }

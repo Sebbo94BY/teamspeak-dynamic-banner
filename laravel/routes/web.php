@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BannerConfigurationController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BannerTemplateController;
-use App\Http\Controllers\BannerVariableController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\ProfileController;
@@ -58,9 +57,7 @@ Route::middleware(['auth'])->group(function (){
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/instances', [InstanceController::class, 'overview'])->name('instances')->middleware('permission:view instances');
-//    Route::get('/instance/add', [InstanceController::class, 'add'])->name('instance.add')->middleware('permission:add instances');
     Route::post('/instance/save', [InstanceController::class, 'save'])->name('instance.save')->middleware('permission:add instances');
-//    Route::get('/instance/{instance_id}/edit', [InstanceController::class, 'edit'])->name('instance.edit')->middleware('permission:edit instances');
     Route::patch('/instance/{instance_id}/update', [InstanceController::class, 'update'])->name('instance.update')->middleware('permission:edit instances');
     Route::delete('/instance/{instance_id}/delete', [InstanceController::class, 'delete'])->name('instance.delete')->middleware('permission:delete instances');
     Route::get('/instance/{instance_id}/start', [InstanceController::class, 'start'])->name('instance.start')->middleware('permission:start instances');
@@ -70,20 +67,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/templates', [TemplateController::class, 'overview'])->name('templates')->middleware('permission:view templates');
     Route::get('/template/add', [TemplateController::class, 'add'])->name('template.add')->middleware('permission:add templates');
     Route::post('/template/save', [TemplateController::class, 'save'])->name('template.save')->middleware('permission:add templates');
-//    Route::get('/template/{template_id}/edit', [TemplateController::class, 'edit'])->name('template.edit')->middleware('permission:edit templates');
     Route::patch('/template/{template_id}/update', [TemplateController::class, 'update'])->name('template.update')->middleware('permission:edit templates');
     Route::get('/template/{template_id}/delete', [TemplateController::class, 'delete'])->name('template.delete')->middleware('permission:delete templates');
 
     Route::get('/banners', [BannerController::class, 'overview'])->name('banners')->middleware('permission:view banners');
     Route::post('/banner/save', [BannerController::class, 'save'])->name('banner.save')->middleware('permission:add banners');
-//    Route::get('/banner/{banner_id}/edit', [BannerController::class, 'edit'])->name('banner.edit')->middleware('permission:edit banners');
     Route::patch('/banner/{banner_id}/update', [BannerController::class, 'update'])->name('banner.update')->middleware('permission:edit banners');
     Route::get('/banner/{banner_id}/delete', [BannerController::class, 'delete'])->name('banner.delete')->middleware('permission:delete banners');
 
-//    Route::get('/banner/{banner_id}/variables', [BannerVariableController::class, 'overview'])->name('banner.variables');
-
     Route::get('/banner/{banner_id}/templates', [BannerTemplateController::class, 'edit'])->name('banner.templates')->middleware('permission:edit banners');
-//    Route::get('/banner/{banner_id}/template/add', [BannerTemplateController::class, 'add_template'])->name('banner.template.add')->middleware('permission:edit banners');
     Route::post('/banner/template/add', [BannerTemplateController::class, 'add'])->name('banner.add.template')->middleware('permission:edit banners');
     Route::get('/banner/template/{banner_template_id}/remove', [BannerTemplateController::class, 'remove'])->name('banner.template.remove')->middleware('permission:edit banners');
     Route::get('/banner/template/{banner_template_id}/disable', [BannerTemplateController::class, 'disable'])->name('banner.template.disable')->middleware('permission:edit banners');
@@ -94,18 +86,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
     Route::get('/administration/users', [UsersController::class, 'users'])->name('administration.users')->middleware('permission:view users');
-//    Route::get('/administration/user/add', [UsersController::class, 'add_user'])->name('administration.user.add')->middleware('permission:add users');
     Route::post('/administration/user/create', [UsersController::class, 'create_user'])->name('administration.user.create')->middleware('permission:add users');
-//    Route::get('/administration/user/{user_id}/edit', [UsersController::class, 'edit_user'])->name('administration.user.edit')->middleware('permission:edit users');
     Route::patch('/administration/user/{user_id}/update', [UsersController::class, 'update_user'])->name('administration.user.update')->middleware('permission:edit users');
     Route::delete('/administration/user/{user_id}/delete', [UsersController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
 
     Route::get('/administration/roles', [RolesController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
 
     Route::get('/administration/fonts', [FontsController::class, 'fonts'])->name('administration.fonts')->middleware('permission:view fonts');
-//    Route::get('/administration/font/add', [FontsController::class, 'add_form'])->name('administration.font.add')->middleware('permission:add fonts');
     Route::post('/administration/font/create', [FontsController::class, 'create'])->name('administration.font.create')->middleware('permission:add fonts');
-//    Route::get('/administration/font/{font_id}/edit', [FontsController::class, 'edit_form'])->name('administration.font.edit')->middleware('permission:edit fonts');
     Route::patch('/administration/font/{font_id}/update', [FontsController::class, 'update'])->name('administration.font.update')->middleware('permission:edit fonts');
     Route::delete('/administration/font/{font_id}/delete', [FontsController::class, 'delete'])->name('administration.font.delete')->middleware('permission:delete fonts');
 
