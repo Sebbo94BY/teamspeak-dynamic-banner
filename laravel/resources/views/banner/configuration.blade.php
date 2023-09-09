@@ -95,7 +95,7 @@
                                     An optional URL, where the user should get redirected, when he clicks on the banner. By default, the rendered template will be opened.
                                 </div>
                                 <p class="mt-2">For this functionality you need to configure the following URL as Hostbanner URL on your TeamSpeak server:<br>
-                                    <code>https://banner.highend-gaming.com/api/v1/banner/1jdxvi25/redirect-url</code>
+                                    <code>{{ route('api.banner.redirect_url', ['banner_id' => base_convert($banner_template->banner_id, 10, 35)]) }}</code>
                                 </p>
                             </div>
                         </div>
