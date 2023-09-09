@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/administration/users', [UsersController::class, 'users'])->name('administration.users')->middleware('permission:view users');
     Route::post('/administration/user/create', [UsersController::class, 'create_user'])->name('administration.user.create')->middleware('permission:add users');
     Route::patch('/administration/user/{user_id}/update', [UsersController::class, 'update_user'])->name('administration.user.update')->middleware('permission:edit users');
-    Route::delete('/administration/user/{user_id}/delete', [UsersController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
+    Route::get('/administration/user/{user_id}/delete', [UsersController::class, 'delete_user'])->name('administration.user.delete')->middleware('permission:delete users');
 
     Route::get('/administration/roles', [RolesController::class, 'roles'])->name('administration.roles')->middleware('permission:view roles');
 
