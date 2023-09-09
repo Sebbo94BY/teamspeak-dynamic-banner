@@ -51,7 +51,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    There are no templates created! <a href="#addTemplate" data-bs-toggle="modal" data-bs-target="#addTemplate">Add now a new Banner template</a>
+                    No templates have been uploaded yet! <a href="#addTemplate" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</a>
                 </div>
             </div>
         </div>

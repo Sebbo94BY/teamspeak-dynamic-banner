@@ -69,7 +69,7 @@
             <ul class="navbar-nav my-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle @yield('nav_link_active_edit_profile')" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{\Illuminate\Support\Facades\Auth::user()->name}}
+                        {{ Auth::user()->name }}
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item @yield('nav_link_active_edit_profile')" href="{{ route('profile.edit') }}">Profil</a></li>
