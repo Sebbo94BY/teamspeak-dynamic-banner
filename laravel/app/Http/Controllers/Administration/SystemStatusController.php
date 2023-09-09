@@ -14,6 +14,7 @@ class SystemStatusController extends Controller
     public function system_status(): View
     {
         $system_status_helper = new HelpersSystemStatusController();
-        return view('administration.systemstatus',$system_status_helper->system_status());
+
+        return view('administration.systemstatus', $system_status_helper->system_status());
     }
 }

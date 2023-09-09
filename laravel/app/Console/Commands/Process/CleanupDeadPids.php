@@ -32,7 +32,7 @@ class CleanupDeadPids extends Command
 
         foreach ($instance_processes as $process) {
             if (file_exists("/proc/$process->process_id") and (str_contains(file_get_contents("/proc/$process->process_id/cmdline"),
-                    'instance:start-teamspeak-bot'))) {
+                'instance:start-teamspeak-bot'))) {
                 $this->info("PID $process->process_id is still active. Skipping.");
                 continue;
             }

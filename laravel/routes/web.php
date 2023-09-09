@@ -40,7 +40,7 @@ Route::get('/', function () {
     return Redirect::route('dashboard');
 });
 
-Route::middleware(['guest'])->group(function (){
+Route::middleware(['guest'])->group(function () {
     Route::get('/setup/installer/requirements', [RequirementsController::class, 'show_view'])->name('setup.installer.requirements');
     Route::get('/setup/installer/user', [UserController::class, 'show_view'])->name('setup.installer.user');
     Route::post('/setup/installer/user/add', [UserController::class, 'create'])->name('setup.installer.user.create');

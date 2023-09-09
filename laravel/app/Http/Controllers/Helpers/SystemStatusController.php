@@ -340,7 +340,7 @@ class SystemStatusController extends Controller
         $php_ini_settings = collect($php_status['INI_SETTINGS']);
 
         $db_status = collect($system_status['DATABASE']);
-        $db_status_connection =collect($db_status['CONNECTION']);
+        $db_status_connection = collect($db_status['CONNECTION']);
         $db_status_settings = collect($db_status['SETTINGS']);
 
         $permission_status = collect($system_status['PERMISSIONS']);
@@ -355,7 +355,7 @@ class SystemStatusController extends Controller
         $various_status = collect($system_status['VARIOUS']);
         $various_status_information = collect($various_status['INFORMATION']);
 
-        return array(
+        return [
             'php_status'=>$php_status,
             'php_status_extension'=>$php_extensions,
             'php_status_ini_settings'=>$php_ini_settings,
@@ -379,6 +379,6 @@ class SystemStatusController extends Controller
             'various_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $various_status),
             'system_status_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $system_status),
             'system_status_danger_count' => preg_match_all("/\"severity\"\:\"danger\"/", $system_status),
-        );
+        ];
     }
 }

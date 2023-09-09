@@ -35,9 +35,9 @@ class BannerVariableController extends Controller
         $banner_variable_helper = new HelpersBannerVariableController(null);
         $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_client_specific_info_from_cache($instance, Request::ip()));
 
-        return array(
+        return [
             'redis_connection_error' => $redis_connection_error,
             'variables_and_values' => $variables_and_values,
-        );
+        ];
     }
 }
