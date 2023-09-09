@@ -4,10 +4,6 @@
     PHP Info
 @endsection
 
-@section('nav_link_active_php_info')
-    active
-@endsection
-
 @section('content')
     <style>
         #phpinfo {}

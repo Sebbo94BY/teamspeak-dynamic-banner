@@ -4,10 +4,6 @@
     Dashboard
 @endsection
 
-@section('nav_link_active_dashboard')
-    active
-@endsection
-
 @section('content')
     <div class="container mt-3">
         @include('inc.standard-alerts')

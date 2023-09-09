@@ -4,10 +4,6 @@
     Templates
 @endsection
 
-@section('nav_link_active_templates')
-    active
-@endsection
-
 @section('dataTables_script')
     <script>
         $(document).ready( function () {

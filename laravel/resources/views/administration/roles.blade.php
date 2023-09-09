@@ -4,10 +4,6 @@
     Administration Roles and Permission
 @endsection
 
-@section('nav_link_active_roles')
-    active
-@endsection
-
 @section('dataTables_script')
     <script>
         $(document).ready( function () {

@@ -8,10 +8,6 @@
 
 @endsection
 
-@section('nav_link_active_')
-
-@endsection
-
 @section('content')
 
 @endsection

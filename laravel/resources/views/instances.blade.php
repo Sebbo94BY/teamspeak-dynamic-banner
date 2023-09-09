@@ -4,10 +4,6 @@
     Instances
 @endsection
 
-@section('nav_link_active_instances')
-    active
-@endsection
-
 @section('dataTables_config')
     <script type="module">
         $(document).ready( function () {

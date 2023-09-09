@@ -4,10 +4,6 @@
     Edit Profile
 @endsection
 
-@section('nav_link_active_edit_profile')
-    active
-@endsection
-
 @section('content')
 <div class="container mt-3">
     <div class="row">

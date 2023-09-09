@@ -4,10 +4,6 @@
     Systemstatus
 @endsection
 
-@section('nav_link_active_system_status')
-    active
-@endsection
-
 @section('content')
 <div class="container mt-3">
     <div class="row">

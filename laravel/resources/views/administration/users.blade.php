@@ -4,10 +4,6 @@
     Administration Users
 @endsection
 
-@section('nav_link_active_user')
-    active
-@endsection
-
 @section('dataTables_script')
     <script>
         $(document).ready( function () {
