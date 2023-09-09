@@ -32,27 +32,6 @@ class UsersController extends Controller
     }
 
     /**
-     * Display the user add form.
-     */
-    public function add_user(): View
-    {
-        //todo obsolete
-        return view('administration.user.add', ['roles' => Role::all()]);
-    }
-
-    /**
-     * Display the user edit form.
-     */
-    public function edit_user(UserEditRequest $request): View
-    {
-        //todo obsolete
-        return view('administration.user.edit', [
-            'user' => User::find($request->user_id),
-            'roles' => Role::all(),
-        ]);
-    }
-
-    /**
      * Creates a new user model in the database.
      */
     public function create_user(UserAddRequest $request): RedirectResponse

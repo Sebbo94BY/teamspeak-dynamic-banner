@@ -29,15 +29,6 @@ class InstanceController extends Controller
     }
 
     /**
-     * Display the add view.
-     */
-    public function add(): View
-    {
-        //todo obsolete
-        return view('instance.add');
-    }
-
-    /**
      * Save a new data set.
      */
     public function save(InstanceAddRequest $request): RedirectResponse
@@ -96,50 +87,6 @@ class InstanceController extends Controller
     }
 
     /**
-     * Display the edit view.
-     */
-    public function edit(InstanceEditRequest $request): View|RedirectResponse
-    {
-        //TODO obsolete
-        $instance = Instance::find($request->instance_id);
-
-        try {
-            $virtualserver_helper = new TeamSpeakVirtualserver($instance);
-            $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-        } catch (TransportException $transport_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-unreachable-error',
-                'message' => $transport_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        } catch (ServerQueryException $serverquery_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-serverquery-error',
-                'message' => $serverquery_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        }
-
-        try {
-            $channel_list = $virtualserver->channelList();
-        } catch (ServerQueryException $serverquery_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-channellist-error',
-                'message' => $serverquery_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        }
-
-        return view('instance.edit', ['instance_id' => $instance->id])->with([
-            'instance' => $instance,
-            'channel_list' => $channel_list,
-        ]);
-    }
-
-    /**
      * Update an existing data set.
      */
     public function update(InstanceUpdateRequest $request): RedirectResponse
@@ -180,7 +127,7 @@ class InstanceController extends Controller
         }
 
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
-        $instance->autostart_enabled = ($request->has('autostart_enabled')) ? true : false;
+        $instance->autostart_enabled = $request->has('autostart_enabled');
 
         if (! $instance->save()) {
             return Redirect::route('instances')
