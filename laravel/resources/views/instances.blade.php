@@ -47,7 +47,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    There are no instance configured! <a href="#modalAddInstance" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add now a new instance</a>
+                    There is no instance configured yet! <a href="#modalAddInstance" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</a>
                 </div>
             </div>
         </div>
