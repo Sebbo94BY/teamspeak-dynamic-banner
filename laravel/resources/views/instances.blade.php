@@ -148,7 +148,7 @@
 @include('modals.instance.modal-add')
 @foreach($instances as $instanceModal)
     @can('edit instances')
-        @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal])
+        @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal,'channel_list'=>$channel_list])
     @endcan
 @endforeach
 

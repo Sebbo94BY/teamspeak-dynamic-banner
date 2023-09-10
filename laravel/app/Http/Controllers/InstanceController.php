@@ -24,7 +24,30 @@ class InstanceController extends Controller
      */
     public function overview(): View
     {
-        return view('instances')->with('instances', Instance::all());
+        $instances = Instance::all();
+
+        $channelListForEachInstance = array();
+        foreach ($instances as $instance)
+        {
+            try {
+                $virtualserver_helper = new TeamSpeakVirtualserver($instance);
+                $virtualserver = $virtualserver_helper->get_virtualserver_connection();
+                $channel_list = $virtualserver->channelList();
+            } catch (ServerQueryException $serverquery_exception) {
+                return view('instance.edit', ['instance_id' => $instance->id])->with([
+                    'error' => 'instance-channellist-error',
+                    'message' => $serverquery_exception->getMessage(),
+                    'instance' => $instance,
+                    'channel_list' => [],
+                ]);
+            }
+            $channelListForEachInstance[] = [$instance->id => $channel_list];
+        }
+
+        return view('instances')->with([
+            'instances' => $instances,
+            'channel_list' => $channelListForEachInstance,
+        ]);
     }
 
     /**

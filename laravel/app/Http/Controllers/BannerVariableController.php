@@ -3,13 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\BannerVariableController as HelpersBannerVariableController;
-use App\Http\Requests\BannerVariableOverviewRequest;
-use App\Models\Banner;
 use App\Models\Instance;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
-use Illuminate\View\View;
 use Predis\Connection\ConnectionException;
 
 class BannerVariableController extends Controller
@@ -17,9 +13,9 @@ class BannerVariableController extends Controller
     /**
      * Display the overview page.
      */
-    public function getInstanceVariables(int $id)
+    public function getInstanceVariables(int $instance_id): array
     {
-        $instance = Instance::find($id);
+        $instance = Instance::find($instance_id);
 
         $redis_connection_error = null;
         $variables_and_values = [];

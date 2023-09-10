@@ -53,6 +53,33 @@
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
                                 <div class="invalid-feedback">{{ __("Please provide a valid nickname.") }}</div>
                             </div>
+                            <div class="mb-3">
+                                <label for="validationDefaultChannelId" class="form-label fw-bold">Default Channel</label>
+                                <select class="form-select" name="default_channel_id" id="validationDefaultChannelId" aria-describedby="defaultChannelIdHelp">
+                                    <option value="" selected>Default Channel</option>
+                                    @foreach ($channel_list as $channel)
+                                        @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel[$instanceModal->id]['cid']) "selected"
+                                        <option value="{{ $channel[$instanceModal->id]['cid'] }}" selected>{{ $channel[$instanceModal->id]['name'] }}</option>
+                                        @else
+                                            <option value="{{ $channel[$instanceModal->id]['cid'] }}">{{ $channel[$instanceModal->id]['name'] }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <div id="defaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
+                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                <div class="invalid-feedback">{{ __("Please provide a valid channel (ID).") }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="validationAutostart" class="form-check-label fw-bold">Enable autostart</label>
+                                @if (old('autostart_enabled', $instance->autostart_enabled))
+                                    <input class="form-check-input ms-2" id="validationAutostart" type="checkbox" name="autostart_enabled" aria-describedby="autostartHelp" checked>
+                                @else
+                                    <input class="form-check-input ms-2" id="validationAutostart" type="checkbox" name="autostart_enabled" aria-describedby="autostartHelp">
+                                @endif
+                                <div id="autostartHelp" class="form-text">When enabled, the application automatically starts the bot instance after up to 5 minutes, if it should not run yet.</div>
+                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                <div class="invalid-feedback">{{ __("You can only enable or disable this checkbox.") }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
