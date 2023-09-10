@@ -23,6 +23,7 @@ class RequirementsController extends Controller
         }
 
         $system_status_helper = new SystemStatusController();
+
         return view('setup.installer.requirements', $system_status_helper->system_status());
     }
 }
