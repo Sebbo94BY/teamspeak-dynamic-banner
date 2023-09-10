@@ -44,6 +44,8 @@ class InstanceTest extends TestCase
      */
     public function test_page_gets_displayed_when_authenticated(): void
     {
+        //to test this route without a connection timeout is to delete all instances
+        $this->instance->delete();
         $response = $this->actingAs($this->user)->get(route('instances'));
         $response->assertStatus(200);
         $response->assertViewIs('instances');
