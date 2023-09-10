@@ -15,6 +15,26 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    @if (config('matomo.enabled'))
+    <!-- Matomo -->
+    <script>
+        var _paq = window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(["setDoNotTrack", true]);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        _paq.push(['enableHeartBeatTimer'], "{{ config('matomo.heartbeat_timer') }}");
+        (function() {
+            var u="{{ config('matomo.base_url') }}";
+            _paq.push(['setTrackerUrl', u+'/matomo.php']);
+            _paq.push(['setSiteId', "{{ config('matomo.site_id') }}"]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>
+    <noscript><p><img src="{{ config('matomo.base_url') }}/matomo.php?idsite={{ config('matomo.site_id') }}&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    @endif
 </head>
 <body>
     <div id="app">

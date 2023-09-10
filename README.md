@@ -120,6 +120,15 @@ The application UI is currently available in the following languages:
 * English
 
 
+## Matomo Tracking
+
+If you're interested in some statistics of this application, you can configure a Matomo tracking code, which sends the respective tracking data to your Matomo installation.
+
+Simply configure the Matomo tracking in your DotEnv file (`.env`) with the respective variables. See the configuration file `laravel/config/matomo.php` for the available environment variables and a detailed explanation.
+
+After configuring it, don't forget to cache your configuration: `php artisan config:cache`
+
+
 ## Architecture
 
 [Open Architecture README](/docs/ARCHITECTURE.md)

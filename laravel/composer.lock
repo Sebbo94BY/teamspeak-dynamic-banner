@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "adbdd86b818dd0838b256c22fae63f69",
+    "content-hash": "048d61ac66cb9a3c3860a6cbbc550d02",
     "packages": [
         {
             "name": "brick/math",
@@ -2210,6 +2210,62 @@
                 }
             ],
             "time": "2023-08-05T12:09:49+00:00"
+        },
+        {
+            "name": "matomo/matomo-php-tracker",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/matomo-org/matomo-php-tracker.git",
+                "reference": "c9e7816d63ddf99bffb1414cfbe45f4c4edf1d4b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/matomo-org/matomo-php-tracker/zipball/c9e7816d63ddf99bffb1414cfbe45f4c4edf1d4b",
+                "reference": "c9e7816d63ddf99bffb1414cfbe45f4c4edf1d4b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.3"
+            },
+            "suggest": {
+                "ext-curl": "Using this extension to issue the HTTPS request to Matomo"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "."
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "The Matomo Team",
+                    "email": "hello@matomo.org",
+                    "homepage": "https://matomo.org/team/"
+                }
+            ],
+            "description": "PHP Client for Matomo Analytics Tracking API",
+            "homepage": "https://matomo.org",
+            "keywords": [
+                "analytics",
+                "matomo",
+                "piwik",
+                "tracker"
+            ],
+            "support": {
+                "forum": "https://forum.matomo.org/",
+                "issues": "https://github.com/matomo-org/matomo-php-tracker/issues",
+                "source": "https://github.com/matomo-org/matomo-php-tracker"
+            },
+            "time": "2023-03-24T15:16:22+00:00"
         },
         {
             "name": "monolog/monolog",
