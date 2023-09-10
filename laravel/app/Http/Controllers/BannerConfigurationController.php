@@ -27,7 +27,7 @@ class BannerConfigurationController extends Controller
         return view('banner.configuration')->with([
             'banner_template' => BannerTemplate::find($request->banner_template_id),
             'fonts' => Font::all(),
-            'instance'=>Instance::all(),
+            'instance' => Instance::all(),
         ]);
     }
 
