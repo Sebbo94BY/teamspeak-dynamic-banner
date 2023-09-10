@@ -57,12 +57,14 @@
                                 <label for="validationDefaultChannelId" class="form-label fw-bold">Default Channel</label>
                                 <select class="form-select" name="default_channel_id" id="validationDefaultChannelId" aria-describedby="defaultChannelIdHelp">
                                     <option value="" selected>Default Channel</option>
-                                    @foreach ($channel_list as $channel)
-                                        @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel[$instanceModal->id]['cid']) "selected"
-                                        <option value="{{ $channel[$instanceModal->id]['cid'] }}" selected>{{ $channel[$instanceModal->id]['name'] }}</option>
-                                        @else
-                                            <option value="{{ $channel[$instanceModal->id]['cid'] }}">{{ $channel[$instanceModal->id]['name'] }}</option>
-                                        @endif
+                                    @foreach ($channel_list as $channelInstance)
+                                        @foreach($channelInstance[$instanceModal->id] as $channel)
+                                            @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel->cid) "selected"
+                                            <option value="{{ $channel->cid }}" selected>{{ $channel->name }}</option>
+                                            @else
+                                                <option value="{{ $channel->cid }}">{{ $channel->name }}</option>
+                                            @endif
+                                        @endforeach
                                     @endforeach
                                 </select>
                                 <div id="defaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
