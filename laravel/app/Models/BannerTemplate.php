@@ -17,6 +17,7 @@ class BannerTemplate extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
         'banner_id',
         'template_id',
         'file_path_drawed_grid_text',

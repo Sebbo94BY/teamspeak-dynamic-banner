@@ -34,6 +34,7 @@ class BannerConfigurationController extends Controller
     public function upsert(BannerConfigurationUpsertRequest $request): View|RedirectResponse
     {
         $banner_template = BannerTemplate::find($request->banner_template_id);
+        $banner_template->name = $request->name;
         $banner_template->redirect_url = $request->redirect_url;
         $banner_template->disable_at = (isset($request->disable_at)) ? Carbon::parse($request->disable_at) : null;
 

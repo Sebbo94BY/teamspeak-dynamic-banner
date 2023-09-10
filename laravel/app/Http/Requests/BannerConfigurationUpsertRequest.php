@@ -41,6 +41,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
     {
         return [
             'banner_template_id' => ['required', 'integer', 'exists:App\Models\BannerTemplate,id'],
+            'name' => ['required', 'string'],
             'redirect_url' => ['nullable', 'url'],
             'disable_at' => ['nullable', 'date'],
             'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],

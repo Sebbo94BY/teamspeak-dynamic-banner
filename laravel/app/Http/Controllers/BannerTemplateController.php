@@ -57,6 +57,7 @@ class BannerTemplateController extends Controller
     public function add(BannerTemplateAddRequest $request): RedirectResponse
     {
         $banner_template = new BannerTemplate;
+        $banner_template->name = $request->name;
         $banner_template->banner_id = $request->banner_id;
         $banner_template->template_id = $request->template_id;
 
