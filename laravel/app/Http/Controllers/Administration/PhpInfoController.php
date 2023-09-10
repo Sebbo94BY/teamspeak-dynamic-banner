@@ -18,6 +18,6 @@ class PhpInfoController extends Controller
         ob_end_clean();
         $phpinfo_only_body_html = preg_replace('%^.*<body>(.*)</body>.*$%ms', '$1', $phpinfo_full_html);
 
-        return view('administration.phpinfo')->with(['phpinfo'=>$phpInfo]);
+        return view('administration.phpinfo')->with(['phpinfo'=>$phpinfo_only_body_html]);
     }
 }
