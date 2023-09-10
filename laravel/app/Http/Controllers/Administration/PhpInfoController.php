@@ -12,7 +12,6 @@ class PhpInfoController extends Controller
      */
     public function php_info(): View
     {
-        //embedded php info
         ob_start();
         phpinfo();
         $phpInfo = ob_get_contents();
