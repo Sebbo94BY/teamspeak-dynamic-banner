@@ -15,7 +15,8 @@
         "planetteamspeak/ts3-php-framework": "dev-dev",
         "predis/predis": "^2.1",
         "spatie/laravel-permission": "^5.10",
-        "ext-gd": "*"
+        "ext-gd": "*",
+        "ext-pcntl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
