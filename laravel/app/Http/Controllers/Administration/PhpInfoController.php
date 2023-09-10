@@ -16,7 +16,7 @@ class PhpInfoController extends Controller
         phpinfo();
         $phpinfo_full_html = ob_get_contents();
         ob_end_clean();
-        $phpInfo = preg_replace('%^.*<body>(.*)</body>.*$%ms', '$1', $phpInfo);
+        $phpinfo_only_body_html = preg_replace('%^.*<body>(.*)</body>.*$%ms', '$1', $phpinfo_full_html);
 
         return view('administration.phpinfo')->with(['phpinfo'=>$phpInfo]);
     }
