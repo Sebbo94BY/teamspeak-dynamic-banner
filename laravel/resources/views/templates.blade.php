@@ -31,6 +31,7 @@
     </div>
     <hr>
 </div>
+@can('add templates')
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
@@ -41,13 +42,17 @@
     </div>
     <hr>
 </div>
+@endcan
 <div class="container mt-3">
     @include('inc.standard-alerts')
     @if($templates->count() == 0)
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    No templates have been uploaded yet! <a href="#addTemplate" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</a>
+                    No templates have been uploaded yet!
+                    @can('add templates')
+                    <a href="#addTemplate" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</a>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -93,16 +98,13 @@
 
 @include('modals.templates.modal-add')
 
-@can('edit templates')
-    @foreach($templates as $templateModal)
+@foreach($templates as $templateModal)
+    @can('edit templates')
         @include('modals.templates.modal-edit', ['templateModal'=>$templateModal])
-    @endforeach
-@endcan
-
-@can('delete templates')
-    @foreach($templates as $templateDeleteModal)
-        @include('modals.soft-delete-feedback.modal-delete-template', ['templateDeleteModal'=>$templateDeleteModal])
-    @endforeach
-@endcan
+    @endcan
+    @can('delete templates')
+        @include('modals.soft-delete-feedback.modal-delete-template', ['templateDeleteModal'=>$templateModal])
+    @endcan
+@endforeach
 
 @endsection
