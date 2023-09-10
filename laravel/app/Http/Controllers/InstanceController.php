@@ -26,9 +26,8 @@ class InstanceController extends Controller
     {
         $instances = Instance::all();
 
-        $channelListForEachInstance = array();
-        foreach ($instances as $instance)
-        {
+        $channelListForEachInstance = [];
+        foreach ($instances as $instance) {
             try {
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
