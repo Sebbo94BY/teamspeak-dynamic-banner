@@ -51,7 +51,7 @@
                 <div class="alert alert-primary" role="alert">
                     No templates have been uploaded yet!
                     @can('add templates')
-                    <a href="#addTemplate" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</a>
+                    <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</button>
                     @endcan
                 </div>
             </div>
@@ -103,7 +103,7 @@
         @include('modals.templates.modal-edit', ['templateModal'=>$templateModal])
     @endcan
     @can('delete templates')
-        @include('modals.soft-delete-feedback.modal-delete-template', ['templateDeleteModal'=>$templateModal])
+        @include('modals.delete-feedback.modal-delete-template', ['templateDeleteModal'=>$templateModal])
     @endcan
 @endforeach
 

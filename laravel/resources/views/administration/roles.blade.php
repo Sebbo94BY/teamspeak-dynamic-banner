@@ -50,8 +50,10 @@
                         <span class="badge text-bg-secondary">{{ $role->users->count() }}</span>
                     </td>
                     <td class="col-lg-2">
-                        <a href="#rolePermission-{{$role->id}}" data-bs-toggle="modal" data-bs-target="#rolePermission-{{$role->id}}"><i class="fa-solid fa-key text-primary fa-lg me-1"></i></a>
-                        <a href="#roleMembers-{{$role->id}}" data-bs-toggle="modal" data-bs-target="#roleMembers-{{$role->id}}"><i class="fa-solid fa-users fa-lg me-1"></i></a>
+                        <div class="d-flex">
+                            <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#rolePermission-{{$role->id}}"><i class="fa-solid fa-key text-primary fa-lg"></i></button>
+                            <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#roleMembers-{{$role->id}}"><i class="fa-solid fa-users fa-lg"></i></button>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -63,9 +65,6 @@
 
 @foreach($roles as $role)
     @include('modals.administration.modal-view-role-permissions', ['role'=>$role])
-@endforeach
-
-@foreach($roles as $role)
     @include('modals.administration.modal-view-role-users', ['role'=>$role])
 @endforeach
 

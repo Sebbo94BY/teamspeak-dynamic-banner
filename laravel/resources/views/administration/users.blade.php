@@ -69,10 +69,10 @@
                             @switch(true)
                                 @case($role == 'Super Admin')
                                     <span class="badge text-bg-danger">{{$role}}</span>
-                                @break
+                                    @break
                                 @case(preg_match('/Admin/i', $role))
                                     <span class="badge text-bg-warning">{{$role}}</span>
-                                @break
+                                    @break
                                 @default
                                     <span class="badge text-bg-primary">{{$role}}</span>
                             @endswitch
@@ -82,15 +82,17 @@
                         {{ \Illuminate\Support\Carbon::parse($user->created_at)->format('d.m.Y') }}
                     </td>
                     <td class="col-lg-2">
-                        <a href="#roleRolesAndPermission-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#roleRolesAndPermission-{{$user->id}}"><i class="fa-solid fa-key text-primary fa-lg me-1"></i></a>
-                        @can('edit users')
-                        <a href="#editUser-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#editUser-{{$user->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
-                        @endcan
-                        @if (Auth::user()->id != $user->id)
-                        @can('delete users')
-                        <a href="#delUser-{{$user->id}}" data-bs-toggle="modal" data-bs-target="#delUser-{{$user->id}}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
-                        @endcan
-                        @endif
+                        <div class="d-flex">
+                            <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#roleRolesAndPermission-{{$user->id}}"><i class="fa-solid fa-key text-primary fa-lg"></i></button>
+                            @can('edit users')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editUser-{{$user->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                            @if (Auth::user()->id != $user->id)
+                                @can('delete users')
+                                    <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#delUser-{{$user->id}}"><i class="fa fa-trash text-danger fa-lg"></i></button>
+                                @endcan
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -123,7 +125,7 @@
 @can('delete users')
     @foreach($users as $userDeleteModal)
         @if (Auth::user()->id != $userDeleteModal->id)
-            @include('modals.soft-delete-feedback.modal-delete-user', ['userDeleteModal'=>$userDeleteModal])
+            @include('modals.delete-feedback.modal-delete-user', ['userDeleteModal'=>$userDeleteModal])
         @endif
     @endforeach
 @endcan

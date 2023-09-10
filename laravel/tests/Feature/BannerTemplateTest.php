@@ -119,7 +119,7 @@ class BannerTemplateTest extends TestCase
                 Template::factory()->create()
             )->create();
 
-        $response = $this->actingAs($this->user)->get(route('banner.template.remove', ['banner_template_id' => $banner_template->id]));
+        $response = $this->actingAs($this->user)->delete(route('banner.template.remove', ['banner_template_id' => $banner_template->id]));
 
         $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');
@@ -140,7 +140,7 @@ class BannerTemplateTest extends TestCase
             )->create(['enabled' => true]);
 
         $this->assertTrue(BannerTemplate::find($banner_template->id)->enabled);
-        $response = $this->actingAs($this->user)->get(route('banner.template.disable', ['banner_template_id' => $banner_template->id]));
+        $response = $this->actingAs($this->user)->patch(route('banner.template.disable', ['banner_template_id' => $banner_template->id]));
 
         $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');
@@ -161,7 +161,7 @@ class BannerTemplateTest extends TestCase
             )->create(['enabled' => false]);
 
         $this->assertFalse(BannerTemplate::find($banner_template->id)->enabled);
-        $response = $this->actingAs($this->user)->get(route('banner.template.enable', ['banner_template_id' => $banner_template->id]));
+        $response = $this->actingAs($this->user)->patch(route('banner.template.enable', ['banner_template_id' => $banner_template->id]));
 
         $response->assertRedirectToRoute('banner.templates', ['banner_id' => $this->banner->id]);
         $response->assertSessionHas('success');

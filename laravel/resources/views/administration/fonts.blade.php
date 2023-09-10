@@ -45,7 +45,10 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="alert alert-primary" role="alert">
-                        There are no Fonts Uploaded! <a href="#addFont" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</a>
+                        There are no Fonts Uploaded!
+                        @can('add fonts')
+                        <a href="#addFont" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</a>
+                        @endcan
                     </div>
                 </div>
             </div>
@@ -67,13 +70,15 @@
                 <tr>
                     <td>{{ $font->filename }}</td>
                     <td>{{ $font->updated_at }}</td>
-                    <td class="text-end">
-                        @can('edit fonts')
-                            <a href="#editFont-{{$font->id}}" data-bs-toggle="modal" data-bs-target="#editFont-{{$font->id}}"><i class="fa-solid fa-pencil text-primary fa-lg me-1"></i></a>
-                        @endcan
-                        @can('delete fonts')
-                            <a href="#delFont-{{$font->id}}" data-bs-toggle="modal" data-bs-target="#delFont-{{$font->id}}"><i class="fa-solid fa-trash text-danger fa-lg me-1"></i></a>
-                        @endcan
+                    <td>
+                        <div class="d-flex">
+                            @can('edit fonts')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editFont-{{$font->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                            @can('delete fonts')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#delFont-{{$font->id}}"><i class="fa-solid fa-trash text-danger fa-lg"></i></button>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -91,7 +96,7 @@
 
 @can('delete fonts')
     @foreach($fonts as $fontDeleteModal)
-        @include('modals.soft-delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontDeleteModal])
+        @include('modals.delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontDeleteModal])
     @endforeach
 @endcan
 

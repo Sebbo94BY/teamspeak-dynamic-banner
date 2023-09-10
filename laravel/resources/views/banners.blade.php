@@ -53,7 +53,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                There are no Banners configured! <a href="#addBanner" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</a>
+                There are no Banners configured! <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
             </div>
         </div>
     </div>
@@ -73,24 +73,28 @@
                 @foreach($banners as $banner)
                 <tr>
                     <td class="col-lg-3">{{ $banner->name }}</td>
-                    <td class="col-lg-5" role="button">
+                    <td class="col-lg-5">
                         {{ $banner->instance->virtualserver_name }}
                     </td>
                     <td class="col-lg-2">
                         <span class="badge text-bg-secondary fs-6">{{ $banner->templates->count() }}</span>
                     </td>
                     <td class="col-lg-2">
-                        @can('edit banners')
-                        <a href="#editBanner-{{$banner->id}}" data-bs-toggle="modal" data-bs-target="#editBanner-{{$banner->id}}"><i class="fa-solid fa-pencil text-primary me-2 fa-lg"></i></a>
-                        @endcan
-                        <a href="#modalAvailableVariables-{{$banner->instance->id}}" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$banner->instance->id}}"><i class="fa-solid fa-square-root-variable text-primary me-2 fa-lg"></i></a>
-                        @can('edit banners')
-                        <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}"><i class="fa-solid fa-image text-primary me-2 fa-lg"></i></a>
-                        @endcan
-                        <a href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary me-2 fa-lg"></i></a>
-                        @can('delete banners')
-                        <a href="#delBanner-{{$banner->id}}" data-bs-toggle="modal" data-bs-target="#delBanner-{{$banner->id}}"><i class="fa fa-trash text-danger me-2 fa-lg"></i></a>
-                        @endcan
+                        <div class="d-flex">
+                            @can('edit banners')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editBanner-{{$banner->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$banner->instance->id}}"><i class="fa-solid fa-square-root-variable text-primary fa-lg"></i></button>
+                            @can('edit banners')
+                                <form method="get" action="{{ route('banner.templates', ['banner_id' => $banner->id]) }}">
+                                    <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-image text-primary fa-lg"></i></button>
+                                </form>
+                            @endcan
+                                <a class="btn btn-link px-0 me-2" href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary fa-lg"></i></a>
+                            @can('delete banners')
+                                <button class="btn btn-link px-0 me-2" type="submit" data-bs-toggle="modal" data-bs-target="#delBanner-{{$banner->id}}"><i class="fa fa-trash text-danger fa-lg"></i></button>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -115,7 +119,7 @@
 
 @can('delete banners')
     @foreach($banners as $bannerDeleteModal)
-        @include('modals.soft-delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerDeleteModal])
+        @include('modals.delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerDeleteModal])
     @endforeach
 @endcan
 

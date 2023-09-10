@@ -6,7 +6,6 @@ use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
 use App\Http\Requests\BannerConfigurationDeleteRequest;
 use App\Http\Requests\BannerConfigurationEditRequest;
 use App\Http\Requests\BannerConfigurationUpsertRequest;
-use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
 use App\Models\Font;

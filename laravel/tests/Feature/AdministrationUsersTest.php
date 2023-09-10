@@ -175,7 +175,7 @@ class AdministrationUsersTest extends TestCase
     {
         $other_user = User::factory()->create();
 
-        $response = $this->actingAs($this->user)->get(route('administration.user.delete', ['user_id' => $other_user->id]));
+        $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => $other_user->id]));
         $response->assertRedirectToRoute('administration.users');
         $response->assertSessionHas('success');
     }

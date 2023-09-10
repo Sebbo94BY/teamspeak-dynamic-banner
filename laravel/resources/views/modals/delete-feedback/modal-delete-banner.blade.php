@@ -12,7 +12,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="{{ route('banner.delete', ['banner_id' => $bannerDeleteModal->id]) }}" class="btn btn-danger">Delete</a>
+                <form method="post" action="{{ route('banner.delete', ['banner_id' => $bannerDeleteModal->id]) }}">
+                    @method('delete')
+                    @csrf
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
             </div>
         </div>
     </div>

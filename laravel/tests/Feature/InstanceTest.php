@@ -95,7 +95,7 @@ class InstanceTest extends TestCase
      */
     public function test_starting_an_instance_is_possible(): void
     {
-        $response = $this->actingAs($this->user)->get(route('instance.start', ['instance_id' => $this->instance->id]));
+        $response = $this->actingAs($this->user)->post(route('instance.start', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
     }
@@ -107,7 +107,7 @@ class InstanceTest extends TestCase
     {
         InstanceProcess::factory()->for($this->instance)->create();
 
-        $response = $this->actingAs($this->user)->get(route('instance.stop', ['instance_id' => $this->instance->id]));
+        $response = $this->actingAs($this->user)->post(route('instance.stop', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
     }
@@ -119,7 +119,7 @@ class InstanceTest extends TestCase
     {
         InstanceProcess::factory()->for($this->instance)->create();
 
-        $response = $this->actingAs($this->user)->get(route('instance.restart', ['instance_id' => $this->instance->id]));
+        $response = $this->actingAs($this->user)->post(route('instance.restart', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
     }

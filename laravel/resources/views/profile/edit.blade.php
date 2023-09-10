@@ -14,6 +14,7 @@
     <hr>
 </div>
 <div class="container mt-3">
+    @include('inc.standard-alerts')
     <div class="row">
         <div class="col-lg-6 d-flex">
             <div class="card flex-fill">

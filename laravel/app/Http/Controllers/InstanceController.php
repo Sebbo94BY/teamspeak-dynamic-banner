@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Http\Requests\InstanceAddRequest;
 use App\Http\Requests\InstanceDeleteRequest;
-use App\Http\Requests\InstanceEditRequest;
 use App\Http\Requests\InstanceRestartRequest;
 use App\Http\Requests\InstanceStartRequest;
 use App\Http\Requests\InstanceStopRequest;

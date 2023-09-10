@@ -61,13 +61,29 @@
                         <img class="img-fluid w-50 opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                     </td>
                     <td class="col-lg-2">
-                        @if ($banner_template->enabled)
-                        <a href="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}"><i class="fa-solid fa-toggle-on fa-lg me-1"></i></a>
-                        @else
-                        <a href="{{ route('banner.template.enable', ['banner_template_id' => $banner_template->id]) }}"><i class="fa-solid fa-toggle-off fa-lg me-1"></i></a>
-                        @endif
-                        <a href="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}"><i class="fa-solid fa-gear fa-lg me-1"></i></a>
-                        <a href="{{ route('banner.template.remove', ['banner_template_id' => $banner_template->id]) }}"><i class="fa fa-trash text-danger fa-lg me-1"></i></a>
+                        <div class="d-flex">
+                            @if ($banner_template->enabled)
+                                <form method="post" action="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}">
+                                    @method('patch')
+                                    @csrf
+                                    <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-toggle-on fa-lg"></i></button>
+                                </form>
+                            @else
+                                <form method="post" action="{{ route('banner.template.enable', ['banner_template_id' => $banner_template->id]) }}">
+                                    @method('patch')
+                                    @csrf
+                                    <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-toggle-off fa-lg"></i></button>
+                                </form>
+                            @endif
+                            <form method="get" action="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}">
+                                <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-gear fa-lg"></i></button>
+                            </form>
+                            <form method="post" action="{{ route('banner.template.remove', ['banner_template_id' => $banner_template->id]) }}">
+                                @method('delete')
+                                @csrf
+                                <button class="btn btn-link px-0 me-2" type="submit"><i class="fa fa-trash text-danger fa-lg"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Helpers\SystemStatusController as HelpersSystemStatusController;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\View\View;
 use Predis\Connection\ConnectionException;
 
 /**

@@ -47,7 +47,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                There is no instance configured yet! <a href="#modalAddInstance" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</a>
+                There is no instance configured yet! <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</button>
             </div>
         </div>
     </div>
@@ -104,24 +104,35 @@
                         {{ $instance->client_nickname }}
                     </td>
                     <td class="col-lg-2">
-                        @if (is_null($instance->process))
-                        @can('start instances')
-                            <a href="{{ route('instance.start', ['instance_id' => $instance->id]) }}"><i class="fa-solid fa-play text-success me-2 fa-lg"></i></a>
-                        @endcan
-                        @else
-                        @can('stop instances')
-                            <a href="{{ route('instance.stop', ['instance_id' => $instance->id]) }}"><i class="fa-solid fa-power-off text-warning me-2 fa-lg"></i></a>
-                        @endcan
-                        @endif
-                        @can('restart instances')
-                            <a href="{{ route('instance.restart', ['instance_id' => $instance->id]) }}"><i class="fa-solid fa-rotate-left text-warning me-2 fa-lg"></i></a>
-                        @endcan
-                        @can('edit instances')
-                            <a href="#modalEditInstance-{{$instance->id}}" data-bs-toggle="modal" data-bs-target="#modalEditInstance-{{$instance->id}}"><i class="fa-solid fa-pencil text-primary me-2 fa-lg"></i></a>
-                        @endcan
-                        @can('delete instances')
-                            <a href="#delInstance-{{$instance->id}}" data-bs-toggle="modal" data-bs-target="#delInstance-{{$instance->id}}"><i class="fa-solid fa-trash text-danger me-2 fa-lg"></i></a>
-                        @endcan
+                        <div class="d-flex">
+                            @if (is_null($instance->process))
+                                @can('start instances')
+                                    <form method="post" action="{{ route('instance.start', ['instance_id' => $instance->id]) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-play text-success fa-lg"></i></button>
+                                    </form>
+                                @endcan
+                            @else
+                                @can('stop instances')
+                                    <form method="post" action="{{ route('instance.stop', ['instance_id' => $instance->id]) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-power-off text-warning fa-lg"></i></button>
+                                    </form>
+                                @endcan
+                            @endif
+                            @can('restart instances')
+                                <form method="post" action="{{ route('instance.restart', ['instance_id' => $instance->id]) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-rotate-left text-warning fa-lg"></i></button>
+                                </form>
+                            @endcan
+                            @can('edit instances')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalEditInstance-{{$instance->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                            @can('delete instances')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#delInstance-{{$instance->id}}"><i class="fa-solid fa-trash text-danger fa-lg"></i></button>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
                 @endforeach
@@ -143,7 +154,7 @@
 
 @can('delete instances')
     @foreach($instances as $instanceDeleteModal)
-        @include('modals.soft-delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceDeleteModal])
+        @include('modals.delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceDeleteModal])
     @endforeach
 @endcan
 @endsection
