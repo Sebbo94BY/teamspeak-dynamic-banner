@@ -29,3 +29,6 @@ php artisan view:cache
 
 # Run migrations
 php artisan migrate
+
+# Run seeders
+php artisan db:seed
