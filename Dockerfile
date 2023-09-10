@@ -33,8 +33,9 @@ COPY ./docker/php/conf.d/* /usr/local/etc/php/conf.d/
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy helper script
+# Copy helper script and make it executeable
 COPY ./docker/scripts/prepare-docker-setup.sh /tmp/
+RUN chmod +x /tmp/prepare-docker-setup.sh
 
 # Grant www-data permissions on Laravel installation
 RUN chown -R www-data:www-data /var/www/
