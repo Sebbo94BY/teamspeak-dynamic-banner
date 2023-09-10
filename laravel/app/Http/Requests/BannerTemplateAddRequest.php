@@ -14,6 +14,7 @@ class BannerTemplateAddRequest extends FormRequest
     public function rules()
     {
         return [
+            'name' => ['required', 'string'],
             'banner_id' => ['required', 'integer', 'exists:App\Models\Banner,id'],
             'template_id' => ['required', 'integer', 'exists:App\Models\Template,id'],
         ];

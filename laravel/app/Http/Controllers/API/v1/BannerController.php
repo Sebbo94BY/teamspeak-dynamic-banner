@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class BannerController extends Controller
@@ -18,6 +19,8 @@ class BannerController extends Controller
     /**
      * Class properties
      */
+    private \MatomoTracker $matomo;
+
     private Banner $banner;
 
     private Collection|BannerTemplate $banner_templates;
@@ -77,6 +80,16 @@ class BannerController extends Controller
             $this->response_code = 500;
 
             return;
+        }
+
+        if (config('matomo.enabled')) {
+            $this->matomo = new \MatomoTracker(config('matomo.site_id'), config('matomo.base_url'));
+
+            try {
+                $this->matomo->doTrackPageView($this->selected_banner_template->banner->name.': '.$this->selected_banner_template->name);
+            } catch (Exception $matomo_exception) {
+                Log::error('Matomo tracking is enabled, but the configuration seems to be invalid. Please ensure, that all `MATOMO_` environment variables are properly set. Received the following error: '.preg_replace('/\s\s+/', ' ', $matomo_exception->getMessage()));
+            }
         }
     }
 

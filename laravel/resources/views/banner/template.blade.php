@@ -37,6 +37,7 @@
                     <table id="templates" class="table table-striped" style="width:100%">
                         <thead>
                             <tr>
+                                <th>Name</th>
                                 <th>Template</th>
                                 <th>Actions</th>
                             </tr>
@@ -44,6 +45,7 @@
                         <tbody>
                             @foreach($banner->templates as $banner_template)
                             <tr>
+                                <td>{{ $banner_template->name }}</td>
                                 <td>
                                     <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" style="max-height: 200px;" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                                 </td>

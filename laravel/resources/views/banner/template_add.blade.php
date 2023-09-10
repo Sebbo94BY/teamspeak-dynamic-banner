@@ -49,6 +49,14 @@
                                         <input type="hidden" name="banner_id" value="{{ $banner->id }}">
                                         <input type="hidden" name="template_id" value="{{ $template->id }}">
 
+                                        <div class="mb-3">
+                                            <label for="validationName" class="form-label">Name</label>
+                                            <input class="form-control" id="validationName" type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Event Announcement" aria-describedby="nameHelp" required>
+                                            <div id="nameHelp" class="form-text">What will this template be about? Give it a descriptive name.</div>
+                                            <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                            <div class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                                        </div>
+
                                         <span class="badge" data-bs-toggle="tooltip" data-bs-html="true"
                                             title="Add this template. Make it configurable."
                                             id="add-badge">

@@ -108,6 +108,7 @@ class BannerTemplateTest extends TestCase
         DrawGridSystemOnTemplate::dispatchSync($template);
 
         $response = $this->actingAs($this->user)->post(route('banner.add.template'), [
+            'name' => fake()->name(),
             'banner_id' => $this->banner->id,
             'template_id' => $template->id,
         ]);

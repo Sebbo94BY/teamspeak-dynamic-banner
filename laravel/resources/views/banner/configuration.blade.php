@@ -98,6 +98,16 @@
                         <input type="hidden" name="banner_template_id" value="{{ $banner_template->id }}">
 
                         <div class="col-md-12">
+                            <label for="validationName" class="form-label">Name</label>
+                            <input class="form-control" id="validationName" type="text" name="name" value="{{ old('name', (isset($banner_template)) ? $banner_template->name : '') }}" placeholder="e.g. Event Announcement" aria-describedby="nameHelp" required>
+                            <div id="nameHelp" class="form-text">What will this template be about? Give it a descriptive name.</div>
+                            <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                            <div class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                        </div>
+
+                        <hr>
+
+                        <div class="col-md-12">
                             <label for="validationRedirectUrl" class="form-label">Redirect URL</label>
                             <div class="input-group">
                                 <input class="form-control" id="validationRedirectUrl" type="url" name="redirect_url" value="{{ old('redirect_url', (isset($banner_template)) ? $banner_template->redirect_url : '') }}" placeholder="e.g. https://example.com/news" aria-describedby="redirectUrlHelp">
