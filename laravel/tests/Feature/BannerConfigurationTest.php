@@ -102,6 +102,7 @@ class BannerConfigurationTest extends TestCase
     {
         $response = $this->actingAs($this->user)->patch(route('banner.template.configuration.upsert', ['banner_template_id' => $this->banner_template->id]), [
             'banner_template_id' => $this->banner_template->id,
+            'name' => fake()->name(),
             'configuration' => [
                 'x_coordinate' => [$this->banner_template->template->width],
                 'y_coordinate' => [$this->banner_template->template->height],
