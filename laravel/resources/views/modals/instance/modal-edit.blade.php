@@ -60,9 +60,9 @@
                                     @foreach ($channel_list as $channelInstance)
                                         @foreach($channelInstance[$instanceModal->id] as $channel)
                                             @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel->cid) "selected"
-                                            <option value="{{ $channel->cid }}" selected>{{ $channel->name }}</option>
+                                                <option value="{{ $channel->cid }}" selected>{{ $channel->channel_name }}</option>
                                             @else
-                                                <option value="{{ $channel->cid }}">{{ $channel->name }}</option>
+                                                <option value="{{ $channel->cid }}">{{ $channel->channel_name }}</option>
                                             @endif
                                         @endforeach
                                     @endforeach
