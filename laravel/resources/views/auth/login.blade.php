@@ -10,7 +10,7 @@
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-lg-8 my-auto">
-                        <h1 class="fw-bold fs-3 ms-3">Login Dynamic Banner</h1>
+                        <h1 class="fw-bold fs-3 ms-3">Login</h1>
                     </div>
                     <div class="col-lg-4">
                         <img class="card-img pe-3" src="{{asset('img/design/lock.png')}}" alt="Logo" oncontextmenu="return false">
