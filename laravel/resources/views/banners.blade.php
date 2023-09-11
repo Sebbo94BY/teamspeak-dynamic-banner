@@ -36,8 +36,8 @@
     </div>
     <hr>
 </div>
-@can('add banners')
 <div class="container">
+    @can('add banners')
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
@@ -46,8 +46,9 @@
         </div>
     </div>
     <hr>
+    @endcan
+    @include('inc.standard-alerts')
 </div>
-@endcan
 <div class="container mt-3">
     @if ($banners->count() == 0)
     <div class="row">
@@ -108,19 +109,17 @@
     @include('modals.banners.modal-add')
 @endcan
 
-@can('edit banners')
-    @foreach($banners as $bannerEditModal)
-        @include('modals.banners.modal-edit',['bannerEditModal'=>$bannerEditModal])
-    @endforeach
-@endcan
+@foreach($banners as $bannerModal)
+    @can('edit banners')
+        @include('modals.banners.modal-edit',['bannerEditModal'=>$bannerModal])
+    @endcan
+    @can('delete banners')
+        @include('modals.delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerModal])
+    @endcan
+@endforeach
+
 @foreach($instance_list as $instanceVariableModal)
     @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
-
-@can('delete banners')
-    @foreach($banners as $bannerDeleteModal)
-        @include('modals.delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerDeleteModal])
-    @endforeach
-@endcan
 
 @endsection

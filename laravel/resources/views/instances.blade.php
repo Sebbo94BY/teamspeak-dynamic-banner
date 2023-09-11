@@ -32,14 +32,16 @@
     <hr>
 </div>
 <div class="container">
-    <div class="row">
-        <div class="col-lg-3">
-            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddInstance">
-                Add Instance
-            </button>
+    @can('add instances')
+        <div class="row">
+            <div class="col-lg-3">
+                <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddInstance">
+                    Add Instance
+                </button>
+            </div>
         </div>
-    </div>
-    <hr>
+        <hr>
+    @endcan
     @include('inc.standard-alerts')
 </div>
 <div class="container mt-3">

@@ -32,15 +32,10 @@ class InstanceController extends Controller
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
                 $channel_list = $virtualserver->channelList();
+                $channelListForEachInstance[$instance->id] = $channel_list;
             } catch (ServerQueryException $serverquery_exception) {
-                return view('instance.edit', ['instance_id' => $instance->id])->with([
-                    'error' => 'instance-channellist-error',
-                    'message' => $serverquery_exception->getMessage(),
-                    'instance' => $instance,
-                    'channel_list' => [],
-                ]);
+                $channelListForEachInstance[$instance->id] = ['error' => $serverquery_exception->getMessage()];
             }
-            $channelListForEachInstance[] = [$instance->id => $channel_list];
         }
 
         return view('instances')->with([
@@ -75,18 +70,18 @@ class InstanceController extends Controller
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
             } catch (TransportException $transport_exception) {
-                return Redirect::route('instance.add')->withInput($request->all())->with([
+                return Redirect::route('instances')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $transport_exception->getMessage(),
                 ]);
             } catch (ServerQueryException $serverquery_exception) {
-                return Redirect::route('instance.add')->withInput($request->all())->with([
+                return Redirect::route('instances')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $serverquery_exception->getMessage(),
                 ]);
             }
         } catch (ServerQueryException $serverquery_exception) {
-            return Redirect::route('instance.add')->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
                 'message' => $serverquery_exception->getMessage(),
             ]);

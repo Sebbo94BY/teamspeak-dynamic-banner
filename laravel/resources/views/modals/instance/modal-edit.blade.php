@@ -55,21 +55,25 @@
                             </div>
                             <div class="mb-3">
                                 <label for="validationDefaultChannelId" class="form-label fw-bold">Default Channel</label>
-                                <select class="form-select" name="default_channel_id" id="validationDefaultChannelId" aria-describedby="defaultChannelIdHelp">
+                                @if(isset($channel_list[$instanceModal->id]['error']))
+                                    <div class="alert alert-danger" role="alert">
+                                        {{ $channel_list[$instanceModal->id]['error'] }}
+                                    </div>
+                                @else
+                                    <select class="form-select" name="default_channel_id" id="validationDefaultChannelId" aria-describedby="defaultChannelIdHelp">
                                     <option value="" selected>Default Channel</option>
-                                    @foreach ($channel_list as $channelInstance)
-                                        @foreach($channelInstance[$instanceModal->id] as $channel)
+                                        @foreach($channel_list[$instanceModal->id] as $channel)
                                             @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel->cid) "selected"
-                                                <option value="{{ $channel->cid }}" selected>{{ $channel->channel_name }}</option>
+                                            <option value="{{ $channel->cid }}" selected>{{ $channel->channel_name }}</option>
                                             @else
                                                 <option value="{{ $channel->cid }}">{{ $channel->channel_name }}</option>
                                             @endif
                                         @endforeach
-                                    @endforeach
-                                </select>
-                                <div id="defaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
-                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("Please provide a valid channel (ID).") }}</div>
+                                    </select>
+                                    <div id="defaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
+                                    <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                    <div class="invalid-feedback">{{ __("Please provide a valid channel (ID).") }}</div>
+                                @endif
                             </div>
                             <div class="mb-3">
                                 <label for="validationAutostart" class="form-check-label fw-bold">Enable autostart</label>
