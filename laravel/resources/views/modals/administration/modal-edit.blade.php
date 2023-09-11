@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="editUser--{{$userEdit->id}}-Label">Edit user <code>{{$userEdit->name}}</code></h1>
+                <h1 class="modal-title fs-5 fw-bold" id="editUser-{{$userEdit->id}}-Label">Edit user <code>{{$userEdit->name}}</code></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="{{ route('administration.user.update', ['user_id' => $userEdit->id]) }}" class="row g-3 needs-validation" novalidate>
