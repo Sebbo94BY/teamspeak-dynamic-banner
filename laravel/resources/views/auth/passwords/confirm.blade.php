@@ -1,4 +1,8 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    Password Confirm
+@endsection
 
 @section('content')
 <div class="container">
