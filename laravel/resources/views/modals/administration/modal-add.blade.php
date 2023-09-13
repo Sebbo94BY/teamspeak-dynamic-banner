@@ -11,28 +11,28 @@
                     <div class="col-lg-12">
                         <div class="mb-3">
                             <label for="validationName" class="form-label fw-bold">Nickname</label>
-                            <input type="text" class="form-control" id="validationName" name="name" value="{{ old('name') }}" placeholder="e.g. MyNickname" required>
-                            <div class="form-text">The users display name.</div>
+                            <input type="text" class="form-control" id="validationName" name="name" value="{{ old('name') }}" aria-describedby="validationNameHelp validationNameFeedback" placeholder="e.g. MyNickname" required>
+                            <div id="validationNameHelp" class="form-text">The users display name.</div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                            <div class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                            <div id="validationNameFeedback" class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
                         </div>
                         <div class="mb-3">
                             <label for="validationEmail" class="form-label fw-bold">E-Mail</label>
-                            <input type="email" class="form-control" id="validationEmail" name="email" value="{{ old('email') }}" placeholder="e.g. max@example.com" required>
-                            <div class="form-text">The users email address.</div>
+                            <input type="email" class="form-control" id="validationEmail" name="email" value="{{ old('email') }}" aria-describedby="validationEmailHelp validationEmailFeedback" placeholder="e.g. max@example.com" required>
+                            <div id="validationEmailHelp" class="form-text">The users email address.</div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                            <div class="invalid-feedback">{{ __("Please provide a valid email.") }}</div>
+                            <div id="validationEmailFeedback" class="invalid-feedback">{{ __("Please provide a valid email.") }}</div>
                         </div>
                         <div class="mb-3">
                             <label for="validationRoles" class="form-label fw-bold">Roles</label>
-                            <select class="form-select" id="validationRoles" multiple name="roles[]">
+                            <select class="form-select" id="validationRoles" multiple name="roles[]" aria-describedby="validationRolesHelp validationRolesFeedback">
                                 @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
-                            <div class="form-text">The roles (and thus permissions), which the user should get.</div>
+                            <div id="validationRolesHelp" class="form-text">The roles (and thus permissions), which the user should get.</div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                            <div class="invalid-feedback">{{ __("Please select at least one role.") }}</div>
+                            <div id="validationRolesFeedback" class="invalid-feedback">{{ __("Please select at least one role.") }}</div>
                         </div>
                     </div>
                 </div>

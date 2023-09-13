@@ -31,10 +31,12 @@
                         <div class="col-lg-12">
                             <div class="mb-3">
                                 <label for="validationFile" class="form-label">Font</label>
-                                <input class="form-control" id="validationFile" type="file" accept=".ttf" name="file" value="{{ old('file') }}" aria-describedby="fileHelp" required>
-                                <div id="fileHelp" class="form-text">The fonts file. (TTF)</div>
+                                <input class="form-control" id="validationFile" type="file" accept=".ttf"
+                                       name="file" value="{{ old('file') }}"
+                                       aria-describedby="validationFileHelp validationFileFeedback" required>
+                                <div id="validationFileHelp" class="form-text">The fonts file. (TTF)</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("Please provide a valid file.") }}</div>
+                                <div id="validationFileFeedback" class="invalid-feedback">{{ __("Please provide a valid file.") }}</div>
                             </div>
                         </div>
                     </div>

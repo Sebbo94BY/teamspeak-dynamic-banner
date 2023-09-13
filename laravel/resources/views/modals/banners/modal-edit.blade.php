@@ -13,18 +13,19 @@
                         <div class="mb-3 row">
                             <label for="validationName" class="col-lg-1 col-form-label fw-bold">Name</label>
                             <div class="col-lg-11">
-                                <input type="text" class="form-control" id="validationName" name="name" value="{{ old('name', $bannerEditModal->name) }}" placeholder="e.g. My Banner or Games Banner" required>
-                                <div class="form-text">
-                                    A name for the banner configuration as identifier for you.
-                                </div>
+                                <input type="text" class="form-control" id="validationName"
+                                       name="name" value="{{ old('name', $bannerEditModal->name) }}"
+                                       aria-describedby="validationNameHelp validationNameFeedback"
+                                       placeholder="e.g. My Banner or Games Banner" required>
+                                <div id="validationNameHelp" class="form-text">A name for the banner configuration as identifier for you.</div>
                             </div>
                             <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                            <div class="invalid-feedback">{{ __("Please provide a valid alias.") }}</div>
+                            <div id="validationNameFeedback" class="invalid-feedback">{{ __("Please provide a valid alias.") }}</div>
                         </div>
                         <div class="mb-3 row">
                             <label for="validationInstanceId" class="col-lg-1 col-form-label fw-bold">Instance</label>
                             <div class="col-lg-11 col-form-label">
-                                <select class="form-select" id="validationInstanceId" name="instance_id" required>
+                                <select class="form-select" id="validationInstanceId" name="instance_id" aria-describedby="validationInstanceIdHelp validationInstanceIdFeedback" required>
                                     @foreach ($instance_list as $instance)
                                         @if (old('instance_id', $instance->instance_id) == $instance->id) "selected"
                                         <option value="{{ $instance->id }}" selected>{{ $instance->virtualserver_name }} ({{ $instance->host }}:{{ $instance->voice_port }})</option>
@@ -33,27 +34,26 @@
                                         @endif
                                     @endforeach
                                 </select>
-                                <div class="form-text">
-                                    Please select your instance as data source for the banner.
-                                </div>
+                                <div id="validationInstanceIdHelp" class="form-text">Please select your instance as data source for the banner.</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("Please provide a valid instance (ID).") }}</div>
+                                <div id="validationInstanceIdFeedback" class="invalid-feedback">{{ __("Please provide a valid instance (ID).") }}</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-lg-1">
-                                <label class="col-form-label fw-bold" for="validationRandomRotation">Enable</label>
+                                <label class="col-form-label fw-bold" for="validationRandomRotationEnabled">Enable</label>
                             </div>
                             <div class="col-lg-11 my-auto">
-                                <input class="form-check-input" type="checkbox" id="validationRandomRotation" @if(old('random_rotation', $banner->random_rotation)) checked @endif>
-                                <label class="form-check-label" for="checkRandom">
-                                    Random template rotation
-                                </label>
-                                <div class="form-text">
+                                <input class="form-check-input" type="checkbox"
+                                       id="validationRandomRotation" @if(old('random_rotation', $banner->random_rotation)) checked @endif
+                                       name="random_rotation"
+                                       aria-describedby="validationRandomRotationHelp validationRandomRotationFeedback">
+                                <label class="form-check-label" for="validationRandomRotation">Random template rotation</label>
+                                <div id="validationRandomRotationHelp" class="form-text">
                                     When enabled, every client will see a different random template. If disabled, the same template will be shown to all clients.
                                 </div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("You can only enable or disable this checkbox.") }}</div>
+                                <div id="validationRandomRotationFeedback" class="invalid-feedback">{{ __("You can only enable or disable this checkbox.") }}</div>
                             </div>
                         </div>
                     </div>

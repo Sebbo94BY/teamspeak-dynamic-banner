@@ -6,7 +6,8 @@
 
         <title>@yield('site_title') | {{ config('app.name', 'TeamSpeak Dynamic Banner') }}</title>
 
-        @include('layouts.head')
+        <!-- CSS and JS -->
+        @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     </head>
 
     <body class="d-flex flex-column vh-100">

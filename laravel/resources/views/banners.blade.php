@@ -36,8 +36,8 @@
     </div>
     <hr>
 </div>
+@can('add banners')
 <div class="container">
-    @can('add banners')
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
@@ -46,10 +46,10 @@
         </div>
     </div>
     <hr>
-    @endcan
-    @include('inc.standard-alerts')
 </div>
+@endcan
 <div class="container mt-3">
+    @include('inc.standard-alerts')
     @if ($banners->count() == 0)
     <div class="row">
         <div class="col-lg-12">

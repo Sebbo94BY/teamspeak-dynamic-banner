@@ -47,7 +47,7 @@
                     <div class="alert alert-primary" role="alert">
                         There are no Fonts Uploaded!
                         @can('add fonts')
-                        <a href="#addFont" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</a>
+                            <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</button>
                         @endcan
                     </div>
                 </div>
@@ -92,12 +92,9 @@
 
 @foreach($fonts as $fontForEdit)
     @include('modals.fonts.modal-edit', ['fontForEdit'=>$fontForEdit])
+    @can('delete fonts')
+        @include('modals.delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontForEdit])
+    @endcan
 @endforeach
-
-@can('delete fonts')
-    @foreach($fonts as $fontDeleteModal)
-        @include('modals.delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontDeleteModal])
-    @endforeach
-@endcan
 
 @endsection

@@ -31,25 +31,28 @@
     </div>
     <hr>
 </div>
+@can('add instances')
 <div class="container">
-    @can('add instances')
-        <div class="row">
-            <div class="col-lg-3">
-                <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddInstance">
-                    Add Instance
-                </button>
-            </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddInstance">
+                Add Instance
+            </button>
         </div>
-        <hr>
-    @endcan
-    @include('inc.standard-alerts')
+    </div>
+    <hr>
 </div>
+@endcan
 <div class="container mt-3">
+@include('inc.standard-alerts')
     @if ($instances->count() == 0)
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                There is no instance configured yet! <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</button>
+                There is no instance configured yet!
+                @can('add instances')
+                    <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</button>
+                @endcan
             </div>
         </div>
     </div>
@@ -74,9 +77,7 @@
                         @if(is_null($instance->process))
                             <span class="badge text-bg-danger">Stopped</span>
                         @else
-                            <span class="badge text-bg-success"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-html="true"
+                            <span class="badge text-bg-success" data-bs-toggle="tooltip" data-bs-html="true"
                                   title="PID <b>{{ $instance->process->process_id }}</b> is active since <b>{{ $instance->process->created_at }} UTC</b>."
                                   id="status-badge">Connected
                             </span>
@@ -152,11 +153,9 @@
     @can('edit instances')
         @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal,'channel_list'=>$channel_list])
     @endcan
+    @can('delete instances')
+        @include('modals.delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceModal])
+    @endcan
 @endforeach
 
-@can('delete instances')
-    @foreach($instances as $instanceDeleteModal)
-        @include('modals.delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceDeleteModal])
-    @endforeach
-@endcan
 @endsection

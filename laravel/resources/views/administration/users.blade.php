@@ -31,6 +31,7 @@
     </div>
     <hr>
 </div>
+@can('add users')
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
@@ -41,6 +42,7 @@
     </div>
     <hr>
 </div>
+@endcan
 <div class="container mt-3">
     @include('inc.standard-alerts')
     <div class="row">
@@ -113,23 +115,19 @@
 </div>
 
 @foreach($users as $userEdit)
-    @include('modals.administration.modal-edit', ['userEdit'=>$userEdit])
+    @can('edit users')
+        @include('modals.administration.modal-edit', ['userEdit'=>$userEdit])
+    @endcan
+    @can('delete users')
+        @if (Auth::user()->id != $userEdit->id)
+            @include('modals.delete-feedback.modal-delete-user', ['userDeleteModal'=>$userEdit])
+        @endif
+    @endcan
+    @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userEdit])
 @endforeach
 
-@can('edit users')
-    @foreach($users as $userViewRoles)
-        @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userViewRoles])
-    @endforeach
+@can('add users')
+    @include('modals.administration.modal-add')
 @endcan
-
-@can('delete users')
-    @foreach($users as $userDeleteModal)
-        @if (Auth::user()->id != $userDeleteModal->id)
-            @include('modals.delete-feedback.modal-delete-user', ['userDeleteModal'=>$userDeleteModal])
-        @endif
-    @endforeach
-@endcan
-
-@include('modals.administration.modal-add')
 
 @endsection

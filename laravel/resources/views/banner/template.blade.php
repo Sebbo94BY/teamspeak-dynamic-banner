@@ -25,6 +25,7 @@
     </div>
     <hr>
 </div>
+@can('add templates')
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
@@ -35,12 +36,17 @@
     </div>
     <hr>
 </div>
+@endcan
 <div class="container mt-3">
+    @include('inc.standard-alerts')
     @if($banner->templates->count() == 0)
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    There are no templates configured! <a href="#addBannerTemplate" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">Define a new template now</a>
+                    There are no templates configured!
+                    @can('add templates')
+                        <button data-bs-toggle="modal" data-bs-target="#addBannerTemplate">Define a new template now</button>
+                    @endcan
                 </div>
             </div>
         </div>
