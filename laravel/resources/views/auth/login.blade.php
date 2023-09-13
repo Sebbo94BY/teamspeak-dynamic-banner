@@ -23,25 +23,15 @@
                 @include('inc.standard-alerts')
                 <div class="card border-0">
                     <div class="card-body">
-                        <form method="post" action="{{ Route('login') }}">
+                        <form method="post" action="{{ Route('login') }}" class="needs-validation">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="email">{{ __('Email Address') }}:</label>
-                                <input class="form-control @error('email') is-invalid @enderror" type="email" id="email" name="email" value="{{ old('email') }}" placeholder="john.doe@example.de">
-                                @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                <input class="form-control" type="email" id="email" name="email" value="{{ old('email') }}" placeholder="john.doe@example.de">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="password">{{ __('Password') }}:</label>
-                                <input class="form-control @error('password') is-invalid @enderror" type="password" id="password" name="password" placeholder="Gib dein Passwort ein">
-                                @error('password')
-                                <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                <input class="form-control" type="password" id="password" name="password" placeholder="your password">
                             </div>
                             <div class="row mb-3">
                                 <div class="col-lg-12 d-grid">
