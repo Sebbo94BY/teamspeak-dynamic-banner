@@ -23,7 +23,7 @@
                 @include('inc.standard-alerts')
                 <div class="card border-0">
                     <div class="card-body">
-                        <form method="post" action="{{ Route('login') }}" class="needs-validation">
+                        <form method="post" action="{{ Route('login') }}">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="email">{{ __('Email Address') }}:</label>
