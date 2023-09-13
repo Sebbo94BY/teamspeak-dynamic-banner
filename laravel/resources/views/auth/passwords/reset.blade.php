@@ -54,7 +54,7 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-lg-12 d-grid">
-                                    <button class="btn btn-primary">Reset Password</button>
+                                    <button type="submit" class="btn btn-primary">Reset Password</button>
                                 </div>
                             </div>
                         </form>
