@@ -34,7 +34,8 @@ class InstanceController extends Controller
                 $channel_list = $virtualserver->channelList();
                 $channelListForEachInstance[$instance->id] = $channel_list;
             } catch (ServerQueryException $serverquery_exception) {
-                $channelListForEachInstance[$instance->id] = ['error' => $serverquery_exception->getMessage()];
+                $channelListForEachInstance[$instance->id]['channel_list'] = [];
+                $channelListForEachInstance[$instance->id]['error'] = $serverquery_exception->getMessage();
             }
         }
 
