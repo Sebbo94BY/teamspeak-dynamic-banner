@@ -20,18 +20,18 @@
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-6">
-                @include('inc.standard-alerts')
                 <div class="card border-0">
                     <div class="card-body">
+                        @include('inc.standard-alerts')
                         <form method="post" action="{{ Route('login') }}">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="email">{{ __('Email Address') }}:</label>
-                                <input class="form-control" type="email" id="email" name="email" value="{{ old('email') }}" placeholder="john.doe@example.de">
+                                <input class="form-control @error('email') is-invalid @enderror" type="email" id="email" name="email" value="{{ old('email') }}" aria-describedby="emailFeedback" placeholder="john.doe@example.de">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="password">{{ __('Password') }}:</label>
-                                <input class="form-control" type="password" id="password" name="password" placeholder="your password">
+                                <input class="form-control @error('email') is-invalid @enderror" type="password" id="password" name="password" placeholder="your password" aria-describedby="passwordFeedback">
                             </div>
                             <div class="row mb-3">
                                 <div class="col-lg-12 d-grid">

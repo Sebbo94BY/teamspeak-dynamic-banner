@@ -13,7 +13,6 @@
             </div>
         </div>
     </div>
-        <!-- TODO https://github.com/Sebbo94BY/teamspeak-dynamic-banner/pull/139#discussion_r1321867104 -->
     <div class="col-lg-4 mb-2">
         <label for="validationXCoordinate" class="form-label">X-Coordinate (horizontal)</label>
         <input class="form-control" id="validationXCoordinate" type="number" min="0" step="1" max="{{ $template->width }}"

@@ -10,22 +10,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="alert alert-primary" role="alert">
-                                <p>This project uses TrueType Fonts (TTF) for writing the text on the banner images.</p>
-                                <p>Installation instructions:</p>
-                                <ol>
-                                    <li>Visit for example <a href="https://fontsource.org" target="_blank">Fontsource.org</a></li>
-                                    <li>Specify filters or search for specific fonts</li>
-                                    <li>Checkout the font previews to find a font, which you like and open the font details page</li>
-                                    <li>Click on the download button for this specific font</li>
-                                    <li>Unzip the recently downloaded ZIP file</li>
-                                    <li>Select the required <code>*.ttf</code> file here</li>
-                                    <li>Submit the form</li>
-                                </ol>
-                                <p>You can upload and use any TTF file - it does not have to be from Fontsource.</p>
-                            </div>
-                        </div>
+                        @include('inc.fonts.font-install-instruction')
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -33,10 +18,10 @@
                                 <label for="validationFile" class="form-label">Font</label>
                                 <input class="form-control" id="validationFile" type="file" accept=".ttf"
                                        name="file" value="{{ old('file') }}"
-                                       aria-describedby="validationFileHelp validationFileFeedback" required>
+                                       aria-describedby="validationFileHelp validationFileFeedback-{{$fontForEdit->id}}" required>
                                 <div id="validationFileHelp" class="form-text">The fonts file. (TTF)</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div id="validationFileFeedback" class="invalid-feedback">{{ __("Please provide a valid file.") }}</div>
+                                <div id="validationFileFeedback-{{$fontForEdit->id}}" class="invalid-feedback">{{ __("Please provide a valid file.") }}</div>
                             </div>
                         </div>
                     </div>

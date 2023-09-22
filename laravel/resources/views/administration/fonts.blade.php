@@ -92,9 +92,8 @@
 
 @foreach($fonts as $fontForEdit)
     @can('edit fonts')
-    @include('modals.fonts.modal-edit', ['fontForEdit'=>$fontForEdit])
+        @include('modals.fonts.modal-edit', ['fontForEdit'=>$fontForEdit])
     @endcan
-
     @can('delete fonts')
         @include('modals.delete-feedback.modal-delete-font', ['fontDeleteModal'=>$fontForEdit])
     @endcan

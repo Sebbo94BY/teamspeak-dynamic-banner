@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('site_title') | {{ config('app.name', 'TeamSpeak Dynamic Banner') }}</title>
+        <title>@yield('site_title') | {{ config('app.name') }}</title>
 
         <!-- CSS and JS -->
         @vite(['resources/sass/app.scss', 'resources/js/app.js'])
