@@ -16,7 +16,7 @@
 <div class="container mt-3">
     @include('inc.standard-alerts')
     <form method="POST" action="{{ route('setup.installer.user.create') }}" class="row g-3 needs-validation" novalidate>
-    @csrf
+        @csrf
         <div class="row mb-3">
             <div class="col-lg-12">
                 <button class="btn btn-primary" type="submit">Next</button>
