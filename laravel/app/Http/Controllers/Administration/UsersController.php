@@ -5,13 +5,9 @@ namespace App\Http\Controllers\Administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserAddRequest;
 use App\Http\Requests\UserDeleteRequest;
-use App\Http\Requests\UserEditRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -25,24 +21,8 @@ class UsersController extends Controller
      */
     public function users(): View
     {
-        return view('administration.users', ['users' => User::all()]);
-    }
-
-    /**
-     * Display the user add form.
-     */
-    public function add_user(): View
-    {
-        return view('administration.user.add', ['roles' => Role::all()]);
-    }
-
-    /**
-     * Display the user edit form.
-     */
-    public function edit_user(UserEditRequest $request): View
-    {
-        return view('administration.user.edit', [
-            'user' => User::find($request->user_id),
+        return view('administration.users', [
+            'users' => User::all(),
             'roles' => Role::all(),
         ]);
     }

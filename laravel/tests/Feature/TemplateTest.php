@@ -51,16 +51,6 @@ class TemplateTest extends TestCase
     }
 
     /**
-     * Test, that the user can access the "add template" page, when he is authenticated.
-     */
-    public function test_add_template_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('template.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('template.add');
-    }
-
-    /**
      * Test that adding a new template requires to match the request rules.
      */
     public function test_adding_a_new_template_requires_to_match_the_request_rules(): void
@@ -69,16 +59,6 @@ class TemplateTest extends TestCase
             'alias' => fake()->name(),
         ]);
         $response->assertSessionHasErrors(['file']);
-    }
-
-    /**
-     * Test, that the user can access the "edit template" page, when the requested template ID for the edit page exists.
-     */
-    public function test_edit_template_page_gets_displayed_when_template_id_exists(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('template.edit', ['template_id' => $this->template->id]));
-        $response->assertViewIs('template.edit');
-        $response->assertViewHas('template');
     }
 
     /**

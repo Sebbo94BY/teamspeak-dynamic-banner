@@ -55,16 +55,6 @@ class AdministrationFontsTest extends TestCase
     }
 
     /**
-     * Test, that the user can access the "add font" page, when he is authenticated.
-     */
-    public function test_add_font_page_gets_displayed_when_authenticated(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('administration.font.add'));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.font.add');
-    }
-
-    /**
      * Test that adding a new font successfully returns the view.
      */
     public function test_adding_a_new_font_successfully_returns_the_view(): void
@@ -74,17 +64,6 @@ class AdministrationFontsTest extends TestCase
         ]);
         $response->assertRedirectToRoute('administration.fonts');
         $response->assertSessionHas('success');
-    }
-
-    /**
-     * Test that trying to edit a font ID, which exists, returns the respective view.
-     */
-    public function test_edit_font_returns_the_edit_form_when_the_given_id_exists(): void
-    {
-        $response = $this->actingAs($this->user)->get(route('administration.font.edit', ['font_id' => $this->font->id]));
-        $response->assertStatus(200);
-        $response->assertViewIs('administration.font.edit');
-        $response->assertViewHas('font');
     }
 
     /**

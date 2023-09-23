@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TemplateAddRequest;
 use App\Http\Requests\TemplateDeleteRequest;
-use App\Http\Requests\TemplateEditRequest;
 use App\Http\Requests\TemplateUpdateRequest;
 use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Template;
@@ -30,14 +29,6 @@ class TemplateController extends Controller
     }
 
     /**
-     * Display the add view.
-     */
-    public function add(): View
-    {
-        return view('template.add');
-    }
-
-    /**
      * Save a new data set.
      */
     public function save(TemplateAddRequest $request): RedirectResponse
@@ -56,7 +47,7 @@ class TemplateController extends Controller
         $template->height = $height;
 
         if (! $template->save()) {
-            return Redirect::route('template.add')->withInput($request->all())->with([
+            return Redirect::route('templates')->withInput($request->all())->with([
                 'error' => 'template-add-error',
                 'message' => 'Failed to save the new template in the database. Please try again.',
             ]);
@@ -67,18 +58,6 @@ class TemplateController extends Controller
         return Redirect::route('templates')->with([
             'success' => 'template-add-successful',
             'message' => 'Successfully added the new template.',
-        ]);
-    }
-
-    /**
-     * Display the edit view.
-     */
-    public function edit(TemplateEditRequest $request): View|RedirectResponse
-    {
-        $template = Template::find($request->template_id);
-
-        return view('template.edit', ['template_id' => $template->id])->with([
-            'template' => $template,
         ]);
     }
 

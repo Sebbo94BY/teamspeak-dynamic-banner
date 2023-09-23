@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BannerAddRequest;
 use App\Http\Requests\BannerDeleteRequest;
-use App\Http\Requests\BannerEditRequest;
 use App\Http\Requests\BannerUpdateRequest;
 use App\Models\Banner;
 use App\Models\Instance;
@@ -19,15 +18,10 @@ class BannerController extends Controller
      */
     public function overview(): View
     {
-        return view('banners')->with('banners', Banner::all());
-    }
-
-    /**
-     * Display the add view.
-     */
-    public function add(): View
-    {
-        return view('banner.add')->with('instance_list', Instance::all());
+        return view('banners')->with([
+            'banners'=>Banner::all(),
+            'instance_list'=>Instance::all(),
+        ]);
     }
 
     /**
@@ -38,32 +32,18 @@ class BannerController extends Controller
         $banner = new Banner;
         $banner->name = $request->name;
         $banner->instance_id = $request->instance_id;
-        $banner->random_rotation = ($request->has('random_rotation')) ? true : false;
+        $banner->random_rotation = $request->has('random_rotation');
 
         if (! $banner->save()) {
-            return Redirect::route('banner.add')->withInput($request->all())->with([
+            return Redirect::route('banners')->withInput($request->all())->with([
                 'error' => 'banner-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('banner.edit', ['banner_id' => $banner->id])->with([
+        return Redirect::route('banners')->with([
             'success' => 'banner-add-successful',
             'message' => 'Successfully added the new banner.',
-        ]);
-    }
-
-    /**
-     * Display the edit view.
-     */
-    public function edit(BannerEditRequest $request): View|RedirectResponse
-    {
-        $banner = Banner::find($request->banner_id);
-
-        return view('banner.edit', ['banner_id' => $banner->id])->with([
-            'banner' => $banner,
-            'instance_list' => Instance::all(),
-            'banner_configurations' => $banner->configurations,
         ]);
     }
 
@@ -79,7 +59,7 @@ class BannerController extends Controller
         $banner->random_rotation = ($request->has('random_rotation')) ? true : false;
 
         if (! $banner->save()) {
-            return Redirect::route('banner.edit', ['banner_id' => $banner->id])
+            return Redirect::route('banners')
                 ->withInput($request->all())
                 ->with([
                     'error' => 'banner-edit-error',
@@ -87,7 +67,7 @@ class BannerController extends Controller
                 ]);
         }
 
-        return Redirect::route('banner.edit', ['banner_id' => $banner->id])->with([
+        return Redirect::route('banners')->with([
             'success' => 'banner-edit-successful',
             'message' => 'Successfully updated the banner.',
         ]);

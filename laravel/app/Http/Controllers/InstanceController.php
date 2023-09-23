@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Http\Requests\InstanceAddRequest;
 use App\Http\Requests\InstanceDeleteRequest;
-use App\Http\Requests\InstanceEditRequest;
 use App\Http\Requests\InstanceRestartRequest;
 use App\Http\Requests\InstanceStartRequest;
 use App\Http\Requests\InstanceStopRequest;
@@ -25,15 +24,25 @@ class InstanceController extends Controller
      */
     public function overview(): View
     {
-        return view('instances')->with('instances', Instance::all());
-    }
+        $instances = Instance::all();
 
-    /**
-     * Display the add view.
-     */
-    public function add(): View
-    {
-        return view('instance.add');
+        $channelListForEachInstance = [];
+        foreach ($instances as $instance) {
+            try {
+                $virtualserver_helper = new TeamSpeakVirtualserver($instance);
+                $virtualserver = $virtualserver_helper->get_virtualserver_connection();
+                $channel_list = $virtualserver->channelList();
+                $channelListForEachInstance[$instance->id] = $channel_list;
+            } catch (ServerQueryException $serverquery_exception) {
+                $channelListForEachInstance[$instance->id]['channel_list'] = [];
+                $channelListForEachInstance[$instance->id]['error'] = $serverquery_exception->getMessage();
+            }
+        }
+
+        return view('instances')->with([
+            'instances' => $instances,
+            'channel_list' => $channelListForEachInstance,
+        ]);
     }
 
     /**
@@ -62,18 +71,18 @@ class InstanceController extends Controller
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
             } catch (TransportException $transport_exception) {
-                return Redirect::route('instance.add')->withInput($request->all())->with([
+                return Redirect::route('instances')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $transport_exception->getMessage(),
                 ]);
             } catch (ServerQueryException $serverquery_exception) {
-                return Redirect::route('instance.add')->withInput($request->all())->with([
+                return Redirect::route('instances')->withInput($request->all())->with([
                     'error' => 'instance-add-error',
                     'message' => $serverquery_exception->getMessage(),
                 ]);
             }
         } catch (ServerQueryException $serverquery_exception) {
-            return Redirect::route('instance.add')->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
                 'message' => $serverquery_exception->getMessage(),
             ]);
@@ -82,58 +91,15 @@ class InstanceController extends Controller
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
 
         if (! $instance->save()) {
-            return Redirect::route('instance.add')->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);
         }
 
-        return Redirect::route('instance.edit', ['instance_id' => $instance->id])->with([
+        return Redirect::route('instances')->with([
             'success' => 'instance-add-successful',
             'message' => 'Successfully added the new instance.',
-        ]);
-    }
-
-    /**
-     * Display the edit view.
-     */
-    public function edit(InstanceEditRequest $request): View|RedirectResponse
-    {
-        $instance = Instance::find($request->instance_id);
-
-        try {
-            $virtualserver_helper = new TeamSpeakVirtualserver($instance);
-            $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-        } catch (TransportException $transport_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-unreachable-error',
-                'message' => $transport_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        } catch (ServerQueryException $serverquery_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-serverquery-error',
-                'message' => $serverquery_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        }
-
-        try {
-            $channel_list = $virtualserver->channelList();
-        } catch (ServerQueryException $serverquery_exception) {
-            return view('instance.edit', ['instance_id' => $instance->id])->with([
-                'error' => 'instance-channellist-error',
-                'message' => $serverquery_exception->getMessage(),
-                'instance' => $instance,
-                'channel_list' => [],
-            ]);
-        }
-
-        return view('instance.edit', ['instance_id' => $instance->id])->with([
-            'instance' => $instance,
-            'channel_list' => $channel_list,
         ]);
     }
 
@@ -178,10 +144,10 @@ class InstanceController extends Controller
         }
 
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
-        $instance->autostart_enabled = ($request->has('autostart_enabled')) ? true : false;
+        $instance->autostart_enabled = $request->has('autostart_enabled');
 
         if (! $instance->save()) {
-            return Redirect::route('instance.edit', ['instance_id' => $instance->id])
+            return Redirect::route('instances')
                 ->withInput($request->all())
                 ->with([
                     'error' => 'instance-edit-error',
@@ -189,7 +155,7 @@ class InstanceController extends Controller
                 ]);
         }
 
-        return Redirect::route('instance.edit', ['instance_id' => $instance->id])->with([
+        return Redirect::route('instances')->with([
             'success' => 'instance-edit-successful',
             'message' => 'Successfully updated the instance.',
         ]);

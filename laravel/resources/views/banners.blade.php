@@ -1,98 +1,125 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    Banners
+@endsection
+
+@section('dataTables_script')
+<script>
+    $(document).ready( function () {
+        $('#banners').DataTable({
+            "oLanguage": {
+                "sLengthMenu": "_MENU_",
+            },
+            columnDefs:[
+                {
+                    orderable: false,
+                    targets: 3,
+                }
+            ],
+        });
+        $('#availableVariables').DataTable({
+            "oLanguage": {
+                "sLengthMenu": "_MENU_",
+            },
+        });
+    } );
+</script>
+@endsection
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    {{ __('Banners') }}
-
-                    @can('add banners')
-                    <a href="{{ route('banner.add') }}" class="btn btn-primary">Add</a>
-                    @endcan
-                </div>
-
-                <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
-
-                    @if (count($banners) > 0)
-                    <table id="banners" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Instance</th>
-                                <th>Templates in use</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($banners as $banner)
-                            <tr>
-                                <td>{{ $banner->name }}</td>
-                                <td>
-                                    {{ $banner->instance->virtualserver_name }}
-                                    <a href="{{ route('instance.edit', ['instance_id' => $banner->instance->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                </td>
-                                <td>{{ $banner->templates->count() }}</td>
-                                <td>
-                                    @can('edit banners')
-                                    <a href="{{ route('banner.edit', ['banner_id' => $banner->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                    @endcan
-
-                                    <a href="{{ route('banner.variables', ['banner_id' => $banner->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-square-root-variable"></i>
-                                    </a>
-
-                                    @can('edit banners')
-                                    <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-images"></i>
-                                    </a>
-                                    @endcan
-
-                                    <a href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}" target="_blank" class="btn btn-info">
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>
-
-                                    @can('delete banners')
-                                    <form method="POST" action="{{ route('banner.delete', ['banner_id' => $banner->id]) }}">
-                                        @method('delete')
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fa-solid fa-trash-can"></i>
-                                        </button>
-                                    </form>
-                                    @endcan
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    @else
-                    <p>You do not have any banners configured yet. Add your first banner.</p>
-                    @endif
-                </div>
-            </div>
-
-            <script type="module">
-                $(document).ready(function () {
-                    $('#banners').DataTable();
-                });
-            </script>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="fw-bold fs-3">Banners</h1>
         </div>
     </div>
+    <hr>
 </div>
+@can('add banners')
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
+                Add Banner
+            </button>
+        </div>
+    </div>
+    <hr>
+</div>
+@endcan
+<div class="container mt-3">
+    @include('inc.standard-alerts')
+    @if ($banners->count() == 0)
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-primary" role="alert">
+                There are no Banners configured! <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
+            </div>
+        </div>
+    </div>
+    @else
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped" id="banners">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Instance</th>
+                    <th scope="col">Templates in use</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($banners as $banner)
+                <tr>
+                    <td class="col-lg-3">{{ $banner->name }}</td>
+                    <td class="col-lg-5">
+                        {{ $banner->instance->virtualserver_name }}
+                    </td>
+                    <td class="col-lg-2">
+                        <span class="badge text-bg-secondary fs-6">{{ $banner->templates->count() }}</span>
+                    </td>
+                    <td class="col-lg-2">
+                        <div class="d-flex">
+                            @can('edit banners')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editBanner-{{$banner->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$banner->instance->id}}"><i class="fa-solid fa-square-root-variable text-primary fa-lg"></i></button>
+                            @can('edit banners')
+                                <form method="get" action="{{ route('banner.templates', ['banner_id' => $banner->id]) }}">
+                                    <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-image text-primary fa-lg"></i></button>
+                                </form>
+                            @endcan
+                                <a class="btn btn-link px-0 me-2" href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary fa-lg"></i></a>
+                            @can('delete banners')
+                                <button class="btn btn-link px-0 me-2" type="submit" data-bs-toggle="modal" data-bs-target="#delBanner-{{$banner->id}}"><i class="fa fa-trash text-danger fa-lg"></i></button>
+                            @endcan
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+</div>
+@can('add banners')
+    @include('modals.banners.modal-add')
+@endcan
+
+@foreach($banners as $bannerModal)
+    @can('edit banners')
+        @include('modals.banners.modal-edit',['bannerEditModal'=>$bannerModal])
+    @endcan
+    @can('delete banners')
+        @include('modals.delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerModal])
+    @endcan
+@endforeach
+
+@foreach($instance_list as $instanceVariableModal)
+    @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
+@endforeach
+
 @endsection

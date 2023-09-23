@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FontAddRequest;
 use App\Http\Requests\FontDeleteRequest;
-use App\Http\Requests\FontEditRequest;
 use App\Http\Requests\FontUpdateRequest;
 use App\Models\Font;
 use Carbon\Carbon;
@@ -29,14 +28,6 @@ class FontsController extends Controller
     }
 
     /**
-     * Display the font add form.
-     */
-    public function add_form(): View
-    {
-        return view('administration.font.add');
-    }
-
-    /**
      * Saves a new font.
      */
     public function create(FontAddRequest $request): RedirectResponse
@@ -57,14 +48,6 @@ class FontsController extends Controller
             'success' => 'font-add-successful',
             'message' => 'Successfully added the new font.',
         ]);
-    }
-
-    /**
-     * Display the font edit form.
-     */
-    public function edit_form(FontEditRequest $request): View
-    {
-        return view('administration.font.edit', ['font' => Font::find($request->font_id)]);
     }
 
     /**
