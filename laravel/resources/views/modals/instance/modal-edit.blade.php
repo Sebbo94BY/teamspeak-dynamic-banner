@@ -71,9 +71,8 @@
                                 <label for="validationDefaultChannelId" class="form-label fw-bold">Default Channel</label>
                                 <select class="form-select" name="default_channel_id" id="validationDefaultChannelId"
                                         aria-describedby="validationDefaultChannelIdHelp validationDefaultChannelIdFeedback-{{$instanceModal->id}}">
-                                <option value="" selected>Default Channel</option>
                                     @if(isset($channel_list[$instanceModal->id]['error']))
-                                        <option value="{{$instanceModal->default_channel_id}}">{{$instanceModal->default_channel_id}}</option>
+                                        <option value="{{$instanceModal->default_channel_id}}" selected>{{$instanceModal->default_channel_id}}</option>
                                     @else
                                         @foreach($channel_list[$instanceModal->id]['channel_list'] as $channel)
                                             @if (old('default_channel_id', $instanceModal->default_channel_id) == $channel->cid) "selected"
