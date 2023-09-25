@@ -56,7 +56,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                @if($instance_list->count() != 0)
+                @if($instance_list->count() > 0)
                     There are no Banners configured! <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
                 @else
                     You don’t have any instances configured yet. <a class="btn btn-link p-0" href="{{Route('instances')}}">Add an Instance first!</a>
