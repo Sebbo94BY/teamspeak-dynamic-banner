@@ -19,7 +19,7 @@
                             @csrf
                             <tr>
                                 <td class="col-lg-6 text-start">
-                                    <img class="img-fluid" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
+                                    <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                                 </td>
                                 <td class="col-lg-5">
                                     <label for="validationName" class="form-label fw-bold">Name</label>
@@ -46,7 +46,6 @@
                     </tbody>
                 </table>
             </div>
-            @include('inc.bs-tooltip')
             @include('inc.form-validation')
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

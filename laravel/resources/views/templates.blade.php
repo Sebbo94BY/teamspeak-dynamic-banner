@@ -71,7 +71,7 @@
                 @foreach($templates as $template)
                 <tr>
                     <td class="col-lg-auto">
-                        <img class="img-fluid w-75" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
+                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded w-75" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                     </td>
                     <td class="col-lg-3">
                         <p class="fw-bold">{{ $template->alias }}</p>

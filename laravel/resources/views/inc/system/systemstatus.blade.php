@@ -365,6 +365,18 @@
                                     </td>
                                 </tr>
                             @endforeach
+                            <tr>
+                                <td class="border-0">Bootstrap Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="bootstrap_version"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="border-0">Datatable Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="datatable_version"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="border-0">jQuery Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="jquery_version"></span></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -420,18 +432,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            <tr>
-                                <td class="border-0">Bootstrap Version</td>
-                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="bootstrap_version"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="border-0">Datatable Version</td>
-                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="datatable_version"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="border-0">jQuery Version</td>
-                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="jquery_version"></span></td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>

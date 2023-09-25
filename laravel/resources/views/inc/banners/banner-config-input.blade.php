@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-lg-2">
                 @if (isset($configuration))
-                <a class="form-control btn btn-danger btn-sm" href="{{ route('banner.template.configuration.delete', ['banner_configuration_id' => $configuration->id]) }}">Delete</a>
+                    <a class="form-control btn btn-danger btn-sm" href="{{ route('banner.template.configuration.delete', ['banner_configuration_id' => $configuration->id]) }}">Delete</a>
                 @else
                     <button type="button" class="form-control btn btn-danger btn-sm" id="remove-config-row">Remove row</button>
                 @endif

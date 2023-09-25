@@ -33,7 +33,7 @@
     function convert_input_id_to_snake_case_input_name(input_id_value) {
         let input_id_without_validation_prefix = input_id_value.replace(/validation/, '');
         let input_id_in_snake_case = input_id_without_validation_prefix.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-        return  input_id_in_snake_case.replace('/^\_/', '');
+        return input_id_in_snake_case.replace(/^\_/, ''); // returns without underscore prefix
     }
 
     // Add additional configuration row, if requested by the user

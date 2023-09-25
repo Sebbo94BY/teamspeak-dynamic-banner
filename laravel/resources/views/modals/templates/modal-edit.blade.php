@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <div class="col-lg-12">
                         <div class="mb-3 row justify-content-center">
-                            <img class="img-fluid w-75" src="{{ asset($templateModal->file_path_original.'/'.$templateModal->filename) }}" alt="{{ $templateModal->alias }}">
+                            <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded w-75" src="{{ asset($templateModal->file_path_original.'/'.$templateModal->filename) }}" alt="{{ $templateModal->alias }}">
                         </div>
                         <div class="mb-3 row">
                             <label for="validationAlias" class="col-lg-1 col-form-label fw-bold">Alias</label>

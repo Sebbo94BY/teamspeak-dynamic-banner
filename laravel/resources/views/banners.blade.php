@@ -38,14 +38,16 @@
 </div>
 @can('add banners')
 <div class="container">
-    <div class="row">
-        <div class="col-lg-3">
-            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
-                Add Banner
-            </button>
+    @if($instance_list->count() != 0)
+        <div class="row">
+            <div class="col-lg-3">
+                <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
+                    Add Banner
+                </button>
+            </div>
         </div>
-    </div>
     <hr>
+    @endif
 </div>
 @endcan
 <div class="container mt-3">
@@ -54,7 +56,11 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                There are no Banners configured! <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
+                @if($instance_list->count() != 0)
+                    There are no Banners configured! <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
+                @else
+                    You don’t have any instances configured yet. <a class="btn btn-link p-0" href="{{Route('instances')}}">Add an Instance first!</a>
+                @endif
             </div>
         </div>
     </div>
@@ -89,7 +95,7 @@
                             @can('edit banners')
                                 <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}" class="btn btn-link px-0 me-2"><i class="fa-solid fa-image text-primary fa-lg"></i></a>
                             @endcan
-                                <a class="btn btn-link px-0 me-2" href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary fa-lg"></i></a>
+                                <a class="btn btn-link px-0 me-2" href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square text-primary fa-lg"></i></a>
                             @can('delete banners')
                                 <button class="btn btn-link px-0 me-2" type="submit" data-bs-toggle="modal" data-bs-target="#delBanner-{{$banner->id}}"><i class="fa fa-trash text-danger fa-lg"></i></button>
                             @endcan
@@ -104,7 +110,9 @@
     @endif
 </div>
 @can('add banners')
-    @include('modals.banners.modal-add')
+    @if ($banners->count() == 0)
+        @include('modals.banners.modal-add')
+    @endif
 @endcan
 
 @foreach($banners as $bannerModal)

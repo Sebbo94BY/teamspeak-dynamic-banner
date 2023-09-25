@@ -18,5 +18,7 @@
         @yield('content')
 
         @include('layouts.footer-main')
+
+        @include('inc.bs-tooltip')
     </body>
 </html>

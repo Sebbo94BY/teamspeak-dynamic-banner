@@ -29,11 +29,11 @@
     <div class="row">
         <div class="col-lg-6">
             <p class="fs-5 m-0 mb-3 fw-bold">Preview with Grid System</p>
-            <img class="img-fluid" id="templateWithGrid" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+            <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="templateWithGrid" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
         <div class="col-lg-6">
             <p class="fs-5 m-0 mb-3 fw-bold">Preview</p>
-            <img class="img-fluid" id="renderedTemplate" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+            <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="renderedTemplate" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
     </div>
     <hr>
@@ -194,8 +194,6 @@
     </div>
     <hr>
 </div>
-
-@include('inc.bs-tooltip')
 @include('inc.banner-config-script')
 @include('inc.form-validation')
 @foreach($instance as $instanceVariableModal)

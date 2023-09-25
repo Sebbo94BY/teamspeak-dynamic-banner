@@ -4,17 +4,18 @@
             <span class="text-muted">
                 &copy; {{\Illuminate\Support\Carbon::now()->format('Y')}} by
                 <a href="https://github.com/Sebbo94BY" target="_blank">Sebbo94BY</a> and
-                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/graphs/contributors" target="_blank">Contributors</a>
+                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/graphs/contributors" target="_blank">Contributors</a> |
                 Powered by
-                <i class="fa-brands fa-html5 text-primary"></i>
-                <i class="fa-brands fa-php text-primary"></i>
-                <i class="fa-brands fa-laravel text-primary"></i>
-                <i class="fa-brands fa-bootstrap text-primary"></i>
-                <i class="fa-solid fa-font-awesome text-primary"></i>
-                <i class="fa-brands fa-github text-primary"></i>
+                <i class="fa-brands fa-html5 text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="HTML5"></i>
+                <i class="fa-brands fa-php text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="PHP"></i>
+                <i class="fa-brands fa-laravel text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="LARAVEL"></i>
+                <i class="fa-brands fa-bootstrap text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="BOOTSTRAP"></i>
+                <i class="fa-solid fa-font-awesome text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="FONT AWESOME"></i>
+                <i class="fa-brands fa-github text-primary fa-xl me-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="GITHUB"></i>
             </span>
             <span>
-                <i class="fa-solid fa-bullseye fa-fade text-danger"></i> <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">Open feature request or report issue</a>
+                <i class="fa-solid fa-bullseye fa-fade fa-xl me-1 text-danger"></i>
+                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">Open feature request or report issue</a>
             </span>
         </div>
     </footer>

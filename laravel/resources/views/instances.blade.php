@@ -145,9 +145,6 @@
     </div>
     @endif
 </div>
-
-@include('inc.bs-tooltip')
-
 @include('modals.instance.modal-add')
 @foreach($instances as $instanceModal)
     @can('edit instances')

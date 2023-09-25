@@ -64,7 +64,7 @@
                 @foreach($banner->templates as $banner_template)
                 <tr>
                     <td class="col-lg-10 text-start">
-                        <img class="img-fluid w-50 opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded w-50 opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                     </td>
                     <td class="col-lg-2">
                         <div class="d-flex">
