@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\BannerVariableController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,5 +55,15 @@ class Instance extends Model
     public function process(): BelongsTo
     {
         return $this->belongsTo(InstanceProcess::class, 'id', 'instance_id');
+    }
+
+    /**
+     * Get the instance variables
+     */
+    public function variables(): array
+    {
+        $varController = new BannerVariableController();
+
+        return $varController->getInstanceVariables($this->id);
     }
 }

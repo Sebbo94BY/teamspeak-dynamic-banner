@@ -1,173 +1,133 @@
-@extends('layouts.app')
+@extends('layout')
+
+@section('site_title')
+    Administration Users
+@endsection
+
+@section('dataTables_script')
+    <script>
+        $(document).ready( function () {
+            $('#roles').DataTable({
+                "oLanguage": {
+                    "sLengthMenu": "_MENU_",
+                },
+                columnDefs:[
+                    {
+                        orderable: false,
+                        targets: 4,
+                    }
+                ],
+            });
+        } );
+    </script>
+@endsection
 
 @section('content')
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="fw-bold fs-3">User Administration</h1>
+        </div>
+    </div>
+    <hr>
+</div>
+@can('add users')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    {{ __('Users') }}
-
-                    @can('add users')
-                    <a href="{{ route('administration.user.add') }}" class="btn btn-primary">Add</a>
-                    @endcan
-                </div>
-
-                <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
-                    @if (session('error') or $errors->any())
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('message') }}
-
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <table id="users" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Roles</th>
-                                <th>Registered since</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $user)
-                                @php
-                                    $roles = [];
-                                @endphp
-                                @foreach ($user->roles as $role)
-                                    @php
-                                        $roles[] = $role->name;
-                                    @endphp
-                                @endforeach
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>
-                                    @foreach ($roles as $role)
-                                    @if ($role == 'Super Admin')
-                                    <span class="badge bg-danger">{{ $role }}</span>
-                                    @elseif (preg_match('/Admin/i', $role))
-                                    <span class="badge bg-warning">{{ $role }}</span>
-                                    @else
-                                    <span class="badge bg-primary">{{ $role }}</span>
-                                    @endif
-                                    @endforeach
-                                </td>
-                                <td>{{ $user->created_at }}</td>
-                                <td>
-                                    <a class="btn btn-primary" data-bs-toggle="modal" href="#roles-and-permissions-modal-uid-{{ $user->id }}" role="button">
-                                        <i class="fa-solid fa-key"></i>
-                                    </a>
-
-                                    @can('edit users')
-                                    <a href="{{ route('administration.user.edit', ['user_id' => $user->id]) }}" class="btn btn-info">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                    @endcan
-
-                                    @if (Auth::user()->id != $user->id)
-                                    @can('delete users')
-                                    <form method="POST" action="{{ route('administration.user.delete', ['user_id' => $user->id]) }}">
-                                        @method('delete')
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
-                                    </form>
-                                    @endcan
-                                    @endif
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-                    <p>
-                        Legend:
-                        <span class="badge bg-danger">Super Admin</span>
-                        <span class="badge bg-warning">Area Admin</span>
-                        <span class="badge bg-primary">Limited Role</span>
-                    </p>
-                </div>
-            </div>
-
-            <script type="module">
-                $(document).ready(function () {
-                    $('#users').DataTable();
-                });
-            </script>
+    <div class="row">
+        <div class="col-lg-3">
+            <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#newUser">
+                New User
+            </button>
         </div>
     </div>
+    <hr>
 </div>
-
-@foreach($users as $user)
-<div class="modal modal-lg fade" id="roles-and-permissions-modal-uid-{{ $user->id }}" aria-hidden="true" aria-labelledby="roles-and-permissions-modal-uid-{{ $user->id }}-label" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="roles-and-permissions-modal-uid-{{ $user->id }}-label">Roles and Permissions: <code>{{ $user->name }}</code></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                @php
-                    $role_counter = 0;
-                @endphp
-
-                @foreach ($user->roles as $role)
-                    @if (($role_counter % 3) == 0)
-                    <div class="col-md-12 card-group">
-                    @endif
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $role->name }}</h5>
-                                <p class="card-text">
-                                    <ul>
-                                        @if ($role->name == "Super Admin")
-                                            <li>All permissions</li>
-                                        @else
-                                            @foreach ($role->permissions->pluck('name') as $permission)
-                                                <li>{{ $permission }}</li>
-                                            @endforeach
-                                        @endif
-                                    </ul>
-                                </p>
-                            </div>
+@endcan
+<div class="container mt-3">
+    @include('inc.standard-alerts')
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped" id="roles">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">E-Mail</th>
+                    <th scope="col">Roles</th>
+                    <th scope="col">Registered since</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($users as $user)
+                <tr>
+                    <td class="col-lg-2">
+                        {{ $user->name }}
+                    </td>
+                    <td class="col-lg-2">
+                        {{ $user->email }}
+                    </td>
+                    <td class="col-lg-4">
+                        @foreach($user->getRoleNames() as $role)
+                            @switch(true)
+                                @case($role == 'Super Admin')
+                                    <span class="badge text-bg-danger">{{$role}}</span>
+                                    @break
+                                @case(preg_match('/Admin/i', $role))
+                                    <span class="badge text-bg-warning">{{$role}}</span>
+                                    @break
+                                @default
+                                    <span class="badge text-bg-primary">{{$role}}</span>
+                            @endswitch
+                        @endforeach
+                    </td>
+                    <td class="col-lg-2">
+                        {{ \Illuminate\Support\Carbon::parse($user->created_at)->format('d.m.Y') }}
+                    </td>
+                    <td class="col-lg-2">
+                        <div class="d-flex">
+                            <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#roleRolesAndPermission-{{$user->id}}"><i class="fa-solid fa-key text-primary fa-lg"></i></button>
+                            @can('edit users')
+                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editUser-{{$user->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
+                            @endcan
+                            @if (Auth::user()->id != $user->id)
+                                @can('delete users')
+                                    <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#delUser-{{$user->id}}"><i class="fa fa-trash text-danger fa-lg"></i></button>
+                                @endcan
+                            @endif
                         </div>
-                    @if (($role_counter % 3) == 2)
-                    </div>
-                    @endif
-
-                    @php
-                        ++$role_counter;
-                    @endphp
+                    </td>
+                </tr>
                 @endforeach
-
-                @if (! in_array($role_counter % 3, [0, 2]))
-                </div>
-                @endif
-            </div>
-
-            <div class="modal-footer">
-                @can('view roles')
-                <a href="{{ route('administration.roles') }}" class="btn btn-secondary">View Roles</a>
-                @endcan
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <p>
+                <span class="fw-bold">Legende:</span>
+                <span class="badge text-bg-danger">Super Admin</span>
+                <span class="badge text-bg-warning">Area Admin</span>
+                <span class="badge text-bg-primary">Limited Role</span>
+            </p>
         </div>
     </div>
 </div>
+
+@foreach($users as $userEdit)
+    @can('edit users')
+        @include('modals.administration.modal-edit', ['userEdit'=>$userEdit])
+    @endcan
+    @can('delete users')
+        @if (Auth::user()->id != $userEdit->id)
+            @include('modals.delete-feedback.modal-delete-user', ['userDeleteModal'=>$userEdit])
+        @endif
+    @endcan
+    @include('modals.administration.modal-view-user-roles', ['userViewRoles'=>$userEdit])
 @endforeach
+
+@can('add users')
+    @include('modals.administration.modal-add')
+@endcan
+
 @endsection

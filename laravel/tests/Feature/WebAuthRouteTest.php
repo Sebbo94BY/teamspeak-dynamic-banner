@@ -25,4 +25,10 @@ class WebAuthRouteTest extends TestCase
         $response = $this->get(route('register'));
         $response->assertStatus(404);
     }
+
+    public function test_can_view_forgot_password()
+    {
+        $response = $this->get(Route('password.request'));
+        $response->assertStatus(200);
+    }
 }

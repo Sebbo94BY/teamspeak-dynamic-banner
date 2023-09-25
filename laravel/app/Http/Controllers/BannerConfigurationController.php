@@ -9,6 +9,7 @@ use App\Http\Requests\BannerConfigurationUpsertRequest;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
 use App\Models\Font;
+use App\Models\Instance;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,7 @@ class BannerConfigurationController extends Controller
         return view('banner.configuration')->with([
             'banner_template' => BannerTemplate::find($request->banner_template_id),
             'fonts' => Font::all(),
+            'instance' => Instance::all(),
         ]);
     }
 
