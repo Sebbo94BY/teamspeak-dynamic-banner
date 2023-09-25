@@ -15,7 +15,9 @@
 </div>
 <div class="container mt-3">
     @include('inc.standard-alerts')
-    <form method="POST" action="{{ route('setup.installer.user.create') }}" class="row g-3 needs-validation" novalidate>
+    <form method="POST" action="{{ route('setup.installer.user.create') }}" class="row g-3 needs-validation"
+          oninput ='password_confirmation.setCustomValidity(password_confirmation.value !== password.value ? "Passwords do not match." : "")'
+          novalidate>
         @csrf
         <div class="row mb-3">
             <div class="col-lg-12">
@@ -34,7 +36,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="validationEmail" class="form-label fw-bold">E-Mail</label>
-                    <input type="text" class="form-control" id="validationEmail" name="email" value="{{ old('email') }}" aria-describedby="validationEmailHelp validationEmailFeedback" placeholder="e.g. max@example.com" required>
+                    <input type="email" class="form-control" id="validationEmail" name="email" value="{{ old('email') }}" aria-describedby="validationEmailHelp validationEmailFeedback" placeholder="e.g. max@example.com" required>
                     <div id="validationEmailHelp" class="form-text">Your email address.</div>
                     <div class="valid-feedback">{{ __("Looks good!") }}</div>
                     <div id="validationEmailFeedback" class="invalid-feedback">{{ __("Please provide a valid email.") }}</div>
@@ -57,5 +59,16 @@
         </div>
     </form>
 </div>
+<script>
+    // Check if passwords match
+    $("#pwdId, #validationPasswordConfirmation").on("keyup", function () {
+        if (
+            $("#validationPassword").val() != "" &&
+            $("#validationPasswordConfirmation").val() != "" &&
+            $("#validationPassword").val() == $("#validationPasswordConfirmation").val()
+        )
+        {}
+    });
+</script>
 @include('inc.form-validation')
 @endsection

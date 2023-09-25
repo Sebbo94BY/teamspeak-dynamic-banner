@@ -27,6 +27,10 @@
         </div>
     @endif
     <hr>
+        @php
+        //define a variable to control the description <td>
+        $descStatus = false;
+        @endphp
     <div class="accordion" id="accordionSystemStatus">
         <div class="accordion-item">
             <h2 class="accordion-header" id="accordionSystemStatusPHPHeading">
@@ -71,9 +75,10 @@
                                     </td>
                                 </tr>
                             @endforeach
+                            @php $descStatus = true; @endphp
                             @foreach($php_status_extension as $key => $extension)
                                 <tr>
-                                    <td class="border-0"></td>
+                                    <td class="border-0">@if($descStatus == true) PHP Extensions @php $descStatus = false; @endphp @endif</td>
                                     <td class="border-0">
                                         @switch($extension->severity)
                                             @case('success')
@@ -139,7 +144,7 @@
             <div id="accordionSystemStatusDatabase" class="accordion-collapse collapse @if($db_warning_count > 0  || $db_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusDatabaseHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th class="col-lg-6 border-0" scope="col"></th>
@@ -215,7 +220,7 @@
             <div id="accordionSystemStatusPermission" class="accordion-collapse collapse @if($permission_warning_count > 0  || $permission_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusPermissionHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th class="col-lg-6 border-0" scope="col"></th>
@@ -223,9 +228,14 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @php $descStatus = true; @endphp
                             @foreach($permission_status_dir  as $key => $permissions)
                                 <tr>
-                                    <td class="border-0">Directories <code>{{$permissions->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @if($descStatus == true)
+                                            Directories <code>{{$permissions->required_value}}</code></td>
+                                            @php $descStatus = false;  @endphp
+                                        @endif
                                     <td class="border-0">
                                         @switch($permissions->severity)
                                             @case('success')
@@ -270,7 +280,7 @@
             <div id="accordionSystemStatusRedis" class="accordion-collapse collapse @if($redis_warning_count > 0  || $redis_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusRedisHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th class="col-lg-6 border-0" scope="col"></th>
@@ -305,6 +315,7 @@
                 </div>
             </div>
         </div>
+        @if(Route::currentRouteName() != 'setup.installer.requirements')
         <div class="accordion-item">
             <h2 class="accordion-header" id="accordionSystemStatusVersionHeading">
                 <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($version_warning_count == 0  && $version_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusVersion" aria-expanded="false" aria-controls="accordionSystemStatusVersion">
@@ -325,7 +336,7 @@
             <div id="accordionSystemStatusVersion" class="accordion-collapse collapse @if($version_warning_count > 0  || $version_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusVersionHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th class="col-lg-6 border-0" scope="col"></th>
@@ -380,7 +391,7 @@
             <div id="accordionSystemStatusVarious" class="accordion-collapse collapse @if($various_warning_count > 0  || $various_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusVariousHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table">
+                        <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th class="col-lg-6 border-0" scope="col"></th>
@@ -409,12 +420,25 @@
                                     </td>
                                 </tr>
                             @endforeach
+                            <tr>
+                                <td class="border-0">Bootstrap Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="bootstrap_version"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="border-0">Datatable Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="datatable_version"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="border-0">jQuery Version</td>
+                                <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="jquery_version"></span></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+        @endif
     </div>
     <div class="row mt-3">
         <div class="col-lg-12">
@@ -427,3 +451,11 @@
         </div>
     </div>
 </div>
+
+<script type="module">
+    $(document).ready(function () {
+        $("#bootstrap_version").html(bootstrap.Tooltip.VERSION);
+        $("#datatable_version").html($.fn.dataTable.version);
+        $("#jquery_version").html($.fn.jquery);
+    });
+</script>

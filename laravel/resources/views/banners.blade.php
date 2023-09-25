@@ -87,9 +87,7 @@
                             @endcan
                                 <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$banner->instance->id}}"><i class="fa-solid fa-square-root-variable text-primary fa-lg"></i></button>
                             @can('edit banners')
-                                <form method="get" action="{{ route('banner.templates', ['banner_id' => $banner->id]) }}">
-                                    <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-image text-primary fa-lg"></i></button>
-                                </form>
+                                <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}" class="btn btn-link px-0 me-2"><i class="fa-solid fa-image text-primary fa-lg"></i></a>
                             @endcan
                                 <a class="btn btn-link px-0 me-2" href="{{ route('api.banner', ['banner_id' => base_convert($banner->id, 10, 35)]) }}"><i class="fa-solid fa-arrow-up-right-from-square text-primary fa-lg"></i></a>
                             @can('delete banners')

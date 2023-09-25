@@ -32,7 +32,7 @@ class InstanceController extends Controller
                 $virtualserver_helper = new TeamSpeakVirtualserver($instance);
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
                 $channel_list = $virtualserver->channelList();
-                $channelListForEachInstance[$instance->id] = $channel_list;
+                $channelListForEachInstance[$instance->id]['channel_list'] = $channel_list;
             } catch (ServerQueryException $serverquery_exception) {
                 $channelListForEachInstance[$instance->id]['channel_list'] = [];
                 $channelListForEachInstance[$instance->id]['error'] = $serverquery_exception->getMessage();

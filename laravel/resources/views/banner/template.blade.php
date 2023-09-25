@@ -45,7 +45,7 @@
                 <div class="alert alert-primary" role="alert">
                     There are no templates configured!
                     @can('add templates')
-                        <button data-bs-toggle="modal" data-bs-target="#addBannerTemplate">Define a new template now</button>
+                        <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">Define a new template now</button>
                     @endcan
                 </div>
             </div>
@@ -81,9 +81,7 @@
                                     <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-toggle-off fa-lg"></i></button>
                                 </form>
                             @endif
-                            <form method="get" action="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}">
-                                <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-gear fa-lg"></i></button>
-                            </form>
+                            <a href="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}" class="btn btn-link px-0 me-2"><i class="fa-solid fa-gear fa-lg"></i></a>
                             <form method="post" action="{{ route('banner.template.remove', ['banner_template_id' => $banner_template->id]) }}">
                                 @method('delete')
                                 @csrf

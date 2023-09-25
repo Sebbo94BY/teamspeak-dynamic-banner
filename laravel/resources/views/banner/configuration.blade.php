@@ -19,7 +19,7 @@
             <a class="btn btn-primary btn-sm fw-bold" href="#modalAvailableVariables-{{$banner_template->banner->instance_id}}" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$instance->first()->id}}"><i class="fa-solid fa-square-root-variable fa-lg me-2"></i></a>
         </div>
         <div class="col-lg-1 d-grid">
-            <a class="btn btn-secondary btn-sm fw-bold" href="{{ route('banners') }}">Cancel</a>
+            <a class="btn btn-secondary btn-sm fw-bold" href="{{ route('banner.templates', ['banner_id'=>$banner_template->banner_id]) }}">Back</a>
         </div>
     </div>
     <hr>
@@ -69,12 +69,27 @@
             <div class="col-lg-12">
                 <div class="accordion" id="accordionPanelsStayOpen">
                     <div class="accordion-item">
+                        <h2 class="accordion-header" id="NameHeading">
+                            <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#name" aria-expanded="true" aria-controls="name">
+                                Name
+                            </a>
+                        </h2>
+                        <div id="name" class="accordion-collapse collapse show" aria-labelledby="NameHeading">
+                            <div class="accordion-body">
+                                <input class="form-control" id="validationName" type="text" name="name" value="{{ old('name', (isset($banner_template)) ? $banner_template->name : '') }}" placeholder="e.g. Event Announcement" aria-label="validationName" aria-describedby="nameHelp validationNameFeedback" required>
+                                <div id="nameHelp" class="form-text">What will this template be about? Give it a descriptive name.</div>
+                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                <div id="validationNameFeedback" class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="redirectUrlHeading">
-                            <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#redirectUrl" aria-expanded="true" aria-controls="redirectUrl">
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#redirectUrl" aria-expanded="true" aria-controls="redirectUrl">
                                 <div class="col-lg-9">
                                     Redirect URL
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-2 text-end">
                                     @if(isset($banner_template) && $banner_template->redirect_url != null)
                                         <span class="badge text-bg-success ms-2">Active</span>
                                     @else
@@ -83,7 +98,7 @@
                                 </div>
                             </a>
                         </h2>
-                        <div id="redirectUrl" class="accordion-collapse collapse show" aria-labelledby="redirectUrl">
+                        <div id="redirectUrl" class="accordion-collapse collapse" aria-labelledby="redirectUrl">
                             <div class="accordion-body">
                                 <div class="input-group">
                                     <input class="form-control" type="url" id="validationRedirectUrl" name="redirect_url" value="{{ old('redirect_url', (isset($banner_template)) ? $banner_template->redirect_url : '') }}" placeholder="e.g. https://example.com/news" aria-label="validationRedirectUrl">
@@ -102,11 +117,11 @@
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="autoDisableHeading">
-                            <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#autoDisable" aria-expanded="false" aria-controls="autoDisable">
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#autoDisable" aria-expanded="false" aria-controls="autoDisable">
                                 <div class="col-lg-9">
                                     Automatic Disabling
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-2 text-end">
                                     @if(isset($banner_template) && $banner_template->disable_at != null)
                                         <span class="badge text-bg-success ms-2">Active</span>
                                     @else
@@ -115,7 +130,7 @@
                                 </div>
                             </a>
                         </h2>
-                        <div id="autoDisable" class="accordion-collapse collapse show" aria-labelledby="autoDisable">
+                        <div id="autoDisable" class="accordion-collapse collapse" aria-labelledby="autoDisable">
                             <div class="accordion-body">
                                 <input class="form-control" type="datetime-local" id="validationDisableAt" name="disable_at" value="{{ old('disable_at', (isset($banner_template)) ? $banner_template->disable_at : '') }}" aria-label="validationDisableAt">
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
@@ -136,7 +151,7 @@
                                 <div class="col-lg-9">
                                     Banner Configurations
                                 </div>
-                                <div class="col-lg-2">
+                                <div class="col-lg-2 text-end">
                                     @if($banner_template->configurations->count() > 0)
                                         <span class="badge text-bg-success ms-2">{{$banner_template->configurations->count()}} active configurations</span>
                                     @else

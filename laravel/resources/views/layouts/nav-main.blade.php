@@ -5,16 +5,18 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-end text-bg-dark">
-            <ul class="navbar-nav my-auto">
-                <li class="nav-item">
-                    <a class="nav-link {{ (request()->is('login') ? 'active' : '') }}" href="{{Route('login')}}">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ (str_starts_with(Route::currentRouteName(), 'password.')) ? 'active' : '' }} " href="{{ route('password.request') }}">Forgot Password</a>
-                </li>
-            </ul>
-        </div>
+        @if(!str_starts_with(Route::currentRouteName(), 'setup.'))
+            <div class="collapse navbar-collapse justify-content-end text-bg-dark">
+                <ul class="navbar-nav my-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ (request()->is('login') ? 'active' : '') }}" href="{{Route('login')}}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ (str_starts_with(Route::currentRouteName(), 'password.')) ? 'active' : '' }} " href="{{ route('password.request') }}">Forgot Password</a>
+                    </li>
+                </ul>
+            </div>
+        @endif
     </div>
 </nav>
 @endguest
