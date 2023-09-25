@@ -57,16 +57,18 @@
                 <thead>
                 <tr>
                     <th scope="col">Banner</th>
+                    <th scope="col">Name</th>
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($banner->templates as $banner_template)
                 <tr>
-                    <td class="col-lg-10 text-start">
-                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded w-50 opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+                    <td class="col-lg-6 text-start">
+                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                     </td>
-                    <td class="col-lg-2">
+                    <td class="col-lg-5">{{$banner_template->name}}</td>
+                    <td class="col-lg-1 text-end">
                         <div class="d-flex">
                             @if ($banner_template->enabled)
                                 <form method="post" action="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}">
