@@ -52,6 +52,7 @@
                                 <label class="form-label fw-bold" for="validationServerQueryPassword">ServerQuery Password</label>
                                 <input type="password" class="form-control" id="validationServerQueryPassword"
                                        aria-describedby="validationServerQueryPasswordHelp validationServerQueryPasswordFeedback-{{$instanceModal->id}}"
+                                       value="{{ old('serverquery_password', $instance->serverquery_password) }}"
                                        name="serverquery_password" required>
                                 <div id="validationServerQueryPasswordHelp" class="form-text">The password of the previous defined ServerQuery username</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>

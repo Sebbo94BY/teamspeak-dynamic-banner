@@ -38,7 +38,7 @@
 </div>
 @can('add banners')
 <div class="container">
-    @if($instance_list->count() != 0)
+    @if($instance_list->count() > 0)
         <div class="row">
             <div class="col-lg-3">
                 <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
@@ -110,7 +110,7 @@
     @endif
 </div>
 @can('add banners')
-    @if ($banners->count() == 0)
+    @if ($instance_list->count() > 0)
         @include('modals.banners.modal-add')
     @endif
 @endcan
