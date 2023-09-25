@@ -85,9 +85,9 @@
                                     @endif
                                 </select>
                                 @if(isset($channel_list[$instanceModal->id]['error']))
-                                    <div id="validationDefaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
-                                @else
                                     <div id="validationDefaultChannelIdHelp" class="form-text">An error has occurred. You see here the default channel ID instead of the channel name</div>
+                                @else
+                                    <div id="validationDefaultChannelIdHelp" class="form-text">The default channel to which the client should connect / switch on your TeamSpeak server.</div>
                                 @endif
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
                                 <div id="validationDefaultChannelIdFeedback-{{$instanceModal->id}}" class="invalid-feedback">
