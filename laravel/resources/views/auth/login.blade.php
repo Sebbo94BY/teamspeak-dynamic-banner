@@ -34,7 +34,7 @@
                                 <input class="form-control @error('email') is-invalid @enderror" type="password" id="password" name="password" placeholder="your password" aria-describedby="passwordFeedback">
                             </div>
                             <div class="mb-3">
-                                <input class="form-check-input" type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }} id="flexCheckDefault">
+                                <input class="form-check-input" type="checkbox" name="remember" @if(!old() || old('remember') == 'on') checked="checked" @endif id="flexCheckDefault">
                                 <label class="form-check-label" for="flexCheckDefault">
                                     {{ __('Remember Me') }}
                                 </label>
