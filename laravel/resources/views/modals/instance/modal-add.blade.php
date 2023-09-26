@@ -73,7 +73,8 @@
                                 <input type="text" class="form-control" id="validationClientNickname" maxlength="30"
                                        name="client_nickname"
                                        aria-describedby="validationClientNicknameHelp validationClientNicknameFeedback"
-                                       value="{{ old('client_nickname') }}" required>
+                                       value="{{ old('client_nickname') }}"
+                                       placeholder="e. g. Dynamic Banner" required>
                                 <div id="validationClientNicknameHelp" class="form-text">How this client should be named on your TeamSpeak server. (Maximum length: 30 characters)</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
                                 <div id="validationClientNicknameFeedback" class="invalid-feedback">{{ __("Please provide a valid nickname.") }}</div>
