@@ -54,33 +54,19 @@ class InstanceController extends Controller
         $instance->host = $request->host;
         $instance->voice_port = $request->voice_port;
         $instance->serverquery_port = $request->serverquery_port;
+        $instance->is_ssh = $request->has('is_ssh');
         $instance->serverquery_username = $request->serverquery_username;
         $instance->serverquery_password = $request->serverquery_password;
         $instance->client_nickname = $request->client_nickname;
 
-        // Try SSH first and fallback to RAW
-        $instance->is_ssh = true;
-
         try {
             $virtualserver_helper = new TeamSpeakVirtualserver($instance);
             $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-        } catch (TransportException) {
-            try {
-                $instance->is_ssh = false;
-
-                $virtualserver_helper = new TeamSpeakVirtualserver($instance);
-                $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-            } catch (TransportException $transport_exception) {
-                return Redirect::route('instances')->withInput($request->all())->with([
-                    'error' => 'instance-add-error',
-                    'message' => $transport_exception->getMessage(),
-                ]);
-            } catch (ServerQueryException $serverquery_exception) {
-                return Redirect::route('instances')->withInput($request->all())->with([
-                    'error' => 'instance-add-error',
-                    'message' => $serverquery_exception->getMessage(),
-                ]);
-            }
+        } catch (TransportException $transport_exception) {
+            return Redirect::route('instances')->withInput($request->all())->with([
+                'error' => 'instance-add-error',
+                'message' => $transport_exception->getMessage(),
+            ]);
         } catch (ServerQueryException $serverquery_exception) {
             return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-add-error',
@@ -113,34 +99,25 @@ class InstanceController extends Controller
         $instance->host = $request->host;
         $instance->voice_port = $request->voice_port;
         $instance->serverquery_port = $request->serverquery_port;
+        $instance->is_ssh = $request->has('is_ssh');
         $instance->serverquery_username = $request->serverquery_username;
         $instance->serverquery_password = $request->serverquery_password;
         $instance->client_nickname = $request->client_nickname;
         $instance->default_channel_id = $request->default_channel_id;
 
-        // Try SSH first and fallback to RAW
         try {
-            $instance->is_ssh = true;
-
             $virtualserver_helper = new TeamSpeakVirtualserver($instance);
             $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-        } catch (TransportException) {
-            try {
-                $instance->is_ssh = false;
-
-                $virtualserver_helper = new TeamSpeakVirtualserver($instance);
-                $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-            } catch (TransportException $transport_exception) {
-                return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
-                    'error' => 'instance-edit-error',
-                    'message' => $transport_exception->getMessage(),
-                ]);
-            } catch (ServerQueryException $serverquery_exception) {
-                return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
-                    'error' => 'instance-edit-error',
-                    'message' => $serverquery_exception->getMessage(),
-                ]);
-            }
+        } catch (TransportException $transport_exception) {
+            return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
+                'error' => 'instance-edit-error',
+                'message' => $transport_exception->getMessage(),
+            ]);
+        } catch (ServerQueryException $serverquery_exception) {
+            return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
+                'error' => 'instance-edit-error',
+                'message' => $serverquery_exception->getMessage(),
+            ]);
         }
 
         $instance->virtualserver_name = $virtualserver->virtualserver_name;
