@@ -28,6 +28,7 @@ class InstanceUpdateRequest extends FormRequest
             'host' => ['required', 'string', 'max:255'],
             'voice_port' => ['required', 'integer', 'min:1', 'max:65535'],
             'serverquery_port' => ['required', 'integer', 'min:1', 'max:65535'],
+            'is_ssh' => ['sometimes'],
             'serverquery_username' => ['required', 'string'],
             'serverquery_password' => ['required', 'string'],
             'client_nickname' => ['required', 'string', 'max:30'],

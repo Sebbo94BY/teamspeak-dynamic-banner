@@ -35,9 +35,17 @@
                                 <input type="number" class="form-control" id="validationServerQueryPort" name="serverquery_port" min="1" max="65535"
                                        aria-describedby="validationServerQueryPortHelp validationServerQueryPortFeedback-{{$instanceModal->id}}"
                                        value="{{ old('serverquery_port', $instanceModal->serverquery_port) }}" required>
-                                <div id="validationServerQueryPortHelp" class="form-text">The ServerQuery port of the Teamspeak server for executing commands and gathering data</div>
+                                <div id="validationServerQueryPortHelp" class="form-text">The ServerQuery port of the Teamspeak server for executing commands and gathering data.</div>
                                 <div class="valid-feedback">{{ __("Looks good!") }}</div>
                                 <div id="validationServerQueryPortFeedback-{{$instanceModal->id}}" class="invalid-feedback">{{ __("Please provide a valid port.") }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="validationServerqueryEncryption" class="form-check-label fw-bold">Enable ServerQuery Encryption (SSH)</label>
+                                <input class="form-check-input ms-2" id="validationServerqueryEncryption" type="checkbox" name="is_ssh"
+                                       aria-describedby="validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback-{{$instanceModal->id}}" @if (old('is_ssh', $instance->is_ssh)) checked @endif>
+                                <div id="validationServerqueryEncryptionHelp" class="form-text">When enabled, the ServerQuery connection will be established via an encrypted SSH connection. The respective ServerQuery port must be set.</div>
+                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                <div id="validationServerqueryEncryptionFeedback-{{$instanceModal->id}}" class="invalid-feedback">{{ __("You can only enable or disable this checkbox.") }}</div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="validationServerQueryUsername">ServerQuery Username</label>

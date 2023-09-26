@@ -41,6 +41,14 @@
                                 <div id="validationServerQueryPortFeedback" class="invalid-feedback">{{ __("Please provide a valid port.") }}</div>
                             </div>
                             <div class="mb-3">
+                                <label for="validationServerqueryEncryption" class="form-check-label fw-bold">Enable ServerQuery Encryption (SSH)</label>
+                                <input class="form-check-input ms-2" id="validationServerqueryEncryption" type="checkbox" name="is_ssh"
+                                       aria-describedby="validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback" @if (old('is_ssh')) checked @endif>
+                                <div id="validationServerqueryEncryptionHelp" class="form-text">When enabled, the ServerQuery connection will be established via an encrypted SSH connection. The respective ServerQuery port must be set.</div>
+                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
+                                <div id="validationServerqueryEncryptionFeedback" class="invalid-feedback">{{ __("You can only enable or disable this checkbox.") }}</div>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label fw-bold" for="validationServerQueryUsername">ServerQuery Username</label>
                                 <input type="text" class="form-control" id="validationServerQueryUsername"
                                        name="serverquery_username"
