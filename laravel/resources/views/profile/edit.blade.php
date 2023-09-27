@@ -1,14 +1,14 @@
 @extends('layout')
 
 @section('site_title')
-    Edit Profile
+    {{ __('views/profile/edit.profile') }}
 @endsection
 
 @section('content')
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Profile</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/profile/edit.profile') }}</h1>
         </div>
     </div>
     <hr>
@@ -22,23 +22,23 @@
                 @csrf
                 <div class="card-body">
                     <div class="mb-2">
-                        <label for="validationName" class="form-label fw-bold">Name</label>
+                        <label for="validationName" class="form-label fw-bold">{{ __('views/profile/edit.name_label') }}</label>
                         <input type="text" class="form-control" id="validationName" name="name" value="{{ old('name', $user->name) }}"
-                               aria-describedby="validationNameHelp validationNameFeedback" placeholder="e.g. MyNickname" required>
-                        <div id="validationNameHelp" class="form-text">Your users display name.</div>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div id="validationNameFeedback" class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                               aria-describedby="validationNameHelp validationNameFeedback" placeholder="{{ __('views/profile/edit.name_input_placeholder') }}" required>
+                        <div id="validationNameHelp" class="form-text">{{ __('views/profile/edit.name_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div id="validationNameFeedback" class="invalid-feedback">{{ __('views/profile/edit.name_validation_error') }}</div>
                     </div>
                     <div class="mb-2">
-                        <label for="validationEmail" class="form-label fw-bold">E-Mail</label>
+                        <label for="validationEmail" class="form-label fw-bold">{{ __('views/profile/edit.email_label') }}</label>
                         <input type="email" class="form-control" id="validationEmail" name="email" value="{{ old('email', $user->email) }}"
-                               aria-describedby="validationEmailHelp validationEmailFeedback" placeholder="e.g. max@example.com" required>
-                        <div id="validationEmailHelp" class="form-text">Your email address.</div>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div id="validationEmailFeedback" class="invalid-feedback">{{ __("Please provide a valid email.") }}</div>
+                               aria-describedby="validationEmailHelp validationEmailFeedback" placeholder="{{ __('views/profile/edit.email_input_placeholder') }}" required>
+                        <div id="validationEmailHelp" class="form-text">{{ __("views/profile/edit.email_help") }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div id="validationEmailFeedback" class="invalid-feedback">{{ __('views/profile/edit.email_validation_error') }}</div>
                     </div>
                     <div class="mb-2">
-                        <label for="validationLocalizationId" class="form-label fw-bold">{{ __("Language") }}</label>
+                        <label for="validationLocalizationId" class="form-label fw-bold">{{ __('views/profile/edit.language_label') }}</label>
                         <select class="form-select" name="localization_id" id="validationLocalizationId" aria-describedby="localizationIdHelp" required>
                             @foreach ($localizations as $localization)
                             @if (old('localization_id', $user->localization_id) == $localization->id) "selected"
@@ -48,13 +48,13 @@
                             @endif
                             @endforeach
                         </select>
-                        <div id="localizationIdHelp" class="form-text">{{ __("Please select your preferred language.") }}</div>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div class="invalid-feedback">{{ __("Please provide a valid language (ID).") }}</div>
+                        <div id="localizationIdHelp" class="form-text">{{ __('views/profile/edit.language_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div class="invalid-feedback">{{ __('views/profile/edit.language_validation_error') }}</div>
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0">
-                    <button class="btn btn-primary" type="submit">Update Profile</button>
+                    <button class="btn btn-primary" type="submit">{{ __('views/profile/edit.update_profile_button') }}</button>
                 </div>
             </form>
         </div>
@@ -66,31 +66,32 @@
                 @csrf
                 <div class="card-body">
                     <div class="mb-2">
-                        <label for="validationCurrentPassword" class="form-label fw-bold">Current Password</label>
+                        <label for="validationCurrentPassword" class="form-label fw-bold">{{ __('views/profile/edit.current_password_label') }}</label>
                         <input type="password" class="form-control" id="validationCurrentPassword" minlength="8" name="current_password"
-                               aria-describedby="validationCurrentPasswordFeedback" placeholder="e.g. myOldPassword" required>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div id="validationCurrentPasswordFeedback" class="invalid-feedback">{{ __("Please provide a valid current password.") }}</div>
+                               aria-describedby="validationCurrentPasswordFeedbackHelp validationCurrentPasswordFeedback" placeholder="{{ __('views/profile/edit.current_password_input_placeholder') }}" required>
+                        <div id="validationNewPasswordConfirmationHelp" class="form-text">{{ __('views/profile/edit.current_password_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div id="validationCurrentPasswordFeedback" class="invalid-feedback">{{ __('views/profile/edit.current_password_validation_error') }}</div>
                     </div>
                     <div class="mb-2">
-                        <label for="validationNewPassword" class="form-label fw-bold">New Password</label>
+                        <label for="validationNewPassword" class="form-label fw-bold">{{ __('views/profile/edit.new_password_label') }}</label>
                         <input type="password" class="form-control" id="validationNewPassword" minlength="8" name="password"
-                               aria-describedby="validationNewPasswordHelp validationNewPasswordFeedback" placeholder="e.g. myNewPassword" required>
-                        <div id="validationNewPasswordHelp" class="form-text">Your new login password. (minimum 8 characters)</div>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div id="validationNewPasswordFeedback" class="invalid-feedback">{{ __("Please provide a valid password.") }}</div>
+                               aria-describedby="validationNewPasswordHelp validationNewPasswordFeedback" placeholder="{{ __('views/profile/edit.new_password_input_placeholder') }}" required>
+                        <div id="validationNewPasswordHelp" class="form-text">{{ __('views/profile/edit.new_password_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div id="validationNewPasswordFeedback" class="invalid-feedback">{{ __('views/profile/edit.new_password_validation_error') }}</div>
                     </div>
                     <div class="mb-2">
-                        <label for="validationNewPasswordConfirmation" class="form-label fw-bold">Confirm new Password</label>
+                        <label for="validationNewPasswordConfirmation" class="form-label fw-bold">{{ __('views/profile/edit.confirm_password_label') }}</label>
                         <input type="password" class="form-control" id="validationNewPasswordConfirmation" minlength="8" name="password_confirmation"
-                               aria-describedby="validationNewPasswordConfirmationHelp validationNewPasswordConfirmationFeedback" placeholder="e.g. myNewPassword" required>
-                        <div id="validationNewPasswordConfirmationHelp" class="form-text">Repeat your new password to confirm it.</div>
-                        <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                        <div id="validationNewPasswordConfirmationFeedback" class="invalid-feedback">{{ __("Please repeat your above password correct.") }}</div>
+                               aria-describedby="validationNewPasswordConfirmationHelp validationNewPasswordConfirmationFeedback" placeholder="{{ __('views/profile/edit.confirm_password_input_placeholder') }}" required>
+                        <div id="validationNewPasswordConfirmationHelp" class="form-text">{{ __('views/profile/edit.confirm_password_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div id="validationNewPasswordConfirmationFeedback" class="invalid-feedback">{{ __('views/profile/edit.confirm_password_validation_error') }}</div>
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0">
-                    <button class="btn btn-primary" type="submit">Update Password</button>
+                    <button class="btn btn-primary" type="submit">{{ __('views/profile/edit.change_password_button') }}</button>
                 </div>
             </form>
         </div>
