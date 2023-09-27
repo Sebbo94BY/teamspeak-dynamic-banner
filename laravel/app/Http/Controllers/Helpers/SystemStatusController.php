@@ -30,7 +30,7 @@ class SystemStatusController extends Controller
     {
         $requirements = [];
 
-        $requirements['VERSION_ID']['name'] = 'PHP Version';
+        $requirements['VERSION_ID']['name'] = __('views/inc/system/systemstatus.accordion_section_php_version');
         $requirements['VERSION_ID']['current_value'] = PHP_VERSION_ID.' ('.PHP_VERSION.')';
         $requirements['VERSION_ID']['required_value'] = '>= 80100 (8.1.0)';
         $requirements['VERSION_ID']['severity'] = (PHP_VERSION_ID >= 80100) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
@@ -141,7 +141,7 @@ class SystemStatusController extends Controller
         $date_timezone = ini_get('date.timezone');
         $requirements['DATE_TIMEZONE']['name'] = 'PHP date.timezone';
         $requirements['DATE_TIMEZONE']['current_value'] = $date_timezone;
-        $requirements['DATE_TIMEZONE']['required_value'] = 'should be set';
+        $requirements['DATE_TIMEZONE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_php_ini_date_timezone_required_value');
         $requirements['DATE_TIMEZONE']['severity'] = (! empty(trim($date_timezone))) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
 
         return $requirements;
@@ -160,9 +160,9 @@ class SystemStatusController extends Controller
             $db_name = $exception;
         }
 
-        $requirements['TEST']['name'] = 'Database Connection';
-        $requirements['TEST']['current_value'] = (is_string($db_name)) ? 'Connected' : "Error: $db_name";
-        $requirements['TEST']['required_value'] = '`.env` should contain valid `DB_` settings';
+        $requirements['TEST']['name'] = __('views/inc/system/systemstatus.accordion_section_database_connection');
+        $requirements['TEST']['current_value'] = (is_string($db_name)) ? __('views/inc/system/systemstatus.accordion_section_database_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_database_connection_current_value_error', ['exception' => $db_name]);
+        $requirements['TEST']['required_value'] = __('views/inc/system/systemstatus.accordion_section_database_connection_required_value');
         $requirements['TEST']['severity'] = (is_string($db_name)) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         return $requirements;
@@ -181,27 +181,27 @@ class SystemStatusController extends Controller
             $db_name = $exception->getMessage();
         }
 
-        $requirements['DB_NAME']['name'] = 'Database Name';
+        $requirements['DB_NAME']['name'] = __('views/inc/system/systemstatus.accordion_section_database_name');
         $requirements['DB_NAME']['current_value'] = $db_name;
         $requirements['DB_NAME']['required_value'] = null;
         $requirements['DB_NAME']['severity'] = (is_string($db_name)) ? SystemStatusSeverity::Info : SystemStatusSeverity::Danger;
 
         $username = config('database.connections.'.Config::get('database.default').'.username');
-        $requirements['DB_USER']['name'] = 'Database User';
+        $requirements['DB_USER']['name'] = __('views/inc/system/systemstatus.accordion_section_database_user');
         $requirements['DB_USER']['current_value'] = $username;
-        $requirements['DB_USER']['required_value'] = null;
-        $requirements['DB_USER']['severity'] = SystemStatusSeverity::Info;
+        $requirements['DB_USER']['required_value'] = __('views/inc/system/systemstatus.accordion_section_database_user_required_value');
+        $requirements['DB_USER']['severity'] = ($username != 'root') ? SystemStatusSeverity::Info : SystemStatusSeverity::Warning;
 
         $charset = config('database.connections.'.Config::get('database.default').'.charset');
-        $requirements['CHARACTER_SET']['name'] = 'Character Set';
+        $requirements['CHARACTER_SET']['name'] = __('views/inc/system/systemstatus.accordion_section_database_character_set');
         $requirements['CHARACTER_SET']['current_value'] = $charset;
-        $requirements['CHARACTER_SET']['required_value'] = 'should be utf8-like';
+        $requirements['CHARACTER_SET']['required_value'] = __('views/inc/system/systemstatus.accordion_section_database_character_set_required_value');
         $requirements['CHARACTER_SET']['severity'] = (preg_match('/^utf8/', $charset)) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
 
         $collation = config('database.connections.'.Config::get('database.default').'.collation');
-        $requirements['COLLATION']['name'] = 'Collation';
+        $requirements['COLLATION']['name'] = __('views/inc/system/systemstatus.accordion_section_database_collation');
         $requirements['COLLATION']['current_value'] = $collation;
-        $requirements['COLLATION']['required_value'] = 'should be utf8-like';
+        $requirements['COLLATION']['required_value'] = __('views/inc/system/systemstatus.accordion_section_database_collation_required_value');
         $requirements['COLLATION']['severity'] = (preg_match('/^utf8/', $collation)) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
 
         return $requirements;
@@ -215,15 +215,12 @@ class SystemStatusController extends Controller
         $requirements = [];
 
         $requirements['STORAGE_FRAMEWORK_DIR']['name'] = storage_path('framework');
-        $requirements['STORAGE_FRAMEWORK_DIR']['required_value'] = 'must be writeable';
         $requirements['STORAGE_FRAMEWORK_DIR']['severity'] = (is_writable(storage_path('framework'))) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         $requirements['STORAGE_LOGS_DIR']['name'] = storage_path('logs');
-        $requirements['STORAGE_LOGS_DIR']['required_value'] = 'must be writeable';
         $requirements['STORAGE_LOGS_DIR']['severity'] = (is_writable(storage_path('logs'))) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         $requirements['PUBLIC_DIR']['name'] = public_path();
-        $requirements['PUBLIC_DIR']['required_value'] = 'must be writeable';
         $requirements['PUBLIC_DIR']['severity'] = (is_writable(public_path())) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         return $requirements;
@@ -244,9 +241,9 @@ class SystemStatusController extends Controller
             $redis_connection_exception = $connection_exception->getMessage();
         }
 
-        $requirements['TEST']['name'] = 'Redis Connection';
-        $requirements['TEST']['current_value'] = ($reachable) ? 'Connected' : $redis_connection_exception;
-        $requirements['TEST']['required_value'] = '`.env` should contain valid `REDIS_` settings';
+        $requirements['TEST']['name'] = __('views/inc/system/systemstatus.accordion_section_redis_connection');
+        $requirements['TEST']['current_value'] = ($reachable) ? __('views/inc/system/systemstatus.accordion_section_redis_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_redis_connection_current_value_error', ['exception' => $redis_connection_exception]);
+        $requirements['TEST']['required_value'] = __('views/inc/system/systemstatus.accordion_section_redis_connection_required_value');
         $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         return $requirements;
@@ -259,11 +256,11 @@ class SystemStatusController extends Controller
     {
         $requirements = [];
 
-        $requirements['PHP_VERSION']['name'] = 'PHP Version';
+        $requirements['PHP_VERSION']['name'] = __('views/inc/system/systemstatus.accordion_section_version_php');
         $requirements['PHP_VERSION']['current_value'] = PHP_VERSION;
         $requirements['PHP_VERSION']['severity'] = SystemStatusSeverity::Info;
 
-        $requirements['LARAVEL_VERSION']['name'] = 'Laravel Version';
+        $requirements['LARAVEL_VERSION']['name'] = __('views/inc/system/systemstatus.accordion_section_version_laravel');
         $requirements['LARAVEL_VERSION']['current_value'] = Application::VERSION;
         $requirements['LARAVEL_VERSION']['severity'] = SystemStatusSeverity::Info;
 
@@ -277,29 +274,29 @@ class SystemStatusController extends Controller
     {
         $requirements = [];
 
-        $requirements['IS_GIT_DEPLOYMENT']['name'] = 'Is Git Deployment';
-        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../.git/')) ? 'Yes' : 'No';
+        $requirements['IS_GIT_DEPLOYMENT']['name'] = __('views/inc/system/systemstatus.accordion_section_various_git_deployment');
+        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../.git/')) ? __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_yes') : __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_no');
         $requirements['IS_GIT_DEPLOYMENT']['required_value'] = null;
         $requirements['IS_GIT_DEPLOYMENT']['severity'] = SystemStatusSeverity::Info;
 
-        $requirements['APP_ENVIRONMENT']['name'] = 'Application Environment';
+        $requirements['APP_ENVIRONMENT']['name'] = __('views/inc/system/systemstatus.accordion_section_various_app_env');
         $requirements['APP_ENVIRONMENT']['current_value'] = Config::get('app.env');
-        $requirements['APP_ENVIRONMENT']['required_value'] = 'should be set to `production` in production';
+        $requirements['APP_ENVIRONMENT']['required_value'] = __('views/inc/system/systemstatus.accordion_section_various_app_env_required_value');
         $requirements['APP_ENVIRONMENT']['severity'] = SystemStatusSeverity::Info;
 
-        $requirements['APP_DEBUG']['name'] = 'Application Debug';
-        $requirements['APP_DEBUG']['current_value'] = (Config::get('app.debug')) ? 'Enabled' : 'Disabled';
-        $requirements['APP_DEBUG']['required_value'] = 'should be disabled in production';
+        $requirements['APP_DEBUG']['name'] = __('views/inc/system/systemstatus.accordion_section_various_app_debug');
+        $requirements['APP_DEBUG']['current_value'] = (Config::get('app.debug')) ? __('views/inc/system/systemstatus.accordion_section_various_app_debug_current_value_enabled') : __('views/inc/system/systemstatus.accordion_section_various_app_debug_current_value_disabled');
+        $requirements['APP_DEBUG']['required_value'] = __('views/inc/system/systemstatus.accordion_section_various_app_debug_required_value');
         $requirements['APP_DEBUG']['severity'] = SystemStatusSeverity::Info;
 
         if (isset($_SERVER['SERVER_SOFTWARE'])) {
-            $requirements['SERVER_SOFTWARE']['name'] = 'Server Software';
+            $requirements['SERVER_SOFTWARE']['name'] = __('views/inc/system/systemstatus.accordion_section_various_server_software');
             $requirements['SERVER_SOFTWARE']['current_value'] = $_SERVER['SERVER_SOFTWARE'];
             $requirements['SERVER_SOFTWARE']['required_value'] = null;
             $requirements['SERVER_SOFTWARE']['severity'] = SystemStatusSeverity::Info;
         }
 
-        $requirements['PHP_BINARY']['name'] = 'PHP Binary';
+        $requirements['PHP_BINARY']['name'] = __('views/inc/system/systemstatus.accordion_section_various_php_binary');
         $requirements['PHP_BINARY']['current_value'] = PHP_BINARY;
         $requirements['PHP_BINARY']['required_value'] = null;
         $requirements['PHP_BINARY']['severity'] = SystemStatusSeverity::Info;
