@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Administration Users
+    {{ __('views/administration/users.users') }}
 @endsection
 
 @section('dataTables_script')
@@ -26,7 +26,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">User Administration</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/administration/users.users') }}</h1>
         </div>
     </div>
     <hr>
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#newUser">
-                New User
+                {{ __('views/administration/users.add_user_button') }}
             </button>
         </div>
     </div>
@@ -50,11 +50,11 @@
             <table class="table table-striped" id="roles">
                 <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">E-Mail</th>
-                    <th scope="col">Roles</th>
-                    <th scope="col">Registered since</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ __('views/administration/users.table_name') }}</th>
+                    <th scope="col">{{ __('views/administration/users.table_email') }}</th>
+                    <th scope="col">{{ __('views/administration/users.table_roles') }}</th>
+                    <th scope="col">{{ __('views/administration/users.table_registered_since') }}</th>
+                    <th scope="col">{{ __('views/administration/users.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -105,10 +105,10 @@
     <div class="row mt-3">
         <div class="col-lg-12">
             <p>
-                <span class="fw-bold">Legende:</span>
-                <span class="badge text-bg-danger">Super Admin</span>
-                <span class="badge text-bg-warning">Area Admin</span>
-                <span class="badge text-bg-primary">Limited Role</span>
+                <span class="fw-bold">{{ __('views/administration/users.legend_label') }}:</span>
+                <span class="badge text-bg-danger">{{ __('views/administration/users.legend_super_admin') }}</span>
+                <span class="badge text-bg-warning">{{ __('views/administration/users.legend_area_admin') }}</span>
+                <span class="badge text-bg-primary">{{ __('views/administration/users.legend_limited_role') }}</span>
             </p>
         </div>
     </div>
@@ -116,7 +116,7 @@
 
 @foreach($users as $userEdit)
     @can('edit users')
-        @include('modals.administration.modal-edit', ['userEdit'=>$userEdit])
+        @include('modals.administration.modal-edit-user', ['userEdit'=>$userEdit])
     @endcan
     @can('delete users')
         @if (Auth::user()->id != $userEdit->id)
@@ -127,7 +127,7 @@
 @endforeach
 
 @can('add users')
-    @include('modals.administration.modal-add')
+    @include('modals.administration.modal-add-user')
 @endcan
 
 @endsection
