@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Templates
+    {{ __('views/templates.templates') }}
 @endsection
 
 @section('dataTables_script')
@@ -26,7 +26,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Templates</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/templates.templates') }}</h1>
         </div>
     </div>
     <hr>
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addTemplate">
-                Add Template
+                {{ __('views/templates.add_template') }}
             </button>
         </div>
     </div>
@@ -49,9 +49,9 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    No templates have been uploaded yet!
+                    {{ __('views/templates.no_template_added_yet') }}
                     @can('add templates')
-                    <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addTemplate">Upload a new template now.</button>
+                    <button class="btn btn-link p-0" type="button" data-bs-toggle="modal" data-bs-target="#addTemplate">{{ __('views/templates.add_template') }}</button>
                     @endcan
                 </div>
             </div>
@@ -62,9 +62,9 @@
             <table class="table table-striped" id="templates">
                 <thead>
                 <tr>
-                    <th scope="col">Banner</th>
-                    <th scope="col">Alias</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">{{ __('views/templates.table_template') }}</th>
+                    <th scope="col">{{ __('views/templates.table_information') }}</th>
+                    <th scope="col">{{ __('views/templates.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -74,10 +74,10 @@
                         <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded w-75" src="{{ asset($template->file_path_original.'/'.$template->filename) }}" alt="{{ $template->alias }}">
                     </td>
                     <td class="col-lg-3">
-                        <p class="fw-bold">{{ $template->alias }}</p>
-                        <p>File Size: {{ ceil(filesize($template->file_path_original.'/'.$template->filename) / 1024) }} KiB</p>
-                        <p>File Dimensions: {{ $template->width }}x{{ $template->height }} Pixel</p>
-                        <p>Last Modified: {{ date('d.m.Y', strtotime($template->updated_at)) }}</p>
+                        <p>{{ __('views/templates.table_alias') }}: <b>{{ $template->alias }}</b></p>
+                        <p>{{ __('views/templates.table_file_size') }}: {{ ceil(filesize($template->file_path_original.'/'.$template->filename) / 1024) }} KiB</p>
+                        <p>{{ __('views/templates.table_file_dimensions') }}: {{ $template->width }}x{{ $template->height }} Pixel</p>
+                        <p>{{ __('views/templates.table_last_modified') }}: {{ date('d.m.Y', strtotime($template->updated_at)) }}</p>
                     </td>
                     <td class="col-lg-2">
                         @can('edit templates')
