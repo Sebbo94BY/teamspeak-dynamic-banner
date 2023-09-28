@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Instances
+    {{ __('views/instances.instances') }}
 @endsection
 
 @section('dataTables_config')
@@ -26,7 +26,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Instances</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/instances.instances') }}</h1>
         </div>
     </div>
     <hr>
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAddInstance">
-                Add Instance
+                {{ __('views/instances.add_instance') }}
             </button>
         </div>
     </div>
@@ -49,9 +49,9 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
-                There is no instance configured yet!
+                {{ __('views/instances.no_instance_added_yet') }}
                 @can('add instances')
-                    <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalAddInstance">Add a new instance now.</button>
+                    <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#modalAddInstance">{{ __('views/instances.add_instance') }}</button>
                 @endcan
             </div>
         </div>
@@ -62,12 +62,12 @@
             <table class="table table-striped" id="instances">
                 <thead>
                 <tr>
-                    <th scope="col">Status</th>
-                    <th scope="col">Server Name</th>
-                    <th scope="col">Host</th>
-                    <th scope="col">Voice Port</th>
-                    <th scope="col">Client Nickname</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ __('views/instances.table_status') }}</th>
+                    <th scope="col">{{ __('views/instances.table_server_name') }}</th>
+                    <th scope="col">{{ __('views/instances.table_host') }}</th>
+                    <th scope="col">{{ __('views/instances.table_voice_port') }}</th>
+                    <th scope="col">{{ __('views/instances.table_client_nickname') }}</th>
+                    <th scope="col">{{ __('views/instances.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -75,11 +75,14 @@
                 <tr>
                     <td class="col-lg-1">
                         @if(is_null($instance->process))
-                            <span class="badge text-bg-danger">Stopped</span>
+                            <span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-html="true"
+                                title="{{ __('views/instances.table_status_stopped_title') }}"
+                                id="status-badge-stopped">{{ __('views/instances.table_status_stopped') }}
+                            </span>
                         @else
                             <span class="badge text-bg-success" data-bs-toggle="tooltip" data-bs-html="true"
-                                  title="PID <b>{{ $instance->process->process_id }}</b> is active since <b>{{ $instance->process->created_at }} UTC</b>."
-                                  id="status-badge">Connected
+                                title="{!! __('views/instances.table_status_running_title', ['process_id' => $instance->process->process_id, 'started_at' => $instance->process->created_at]) !!}"
+                                id="status-badge-running">{{ __('views/instances.table_status_running') }}
                             </span>
                         @endif
                     </td>
@@ -90,13 +93,13 @@
                         {{ $instance->host }}
                         @if($instance->is_ssh)
                             <span class="badge text-bg-success ms-2" data-bs-toggle="tooltip" data-bs-html="true"
-                                  title="{{ $instance->serverquery_port }} (TCP)"
-                                  id="instance-port-ssh-badge">SSH
+                                title="{{ $instance->serverquery_port }} (TCP)"
+                                id="instance-port-ssh-badge">SSH
                             </span>
                         @else
                             <span class="badge text-bg-warning ms-2" data-bs-toggle="tooltip" data-bs-html="true"
-                                  title="{{ $instance->serverquery_port }} (TCP)"
-                                  id="instance-port-raw-badge">RAW
+                                title="{{ $instance->serverquery_port }} (TCP)"
+                                id="instance-port-raw-badge">RAW
                             </span>
                         @endif
                     </td>
@@ -146,6 +149,7 @@
     @endif
 </div>
 @include('modals.instance.modal-add')
+
 @foreach($instances as $instanceModal)
     @can('edit instances')
         @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal,'channel_list'=>$channel_list])
