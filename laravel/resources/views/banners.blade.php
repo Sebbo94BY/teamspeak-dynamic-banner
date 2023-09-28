@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Banners
+    {{ __('views/banners.banners') }}
 @endsection
 
 @section('dataTables_script')
@@ -31,7 +31,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Banners</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/banners.banners') }}</h1>
         </div>
     </div>
     <hr>
@@ -42,7 +42,7 @@
         <div class="row">
             <div class="col-lg-3">
                 <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBanner">
-                    Add Banner
+                    {{ __('views/banners.add_banner') }}
                 </button>
             </div>
         </div>
@@ -57,9 +57,11 @@
         <div class="col-lg-12">
             <div class="alert alert-primary" role="alert">
                 @if($instance_list->count() > 0)
-                    There are no Banners configured! <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBanner">Add now a new Banner</button>
+                    {{ __('views/banners.no_banner_added_yet') }}
+                    <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBanner">{{ __('views/banners.add_banner') }}</button>
                 @else
-                    You don’t have any instances configured yet. <a class="btn btn-link p-0" href="{{Route('instances')}}">Add an Instance first!</a>
+                    {{ __('views/banners.no_instances_added_yet') }}
+                    <a class="btn btn-link p-0" href="{{Route('instances')}}">{{ __('views/banners.add_instance') }}</a>
                 @endif
             </div>
         </div>
@@ -70,10 +72,10 @@
             <table class="table table-striped" id="banners">
                 <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Instance</th>
-                    <th scope="col">Templates in use</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ __('views/banners.table_name') }}</th>
+                    <th scope="col">{{ __('views/banners.table_instance') }}</th>
+                    <th scope="col">{{ __('views/banners.table_templates_in_use') }}</th>
+                    <th scope="col">{{ __('views/banners.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
