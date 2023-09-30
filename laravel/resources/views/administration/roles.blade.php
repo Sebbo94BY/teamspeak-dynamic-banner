@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Administration Roles and Permission
+    {{ __('views/administration/roles.roles_and_permissions') }}
 @endsection
 
 @section('dataTables_script')
@@ -26,7 +26,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Administration Roles and Permission</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/administration/roles.roles_and_permissions') }}</h1>
         </div>
     </div>
     <hr>
@@ -37,9 +37,9 @@
             <table class="table table-striped" id="roles">
                 <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Members</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ __('views/administration/roles.table_name') }}</th>
+                    <th scope="col">{{ __('views/administration/roles.table_members') }}</th>
+                    <th scope="col">{{ __('views/administration/roles.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>

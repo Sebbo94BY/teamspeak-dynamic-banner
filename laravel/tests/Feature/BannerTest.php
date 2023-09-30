@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Banner;
 use App\Models\Instance;
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -25,7 +26,7 @@ class BannerTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
         $this->user->syncRoles('Banners Admin');
 
         $this->instance = Instance::factory()->create();

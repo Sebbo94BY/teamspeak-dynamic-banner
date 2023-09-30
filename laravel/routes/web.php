@@ -34,15 +34,15 @@ Auth::routes(['register' => false]);
 
 Route::get('/', function () {
     if (User::all()->count() == 0) {
-        return Redirect::route('setup.installer.requirements');
+        return Redirect::route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]);
     }
 
     return Redirect::route('dashboard');
 });
 
 Route::middleware(['guest'])->group(function () {
-    Route::get('/setup/installer/requirements', [RequirementsController::class, 'show_view'])->name('setup.installer.requirements');
-    Route::get('/setup/installer/user', [UserController::class, 'show_view'])->name('setup.installer.user');
+    Route::get('/{locale}/setup/installer/requirements', [RequirementsController::class, 'show_view'])->name('setup.installer.requirements');
+    Route::get('/{locale}/setup/installer/user', [UserController::class, 'show_view'])->name('setup.installer.user');
     Route::post('/setup/installer/user/add', [UserController::class, 'create'])->name('setup.installer.user.create');
 });
 

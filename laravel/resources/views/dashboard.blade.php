@@ -11,12 +11,12 @@
             <div class="col d-flex">
                 <div class="card flex-fill">
                     <div class="card-body">
-                        <h5 class="card-title">{{ $instances_count }} {{ \Illuminate\Support\Str::plural("Instance", $instances_count) }}</h5>
-                        <p class="card-text">An instance can be seen as data source for the banners.</p>
+                        <h5 class="card-title">{{ trans_choice('views/dashboard.instances_count_title', $instances_count, ['instances_count' => $instances_count]) }}</h5>
+                        <p class="card-text">{{ __("views/dashboard.instances_count_text") }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-0">
                         @can('view instances')
-                        <a href="{{ Route('instances') }}" class="btn btn-primary">Instances</a>
+                        <a href="{{ route('instances') }}" class="btn btn-primary">{{ __("views/dashboard.instances_button") }}</a>
                         @endcan
                     </div>
                 </div>
@@ -24,12 +24,12 @@
             <div class="col d-flex">
                 <div class="card flex-fill">
                     <div class="card-body">
-                        <h5 class="card-title">{{ $templates_count }} {{ \Illuminate\Support\Str::plural("Template", $templates_count) }}</h5>
-                        <p class="card-text">A template defines the design of your banner.</p>
+                        <h5 class="card-title">{{ trans_choice('views/dashboard.templates_count_title', $templates_count, ['templates_count' => $templates_count]) }}</h5>
+                        <p class="card-text">{{ __("views/dashboard.templates_count_text") }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-0">
                         @can('view templates')
-                        <a href="{{ Route('templates') }}" class="btn btn-primary">Templates</a>
+                        <a href="{{ route('templates') }}" class="btn btn-primary">{{ __("views/dashboard.templates_button") }}</a>
                         @endcan
                     </div>
                 </div>
@@ -37,12 +37,12 @@
             <div class="col d-flex">
                 <div class="card flex-fill">
                     <div class="card-body">
-                        <h5 class="card-title">{{ $banners_count }} {{ \Illuminate\Support\Str::plural("Banner", $banners_count) }}</h5>
-                        <p class="card-text">The actual dynamic banner configurations, which use your instances and templates.</p>
+                        <h5 class="card-title">{{ trans_choice('views/dashboard.banners_count_title', $banners_count, ['banners_count' => $banners_count]) }}</h5>
+                        <p class="card-text">{{ __("views/dashboard.banners_count_text") }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-0">
                         @can('view banners')
-                        <a href="{{ Route('banners') }}" class="btn btn-primary">Banners</a>
+                        <a href="{{ route('banners') }}" class="btn btn-primary">{{ __("views/dashboard.banners_button") }}</a>
                         @endcan
                     </div>
                 </div>

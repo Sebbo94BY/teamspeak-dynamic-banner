@@ -6,6 +6,7 @@ use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Banner;
 use App\Models\BannerTemplate;
 use App\Models\Instance;
+use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,7 +27,7 @@ class BannerTemplateTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
         $this->user->syncRoles('Banners Admin');
 
         $this->banner = Banner::factory()->for(

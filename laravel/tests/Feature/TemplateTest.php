@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,7 +23,7 @@ class TemplateTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->for(Localization::factory()->create())->create();
         $this->user->syncRoles('Templates Admin');
 
         $this->template = Template::factory()->create();

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Middleware;
 
+use App\Models\Localization;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,7 +26,7 @@ class RedirectIfAuthenticatedTest extends TestCase
      */
     public function test_redirect_to_dashboard_if_authenticated(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->for(Localization::factory()->create())->create();
 
         $response = $this->actingAs($user)->get(route('login'));
         $response->assertRedirect(RouteServiceProvider::HOME);

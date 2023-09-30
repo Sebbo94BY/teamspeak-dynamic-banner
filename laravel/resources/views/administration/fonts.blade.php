@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Fonts
+    {{ __('views/administration/fonts.fonts') }}
 @endsection
 
 @section('dataTables_script')
@@ -20,7 +20,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Fonts</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/administration/fonts.fonts') }}</h1>
         </div>
     </div>
     <hr>
@@ -30,7 +30,7 @@
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addFont">
-                Add Font
+                {{ __('views/administration/fonts.add_font_button') }}
             </button>
         </div>
     </div>
@@ -45,9 +45,9 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="alert alert-primary" role="alert">
-                        There are no Fonts Uploaded!
+                        {{ __('views/administration/fonts.no_fonts_uploaded_info') }}
                         @can('add fonts')
-                            <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addFont">Add Font now</button>
+                            <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addFont">{{ __('views/administration/fonts.add_font_button') }}</button>
                         @endcan
                     </div>
                 </div>
@@ -60,8 +60,8 @@
             <table class="table table-striped" id="fonts">
                 <thead>
                 <tr>
-                    <th class="col-lg-8">Filename</th>
-                    <th class="col-lg-2">Last Modified</th>
+                    <th class="col-lg-8">{{ __('views/administration/fonts.table_filename') }}</th>
+                    <th class="col-lg-2">{{ __('views/administration/fonts.table_last_modified') }}</th>
                     <th class="col-lg-2"></th>
                 </tr>
                 </thead>

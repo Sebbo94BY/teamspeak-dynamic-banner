@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('site_title')
-    Banner template
+    {{ __('views/banner/template.banner_templates') }}
 @endsection
 
 @section('dataTables_script')
@@ -20,7 +20,7 @@
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Banner template</h1>
+            <h1 class="fw-bold fs-3">{{ __('views/banner/template.banner_templates') }}</h1>
         </div>
     </div>
     <hr>
@@ -30,7 +30,7 @@
     <div class="row">
         <div class="col-lg-3">
             <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">
-                Add Banner Template
+                {{ __('views/banner/template.add_banner_template_button') }}
             </button>
         </div>
     </div>
@@ -43,9 +43,9 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
-                    There are no templates configured!
+                    {{ __('views/banner/template.no_banner_templates_added_info') }}
                     @can('add templates')
-                        <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">Define a new template now</button>
+                        <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">{{ __('views/banner/template.add_banner_template_button') }}</button>
                     @endcan
                 </div>
             </div>
@@ -56,18 +56,18 @@
             <table class="table table-striped" id="templates">
                 <thead>
                 <tr>
-                    <th scope="col">Banner</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">{{ __('views/banner/template.table_name') }}</th>
+                    <th scope="col">{{ __('views/banner/template.table_template') }}</th>
+                    <th scope="col">{{ __('views/banner/template.table_actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($banner->templates as $banner_template)
                 <tr>
+                    <td class="col-lg-5">{{$banner_template->name}}</td>
                     <td class="col-lg-6 text-start">
                         <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
                     </td>
-                    <td class="col-lg-5">{{$banner_template->name}}</td>
                     <td class="col-lg-1 text-end">
                         <div class="d-flex">
                             @if ($banner_template->enabled)

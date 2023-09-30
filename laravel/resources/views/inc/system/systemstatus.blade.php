@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="alert alert-success" role="alert">
-                    There are no problems with your installation.
+                    {{ __('views/inc/system/systemstatus.installation_has_no_errors') }}
                 </div>
             </div>
         </div>
@@ -12,7 +12,7 @@
         <div class="row mt-2">
             <div class="col-lg-12">
                 <div class="alert alert-warning" role="alert">
-                    Your installation has {{ $system_status_warning_count }} {{ \Illuminate\Support\Str::plural("warning", $system_status_warning_count) }}, which you might want to fix for the best software experience.
+                    {{ trans_choice('views/inc/system/systemstatus.installation_has_warnings', $system_status_warning_count, ['warning_count' => $system_status_warning_count]) }}
                 </div>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <div class="row mt-2">
             <div class="col-lg-12">
                 <div class="alert alert-danger" role="alert">
-                    Your installation has {{ $system_status_danger_count }} critical {{ \Illuminate\Support\Str::plural("issue", $system_status_danger_count) }}, which you need to fix that everything works properly.
+                    {{ trans_choice('views/inc/system/systemstatus.installation_has_critical_errors', $system_status_danger_count, ['danger_count' => $system_status_danger_count]) }}
                 </div>
             </div>
         </div>
@@ -36,15 +36,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusPHPHeading">
                 <a class="accordion-button @if($php_warning_count == 0  && $php_error_count == 0 ) collapsed @endif fw-bold bg-light text-decoration-none" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusPHP" aria-expanded="false" aria-controls="accordionSystemStatusPHP">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">PHP</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_php') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($php_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($php_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -78,7 +78,7 @@
                             @php $descStatus = true; @endphp
                             @foreach($php_status_extension as $key => $extension)
                                 <tr>
-                                    <td class="border-0">@if($descStatus == true) PHP Extensions @php $descStatus = false; @endphp @endif</td>
+                                    <td class="border-0">@if($descStatus == true) {{ __('views/inc/system/systemstatus.accordion_section_php_extensions') }} @php $descStatus = false; @endphp @endif</td>
                                     <td class="border-0">
                                         @switch($extension->severity)
                                             @case('success')
@@ -128,15 +128,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusDatabaseHeading">
                 <a class="accordion-button @if($db_warning_count == 0  && $db_error_count == 0 ) collapsed @endif fw-bold bg-light text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusDatabase" aria-expanded="true" aria-controls="accordionSystemStatusDatabase">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">Database</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_database') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($db_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($db_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -204,15 +204,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusPermissionHeading">
                 <a class="accordion-button fw-bold bg-light text-decoration-none @if($permission_warning_count == 0  && $permission_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusPermission" aria-expanded="true" aria-controls="accordionSystemStatusPermission">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">Permissions</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_permissions') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($permission_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($permission_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -233,7 +233,7 @@
                                 <tr>
                                     <td class="border-0">
                                         @if($descStatus == true)
-                                            Directories <code>{{$permissions->required_value}}</code></td>
+                                            {{ __('views/inc/system/systemstatus.accordion_section_permissions_directories') }} <code>{{ __('views/inc/system/systemstatus.accordion_section_permissions_directories_required_value') }}</code></td>
                                             @php $descStatus = false;  @endphp
                                         @endif
                                     <td class="border-0">
@@ -264,15 +264,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusRedisHeading">
                 <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($redis_warning_count == 0  && $redis_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusRedis" aria-expanded="false" aria-controls="accordionSystemStatusRedis">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">Redis</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_redis') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($redis_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($redis_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -320,15 +320,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusVersionHeading">
                 <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($version_warning_count == 0  && $version_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusVersion" aria-expanded="false" aria-controls="accordionSystemStatusVersion">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">Version</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_version') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($version_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($version_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -366,15 +366,15 @@
                                 </tr>
                             @endforeach
                             <tr>
-                                <td class="border-0">Bootstrap Version</td>
+                                <td class="border-0">{{ __('views/inc/system/systemstatus.accordion_section_version_bootstrap') }}</td>
                                 <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="bootstrap_version"></span></td>
                             </tr>
                             <tr>
-                                <td class="border-0">Datatable Version</td>
+                                <td class="border-0">{{ __('views/inc/system/systemstatus.accordion_section_version_datatable') }}</td>
                                 <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="datatable_version"></span></td>
                             </tr>
                             <tr>
-                                <td class="border-0">jQuery Version</td>
+                                <td class="border-0">{{ __('views/inc/system/systemstatus.accordion_section_version_jquery') }}</td>
                                 <td class="border-0"><i class="fa-solid fa-info-circle text-info me-3"></i><span id="jquery_version"></span></td>
                             </tr>
                             </tbody>
@@ -387,15 +387,15 @@
             <h2 class="accordion-header" id="accordionSystemStatusVariousHeading">
                 <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($various_warning_count == 0  && $various_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusVarious" aria-expanded="false" aria-controls="accordionSystemStatusVarious">
                     <div class="col-lg-9">
-                        <span class="fs-5 fw-bold text-dark">Various</span>
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_various') }}</span>
                     </div>
                     <div class="col-lg-2 me-5">
                         @if($various_error_count > 0)
-                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> Error</span>
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
                         @elseif($various_warning_count > 0)
-                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> Warning</span>
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
                         @else
-                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> Operational</span>
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
                         @endif
                     </div>
                 </a>
@@ -442,11 +442,11 @@
     </div>
     <div class="row mt-3">
         <div class="col-lg-12">
-            <p><span class="fw-bold">Legende:</span>
-                <i class="fa-solid fa-circle-check text-success"></i> Good (no issues),
-                <i class="fa-solid fa-triangle-exclamation text-warning"></i> Warning (limited functionality),
-                <i class="fa-solid fa-circle-xmark text-danger"></i> Misconfiguration (something will not work),
-                <i class="fa-solid fa-circle-info text-info"></i> Information (just for your information)
+            <p><span class="fw-bold">{{ __('views/inc/system/systemstatus.legend_label') }}:</span>
+                <i class="fa-solid fa-circle-check text-success"></i> {{ __('views/inc/system/systemstatus.icon_operational') }},
+                <i class="fa-solid fa-triangle-exclamation text-warning"></i> {{ __('views/inc/system/systemstatus.icon_warning') }},
+                <i class="fa-solid fa-circle-xmark text-danger"></i> {{ __('views/inc/system/systemstatus.icon_error') }},
+                <i class="fa-solid fa-circle-info text-info"></i> {{ __('views/inc/system/systemstatus.icon_information') }}
             </p>
         </div>
     </div>

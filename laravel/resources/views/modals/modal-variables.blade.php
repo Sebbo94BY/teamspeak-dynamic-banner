@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5 fw-bold" id="modalAvailableVariables-{{$instanceVariableModal->id}}-Label">Available Variables</h1>
+                <h1 class="modal-title fs-5 fw-bold" id="modalAvailableVariables-{{$instanceVariableModal->id}}-Label">{{ __('views/modals/modal-variables.available_variables') }}</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -15,8 +15,8 @@
                     <table class="table" id="availableVariables">
                         <thead>
                         <tr>
-                            <th scope="col">Variable</th>
-                            <th scope="col">Current Value</th>
+                            <th scope="col">{{ __('views/modals/modal-variables.table_variable_name') }}</th>
+                            <th scope="col">{{ __('views/modals/modal-variables.table_variable_value') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -32,7 +32,7 @@
                 @endif
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('views/modals/modal-variables.dismiss_button') }}</button>
             </div>
         </div>
     </div>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -10,6 +11,8 @@ use Tests\TestCase;
 class AdministrationUsersTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected Localization $localization;
 
     protected User $user;
 
@@ -20,7 +23,9 @@ class AdministrationUsersTest extends TestCase
         // Run the DatabaseSeeder
         $this->seed();
 
-        $this->user = User::factory()->create();
+        $this->localization = Localization::factory()->create();
+
+        $this->user = User::factory()->for($this->localization)->create();
         $this->user->syncRoles('Users Admin');
     }
 
@@ -110,7 +115,7 @@ class AdministrationUsersTest extends TestCase
      */
     public function test_updating_an_existing_user_requires_to_match_the_request_rules(): void
     {
-        $other_user = User::factory()->create();
+        $other_user = User::factory()->for($this->localization)->create();
 
         $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'email' => fake()->email(),
@@ -136,7 +141,7 @@ class AdministrationUsersTest extends TestCase
      */
     public function test_updating_an_existing_user_successfully_assigns_the_respective_roles(): void
     {
-        $other_user = User::factory()->create();
+        $other_user = User::factory()->for($this->localization)->create();
 
         $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'name' => fake()->name(),
@@ -157,7 +162,7 @@ class AdministrationUsersTest extends TestCase
      */
     public function test_updating_an_existing_user_is_working_as_expected(): void
     {
-        $other_user = User::factory()->create();
+        $other_user = User::factory()->for($this->localization)->create();
 
         $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'name' => fake()->name(),
@@ -173,7 +178,7 @@ class AdministrationUsersTest extends TestCase
      */
     public function test_delete_user_returns_the_edit_form_when_the_given_uid_exists(): void
     {
-        $other_user = User::factory()->create();
+        $other_user = User::factory()->for($this->localization)->create();
 
         $response = $this->actingAs($this->user)->delete(route('administration.user.delete', ['user_id' => $other_user->id]));
         $response->assertRedirectToRoute('administration.users');
