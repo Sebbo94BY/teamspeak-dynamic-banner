@@ -1,14 +1,14 @@
 @extends('layout')
 
 @section('site_title')
-    Banner configuration
+    {{ __('views/banner/configuration.banner_configuration') }}
 @endsection
 
 @section('content')
 <div class="container mt-3">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="fw-bold fs-3">Banner configuration for "{{$banner_template->banner->name}}"</h1>
+            <h1 class="fw-bold fs-3">{{ $banner_template->banner->name }} / {{ $banner_template->name }} / {{ __('views/banner/configuration.banner_configuration') }}</h1>
         </div>
     </div>
     <hr>
@@ -19,7 +19,7 @@
             <a class="btn btn-primary btn-sm fw-bold" href="#modalAvailableVariables-{{$banner_template->banner->instance_id}}" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$instance->first()->id}}"><i class="fa-solid fa-square-root-variable fa-lg me-2"></i></a>
         </div>
         <div class="col-lg-1 d-grid">
-            <a class="btn btn-secondary btn-sm fw-bold" href="{{ route('banner.templates', ['banner_id'=>$banner_template->banner_id]) }}">Back</a>
+            <a class="btn btn-secondary btn-sm fw-bold" href="{{ route('banner.templates', ['banner_id'=>$banner_template->banner_id]) }}">{{ __('views/banner/configuration.back_button') }}</a>
         </div>
     </div>
     <hr>
@@ -28,36 +28,30 @@
     @include('inc.standard-alerts')
     <div class="row">
         <div class="col-lg-6">
-            <p class="fs-5 m-0 mb-3 fw-bold">Preview with Grid System</p>
+            <p class="fs-5 m-0 mb-3 fw-bold">{{ __('views/banner/configuration.preview_with_grid_system') }}</p>
             <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="templateWithGrid" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
         <div class="col-lg-6">
-            <p class="fs-5 m-0 mb-3 fw-bold">Preview</p>
+            <p class="fs-5 m-0 mb-3 fw-bold">{{ __('views/banner/configuration.preview_without_grid_system') }}</p>
             <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="renderedTemplate" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
         </div>
     </div>
     <hr>
     <div class="row">
         <div class="col-lg-12">
-            <p class="fs-5 m-0 mb-2 fw-bold">About the Grid System</p>
-            <p>With the help of the grid system, you are able to faster identify, which X-Y-Coordinates you need to put your text at the correct position.<br>
-                Each horizontal and vertical line of the grid system represents 25px. In the left top corner, X and Y is 0px.
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <p class="m-0 fw-bold">Get X-Y-Coordinates</p>
-            <p class="m-0 text-muted">Click on the position in the Grid System Image to get the X-Y-Coordinates</p>
+            <p class="fs-5 m-0 mb-2 fw-bold">{{ __('views/banner/configuration.about_grid_system') }}</p>
+            <p class="m-0 text-muted">{{ __('views/banner/configuration.grid_system_purpose') }}</p>
+            <p class="m-0 text-muted">{{ __('views/banner/configuration.get_x_y_coordinates_on_click') }}</p>
+            <p class="m-0 text-muted">{{ __('views/banner/configuration.grid_system_explanation') }}</p>
         </div>
     </div>
     <div class="row mt-2">
         <div class="col-lg-3">
-            <label for="x_coordinate_preview" class="form-label">X-Coordinate (horizontal)</label>
+            <label for="x_coordinate_preview" class="form-label">{{ __('views/banner/configuration.x_coordinate') }}</label>
             <input type="number" class="form-control" name="x_coordinate_preview" id="x_coordinate_preview" min="0" max="{{ $banner_template->template->width }}" value="0" readonly>
         </div>
         <div class="col-lg-3">
-            <label for="y_coordinate_preview" class="form-label">Y-Coordinate (vertical)</label>
+            <label for="y_coordinate_preview" class="form-label">{{ __('views/banner/configuration.y_coordinate') }}</label>
             <input type="number" class="form-control" name="y_coordinate_preview" id="y_coordinate_preview" min="0" max="{{ $banner_template->template->height }}" value="0" readonly>
         </div>
     </div>
@@ -67,19 +61,20 @@
             @method('patch')
             @csrf
             <div class="col-lg-12">
-                <div class="accordion" id="accordionPanelsStayOpen">
+                <div class="accordion">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="NameHeading">
-                            <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#name" aria-expanded="true" aria-controls="name">
-                                Name
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#name" aria-expanded="true" aria-controls="name">
+                                {{ __('views/banner/configuration.name_accordion_headline') }}
                             </a>
                         </h2>
-                        <div id="name" class="accordion-collapse collapse show" aria-labelledby="NameHeading">
+                        <div id="name" class="accordion-collapse collapse" aria-labelledby="NameHeading">
                             <div class="accordion-body">
-                                <input class="form-control" id="validationName" type="text" name="name" value="{{ old('name', (isset($banner_template)) ? $banner_template->name : '') }}" placeholder="e.g. Event Announcement" aria-label="validationName" aria-describedby="nameHelp validationNameFeedback" required>
-                                <div id="nameHelp" class="form-text">What will this template be about? Give it a descriptive name.</div>
-                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div id="validationNameFeedback" class="invalid-feedback">{{ __("Please provide a valid name.") }}</div>
+                                <input class="form-control" id="validationName" type="text" name="name" value="{{ old('name', (isset($banner_template)) ? $banner_template->name : '') }}"
+                                    placeholder="{{ __('views/banner/configuration.name_placeholder') }}" aria-label="validationName" aria-describedby="nameHelp validationNameFeedback" required>
+                                <div id="nameHelp" class="form-text">{{ __('views/banner/configuration.name_help') }}</div>
+                                <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                <div id="validationNameFeedback" class="invalid-feedback">{{ __('views/banner/configuration.name_validation_error') }}</div>
                             </div>
                         </div>
                     </div>
@@ -87,31 +82,35 @@
                         <h2 class="accordion-header" id="redirectUrlHeading">
                             <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#redirectUrl" aria-expanded="true" aria-controls="redirectUrl">
                                 <div class="col-lg-9">
-                                    Redirect URL
+                                    {{ __('views/banner/configuration.redirect_url_accordion_headline') }}
                                 </div>
                                 <div class="col-lg-2 text-end">
                                     @if(isset($banner_template) && $banner_template->redirect_url != null)
-                                        <span class="badge text-bg-success ms-2">Active</span>
+                                        <span class="badge text-bg-success ms-2">{{ __('views/banner/configuration.accordion_status_configured') }}</span>
                                     @else
-                                        <span class="badge text-bg-warning ms-2">Not configured</span>
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_not_configured') }}</span>
                                     @endif
                                 </div>
                             </a>
                         </h2>
                         <div id="redirectUrl" class="accordion-collapse collapse" aria-labelledby="redirectUrl">
                             <div class="accordion-body">
-                                <div class="input-group">
-                                    <input class="form-control" type="url" id="validationRedirectUrl" name="redirect_url" value="{{ old('redirect_url', (isset($banner_template)) ? $banner_template->redirect_url : '') }}" placeholder="e.g. https://example.com/news" aria-label="validationRedirectUrl">
-                                    <button class="btn btn-outline-primary" type="button">Test Redirect</button>
-                                </div>
-                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("Please provide a valid URL.") }}</div>
-                                <div class="form-text">
-                                    An optional URL, where the user should get redirected, when he clicks on the banner. By default, the rendered template will be opened.
-                                </div>
-                                <p class="mt-2">For this functionality you need to configure the following URL as Hostbanner URL on your TeamSpeak server:<br>
-                                    <code>{{ route('api.banner.redirect_url', ['banner_id' => base_convert($banner_template->banner_id, 10, 35)]) }}</code>
+                                <p class="mt-2">
+                                    {!! __(
+                                        'views/banner/configuration.redirect_url_hostbanner_url',
+                                        [
+                                            'hostbanner_url' => route('api.banner.redirect_url', ['banner_id' => base_convert($banner_template->banner_id, 10, 35)])
+                                        ]
+                                    ) !!}
                                 </p>
+                                <div class="input-group">
+                                    <input class="form-control" type="url" id="validationRedirectUrl" name="redirect_url" value="{{ old('redirect_url', (isset($banner_template)) ? $banner_template->redirect_url : '') }}"
+                                        placeholder="{{ __('views/banner/configuration.redirect_url_placeholder') }}" aria-label="validationRedirectUrl">
+                                    <button class="btn btn-outline-primary" type="button" @if (isset($banner_template) and empty($banner_template->redirect_url)) disabled @endif>{{ __('views/banner/configuration.test_redirect_button') }}</button>
+                                </div>
+                                <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                <div class="invalid-feedback">{{ __('views/banner/configuration.redirect_url_validation_error') }}</div>
+                                <div class="form-text">{{ __('views/banner/configuration.redirect_url_help') }}</div>
                             </div>
                         </div>
                     </div>
@@ -119,29 +118,25 @@
                         <h2 class="accordion-header" id="autoDisableHeading">
                             <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#autoDisable" aria-expanded="false" aria-controls="autoDisable">
                                 <div class="col-lg-9">
-                                    Automatic Disabling
+                                    {{ __('views/banner/configuration.disable_at_accordion_headline') }}
                                 </div>
                                 <div class="col-lg-2 text-end">
                                     @if(isset($banner_template) && $banner_template->disable_at != null)
-                                        <span class="badge text-bg-success ms-2">Active</span>
+                                        <span class="badge text-bg-success ms-2">{{ __('views/banner/configuration.accordion_status_configured') }}</span>
                                     @else
-                                        <span class="badge text-bg-warning ms-2">Not configured</span>
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_not_configured') }}</span>
                                     @endif
                                 </div>
                             </a>
                         </h2>
                         <div id="autoDisable" class="accordion-collapse collapse" aria-labelledby="autoDisable">
                             <div class="accordion-body">
-                                <input class="form-control" type="datetime-local" id="validationDisableAt" name="disable_at" value="{{ old('disable_at', (isset($banner_template)) ? $banner_template->disable_at : '') }}" aria-label="validationDisableAt">
-                                <div class="valid-feedback">{{ __("Looks good!") }}</div>
-                                <div class="invalid-feedback">{{ __("Please provide a valid datetime.") }}</div>
-                                <div class="form-text">
-                                    Define an optional date and time, when this configuration should be automatically disabled. Leave it unset to not automatically disable it.
-                                </div>
-                                <p class="mt-2">This function is for example useful when you announce an event on your banner for a specific date (and time).
-                                    When you set here the respective date (and time) the dynamic banner will automatically disable this configured template for you afterward,
-                                    so that you don't have to disable it manually.
-                                </p>
+                                <p class="mt-2">{{ __('views/banner/configuration.disable_at_use_case') }}</p>
+                                <input class="form-control" type="datetime-local" id="validationDisableAt" name="disable_at"
+                                    value="{{ old('disable_at', (isset($banner_template)) ? $banner_template->disable_at : '') }}" aria-label="validationDisableAt">
+                                <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                <div class="invalid-feedback">{{ __('views/banner/configuration.disable_at_validation_error') }}</div>
+                                <div class="form-text">{{ __('views/banner/configuration.disable_at_help') }}</div>
                             </div>
                         </div>
                     </div>
@@ -149,13 +144,13 @@
                         <h2 class="accordion-header" id="bannerConfigHeading">
                             <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#bannerConfig" aria-expanded="false" aria-controls="bannerConfig">
                                 <div class="col-lg-9">
-                                    Banner Configurations
+                                    {{ __('views/banner/configuration.text_configurations_accordion_headline') }}
                                 </div>
                                 <div class="col-lg-2 text-end">
                                     @if($banner_template->configurations->count() > 0)
-                                        <span class="badge text-bg-success ms-2">{{$banner_template->configurations->count()}} active configurations</span>
+                                        <span class="badge text-bg-success ms-2">{{ trans_choice('views/banner/configuration.accordion_status_has_configurations', $banner_template->configurations->count(), ['count_configurations' => $banner_template->configurations->count()]) }}</span>
                                     @else
-                                        <span class="badge text-bg-warning ms-2">No configurations</span>
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_no_configurations') }}</span>
                                     @endif
                                 </div>
                             </a>
@@ -179,10 +174,10 @@
                                 @endif
                                 <div class="row mb-2 justify-content-between">
                                     <div class="col-lg-2">
-                                        <button type="button" class="form-control btn btn-success" id="add-config-row">Add Row</button>
+                                        <button type="button" class="form-control btn btn-success" id="add-config-row">{{ __('views/banner/configuration.add_row_button') }}</button>
                                     </div>
                                     <div class="col-lg-2">
-                                        <button type="submit" class="form-control btn btn-primary" id="add-config-row">Save</button>
+                                        <button type="submit" class="form-control btn btn-primary" id="add-config-row">{{ __('views/banner/configuration.save_button') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -195,8 +190,11 @@
     <hr>
 </div>
 @include('inc.banner-config-script')
+
 @include('inc.form-validation')
+
 @foreach($instance as $instanceVariableModal)
     @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
+
 @endsection
