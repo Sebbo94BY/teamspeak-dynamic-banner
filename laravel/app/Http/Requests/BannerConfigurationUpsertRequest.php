@@ -44,6 +44,8 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'name' => ['required', 'string'],
             'redirect_url' => ['nullable', 'url'],
             'disable_at' => ['nullable', 'date'],
+            'time_based_enable_at' => ['nullable', 'date_format:H:i,H:i:s'],
+            'time_based_disable_at' => ['nullable', 'date_format:H:i,H:i:s'],
             'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],
 
             'configuration.banner_configuration_id' => ['sometimes', 'array'],

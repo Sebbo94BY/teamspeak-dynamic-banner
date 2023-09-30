@@ -55,6 +55,13 @@ return [
     'disable_at_use_case' => 'This function is for example useful when you announce an event on your banner for a specific date (and time). When you set here the respective date (and time) the dynamic banner will automatically disable this configured template for you afterward, so that you don\'t have to disable it manually.',
     'disable_at_help' => 'Define an optional date and time, when this configuration should be automatically disabled. Leave it unset to not automatically disable it.',
 
+    'time_based_de_activation_accordion_headline' => 'Time-Based Acivation/Deactivation',
+    'time_based_de_activation_use_case' => 'This function is for example useful when you want to show specific banner configurations only during a specific time window.',
+    'time_based_de_activation_enable_at' => 'Enable at',
+    'time_based_de_activation_enable_at_help' => 'Define an optional time, when this configuration should be automatically enabled. Leave it unset to not automatically enable it.',
+    'time_based_de_activation_disable_at' => 'Disable at',
+    'time_based_de_activation_disable_at_help' => 'Define an optional time, when this configuration should be automatically disabled. Leave it unset to not automatically disable it.',
+
     'text_configurations_accordion_headline' => 'Text Configurations',
 
     /**
@@ -64,5 +71,7 @@ return [
     'name_validation_error' => 'Please provide a valid file!',
     'redirect_url_validation_error' => 'Please provide a valid URL!',
     'disable_at_validation_error' => 'Please provide a valid datetime!',
+    'time_based_de_activation_enable_at_validation_error' => 'Please provide a valid time!',
+    'time_based_de_activation_disable_at_validation_error' => 'Please provide a valid time!',
 
 ];

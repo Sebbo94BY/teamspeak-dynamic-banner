@@ -141,6 +141,47 @@
                         </div>
                     </div>
                     <div class="accordion-item">
+                        <h2 class="accordion-header" id="timeBasedDeActivationHeading">
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#timeBasedDeActivation" aria-expanded="false" aria-controls="timeBasedDeActivation">
+                                <div class="col-lg-9">
+                                    {{ __('views/banner/configuration.time_based_de_activation_accordion_headline') }}
+                                </div>
+                                <div class="col-lg-2 text-end">
+                                    @if(isset($banner_template) and ($banner_template->time_based_enable_at != null or $banner_template->time_based_disable_at != null))
+                                        <span class="badge text-bg-success ms-2">{{ __('views/banner/configuration.accordion_status_configured') }}</span>
+                                    @else
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_not_configured') }}</span>
+                                    @endif
+                                </div>
+                            </a>
+                        </h2>
+                        <div id="timeBasedDeActivation" class="accordion-collapse collapse" aria-labelledby="timeBasedDeActivation">
+                            <div class="accordion-body">
+                                <p class="mt-2">{{ __('views/banner/configuration.time_based_de_activation_use_case') }}</p>
+
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label for="validationTimeBasedEnableAt" class="form-label">{{ __('views/banner/configuration.time_based_de_activation_enable_at') }}</label>
+                                        <input class="form-control" type="time" id="validationTimeBasedEnableAt" name="time_based_enable_at"
+                                            value="{{ old('time_based_enable_at', (isset($banner_template)) ? $banner_template->time_based_enable_at : '') }}" aria-label="validationTimeBasedEnableAt">
+                                        <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                        <div class="invalid-feedback">{{ __('views/banner/configuration.time_based_de_activation_enable_at_validation_error') }}</div>
+                                        <div class="form-text">{{ __('views/banner/configuration.time_based_de_activation_enable_at_help') }}</div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <label for="validationTimeBasedDisableAt" class="form-label">{{ __('views/banner/configuration.time_based_de_activation_disable_at') }}</label>
+                                        <input class="form-control" type="time" id="validationTimeBasedDisableAt" name="time_based_disable_at"
+                                            value="{{ old('time_based_disable_at', (isset($banner_template)) ? $banner_template->time_based_disable_at : '') }}" aria-label="validationTimeBasedDisableAt">
+                                        <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                        <div class="invalid-feedback">{{ __('views/banner/configuration.time_based_de_activation_disable_at_validation_error') }}</div>
+                                        <div class="form-text">{{ __('views/banner/configuration.time_based_de_activation_disable_at_help') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="bannerConfigHeading">
                             <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#bannerConfig" aria-expanded="false" aria-controls="bannerConfig">
                                 <div class="col-lg-9">

@@ -27,7 +27,7 @@ class DisableBannerTemplate extends Command
      */
     public function handle()
     {
-        $banner_templates_with_set_disable_at = BannerTemplate::whereNotNull('disable_at')->get(['id', 'disable_at']);
+        $banner_templates_with_set_disable_at = BannerTemplate::whereNotNull('disable_at')->get(['id', 'disable_at', 'enabled']);
 
         $this->info('Checking '.count($banner_templates_with_set_disable_at).' banner templates...');
 
