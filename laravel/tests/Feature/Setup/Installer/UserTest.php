@@ -27,7 +27,7 @@ class UserTest extends TestCase
     {
         User::factory()->for(Localization::factory()->create())->create();
 
-        $response = $this->get(route('setup.installer.user'));
+        $response = $this->get(route('setup.installer.user', ['locale' => config('app.fallback_locale')]));
         $response->assertRedirect(route('dashboard'));
     }
 
@@ -36,7 +36,11 @@ class UserTest extends TestCase
      */
     public function test_view_gets_displayed(): void
     {
-        $response = $this->from(route('setup.installer.requirements'))->get(route('setup.installer.user'));
+        $response = $this->from(
+            route('setup.installer.requirements', ['locale' => config('app.fallback_locale')])
+        )->get(
+            route('setup.installer.user', ['locale' => config('app.fallback_locale')])
+        );
         $response->assertStatus(200);
         $response->assertViewIs('setup.installer.user');
     }

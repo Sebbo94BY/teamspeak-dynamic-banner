@@ -18,7 +18,7 @@ class RequirementsTest extends TestCase
     {
         User::factory()->for(Localization::factory()->create())->create();
 
-        $response = $this->get(route('setup.installer.requirements'));
+        $response = $this->get(route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]));
         $response->assertRedirect(route('dashboard'));
     }
 
@@ -27,7 +27,7 @@ class RequirementsTest extends TestCase
      */
     public function test_view_gets_displayed(): void
     {
-        $response = $this->get(route('setup.installer.requirements'));
+        $response = $this->get(route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]));
         $response->assertStatus(200);
         $response->assertViewIs('setup.installer.requirements');
     }

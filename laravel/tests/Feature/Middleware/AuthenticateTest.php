@@ -28,6 +28,6 @@ class AuthenticateTest extends TestCase
     public function test_redirect_to_installer_if_no_user_exists(): void
     {
         $response = $this->get(route('dashboard'));
-        $response->assertRedirect(route('setup.installer.requirements'));
+        $response->assertRedirect(route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]));
     }
 }
