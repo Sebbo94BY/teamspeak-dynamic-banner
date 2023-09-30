@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Template;
 use Exception;
+use GdImage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,6 +23,11 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
      * @var Template
      */
     protected Template $template;
+
+    /**
+     * The spacing between each horizontal and vertical line for the grid system.
+     */
+    protected int $grid_spacing = 25;
 
     /**
      * The number of seconds after which the job's unique lock will be released.
@@ -54,21 +60,16 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
     }
 
     /**
-     * Execute the job.
+     * Draw grid system on static image.
      */
-    public function handle(): void
+    protected function draw_grid_on_static_image(GdImage $gd_image, int $spacing): GdImage
     {
-        // Load template as GDImage to be able to modify it
-        $source_image_filepath = public_path($this->template->file_path_original).'/'.$this->template->filename;
-        $source_image_file_extension = strtolower(pathinfo($source_image_filepath, PATHINFO_EXTENSION));
-        $gd_image = ($source_image_file_extension == 'png') ? imagecreatefrompng($source_image_filepath) : imagecreatefromjpeg($source_image_filepath);
-
         if ($gd_image === false) {
             throw new Exception('Failed to load the source template as image object.');
         }
 
+        // Define line color and transparency
         $line_color = imagecolorallocatealpha($gd_image, 0, 0, 0, 80);
-        $spacing = 25;
 
         // Draw vertical lines
         for ($iw = 0; $iw < $this->template->width / $spacing; $iw++) {
@@ -84,6 +85,23 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
             }
         }
 
+        return $gd_image;
+    }
+
+    /**
+     * Draw grid system on (animated) GIF image.
+     */
+    protected function draw_grid_on_animated_image(string $source_image_filepath, string $target_image_filepath, int $spacing): void
+    {
+        shell_exec("ffmpeg -hide_banner -loglevel error -nostdin -y -i $source_image_filepath -vf 'drawgrid=width=$spacing:height=$spacing:thickness=1:color=black@0.8' $target_image_filepath 2>&1");
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        // Ensure necessary target directory exists
         $target_directory = $this->template->file_path_drawed_grid;
         if (! Storage::disk('public')->exists($target_directory)) {
             if (! Storage::disk('public')->makeDirectory($target_directory, 0755, true, true)) {
@@ -91,17 +109,36 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
             }
         }
 
-        // Save the generated image as file
         $target_directory = public_path($this->template->file_path_drawed_grid);
 
-        if ($source_image_file_extension == 'png') {
-            if (! imagepng($gd_image, $target_directory.'/'.$this->template->filename, 0)) {
-                throw new Exception("Could not save the template with the drawed grid system to `$target_directory`.");
-            }
-        } else {
-            if (! imagejpeg($gd_image, $target_directory.'/'.$this->template->filename, 100)) {
-                throw new Exception("Could not save the template with the drawed grid system to `$target_directory`.");
-            }
+        // Identify file type and handle respectively the drawing of the grid system
+        $source_image_filepath = public_path($this->template->file_path_original).'/'.$this->template->filename;
+
+        switch (strtolower(pathinfo($source_image_filepath, PATHINFO_EXTENSION))) {
+            case 'png':
+                // Save the generated image as file
+                if (! imagepng($this->draw_grid_on_static_image(imagecreatefrompng($source_image_filepath), $this->grid_spacing), $target_directory.'/'.$this->template->filename, 0)) {
+                    throw new Exception("Could not save the template with the drawed grid system to `$target_directory`.");
+                }
+
+                break;
+
+            case 'jpg':
+            case 'jpeg':
+                // Save the generated image as file
+                if (! imagejpeg($this->draw_grid_on_static_image(imagecreatefromjpeg($source_image_filepath), $this->grid_spacing), $target_directory.'/'.$this->template->filename, 100)) {
+                    throw new Exception("Could not save the template with the drawed grid system to `$target_directory`.");
+                }
+
+                break;
+
+            case 'gif':
+                $this->draw_grid_on_animated_image($source_image_filepath, $target_directory.'/'.$this->template->filename, $this->grid_spacing);
+
+                break;
+
+            default:
+                throw new Exception("The uploaded file `$source_image_filepath` is not supported by this application and can not be used.");
         }
     }
 }

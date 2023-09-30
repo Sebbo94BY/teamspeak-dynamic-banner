@@ -121,6 +121,9 @@ class BannerTest extends TestCase
             ->for(Font::factory()->create())
             ->create();
 
+        // Overwrite the factory default to match the actual controller path
+        $banner_template->file_path_drawed_text = 'uploads/templates/drawed_text/'.$banner_template->id;
+
         // Generate a temporary image to be able to test the API
         $absolut_upload_directory = public_path($banner_template->template->file_path_original);
         $image_file_path = $absolut_upload_directory.'/'.$banner_template->template->filename;
@@ -128,6 +131,10 @@ class BannerTest extends TestCase
         imagecolorallocate($gd_image, 0, 0, 0);
         if (! file_exists($absolut_upload_directory)) {
             mkdir($absolut_upload_directory, 0777, true);
+        }
+        $absolut_drawed_text_directory = public_path($banner_template->file_path_drawed_text).'/'.$banner_template->template->filename;
+        if (! file_exists($absolut_drawed_text_directory)) {
+            mkdir($absolut_drawed_text_directory, 0777, true);
         }
         imagepng($gd_image, $image_file_path);
 
@@ -139,7 +146,7 @@ class BannerTest extends TestCase
         $response->assertHeader('Expires', '-1');
         $response->assertHeader('ETag');
         $response->assertHeader('Last-Modified');
-        $this->assertContains($response->headers->get('Content-Type'), ['image/png', 'image/jpeg']);
+        $this->assertContains($response->headers->get('Content-Type'), ['image/png', 'image/jpeg', 'image/gif']);
         $response->assertStatus(200);
 
         // Delete temporary files again

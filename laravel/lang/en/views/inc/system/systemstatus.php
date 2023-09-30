@@ -31,6 +31,8 @@ return [
     'accordion_section_php' => 'PHP',
     'accordion_section_php_version' => 'PHP Version',
     'accordion_section_php_extensions' => 'PHP Extensions',
+    'accordion_section_php_ini_disable_functions_current_value_empty_list' => 'Empty list',
+    'accordion_section_php_ini_disable_functions_required_value' => '`shell_exec` should not be listed',
     'accordion_section_php_ini_date_timezone_required_value' => 'should be set',
 
     /**
@@ -64,6 +66,14 @@ return [
     'accordion_section_redis_connection_current_value_connected' => 'Connected',
     'accordion_section_redis_connection_current_value_error' => 'Error: :exception',
     'accordion_section_redis_connection_required_value' => '`.env` should contain valid `REDIS_` settings',
+
+    /**
+     * Accordion Section "FFMpeg"
+     */
+    'accordion_section_ffmpeg' => 'FFMpeg (GIF Support)',
+    'accordion_section_ffmpeg_version' => 'FFMpeg Version',
+    'accordion_section_ffmpeg_version_current_value_error' => 'FFMpeg is either not installed or `shell_exec()` is disabled',
+    'accordion_section_ffmpeg_version_required_value' => '`FFMpeg` should be installed to support GIF templates',
 
     /**
      * Accordion Section "Version"

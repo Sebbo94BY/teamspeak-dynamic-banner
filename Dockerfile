@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
+    ffmpeg \
     libonig-dev \
     libxml2-dev \
     libssh2-1-dev \

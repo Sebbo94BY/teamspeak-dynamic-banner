@@ -27,7 +27,7 @@
                         <div class="mb-3 row">
                             <label for="validationFile" class="col-lg-1 col-form-label fw-bold">{{ __('views/modals/templates/modal-edit.template_file') }}</label>
                             <div class="col-lg-11">
-                                <input type="file" class="form-control" id="validationFile" accept="image/png, image/jpeg"
+                                <input type="file" class="form-control" id="validationFile" accept="image/png, image/jpeg @if (! preg_match('/shell_exec/', ini_get('disable_functions')) and (!is_null(@shell_exec('ffmpeg -version | head -1')) or !empty(@shell_exec('ffmpeg -version | head -1')))) , image/gif @endif"
                                        aria-describedby="validationFileHelp validationFileFeedback-{{$templateModal->id}}"
                                        name="file" value="{{ old('file') }}" required>
                                 <div id="validationFileHelp" class="form-text">{{ __('views/modals/templates/modal-edit.template_file_help') }}</div>

@@ -15,7 +15,7 @@ class TemplateAddRequest extends FormRequest
     {
         return [
             'alias' => ['required', 'string'],
-            'file' => ['required', 'image', 'mimes:png,jpg,jpeg', 'dimensions:min_width=468,min_height=60,max_width=1024,max_height=300', 'max:5120'],
+            'file' => ['required', 'image', 'mimes:png,jpg,jpeg,gif', 'dimensions:min_width=468,min_height=60,max_width=1024,max_height=300', 'max:5120'],
         ];
     }
 }
