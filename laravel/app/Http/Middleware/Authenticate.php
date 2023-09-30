@@ -18,7 +18,7 @@ class Authenticate extends Middleware
                 return route('login');
             }
 
-            return route('setup.installer.requirements');
+            return route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]);
         }
     }
 }

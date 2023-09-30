@@ -36,7 +36,7 @@ class UserController extends Controller
         $user->password = Hash::make($request->password);
 
         if (! $user->save()) {
-            return Redirect::route('setup.installer.user')->withInput($request->all())->with([
+            return Redirect::route('setup.installer.user', ['locale' => $request->route()->parameter('locale')])->withInput($request->all())->with([
                 'error' => 'user-add-error',
                 'message' => 'Failed to save the new data set into the database. Please try again.',
             ]);

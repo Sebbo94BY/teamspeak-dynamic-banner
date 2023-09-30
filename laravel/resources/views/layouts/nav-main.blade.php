@@ -5,7 +5,24 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        @if(!str_starts_with(Route::currentRouteName(), 'setup.'))
+        @if (str_starts_with(Route::currentRouteName(), 'setup.'))
+            <div class="collapse navbar-collapse justify-content-end text-bg-dark">
+                <ul class="navbar-nav my-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle
+                           {{ (str_starts_with(Route::currentRouteName(), 'administration.')) ? 'active' : '' }}"
+                           href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           {{ __("views/layouts/nav-main.change_language") }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            @foreach (\App\Models\Localization::get() as $localization)
+                            <li><a class="dropdown-item @if (Request::route('locale') == $localization->locale) active @endif" href="{{ route(Route::currentRouteName(), ['locale' => $localization->locale]) }}">{{ $localization->language_name }}</a></li>
+                            @endforeach
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        @else
             <div class="collapse navbar-collapse justify-content-end text-bg-dark">
                 <ul class="navbar-nav my-auto">
                     <li class="nav-item">

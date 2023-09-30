@@ -18,6 +18,8 @@ class SetLocale
     {
         if (Auth::check()) {
             app()->setLocale(Auth::user()->localization->locale);
+        } elseif (null !== $request->route()->parameter('locale')) {
+            app()->setLocale($request->route()->parameter('locale'));
         } else {
             app()->setLocale(config('app.fallback_locale'));
         }

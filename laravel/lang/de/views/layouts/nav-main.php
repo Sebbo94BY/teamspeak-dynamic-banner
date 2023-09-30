@@ -3,6 +3,11 @@
 return [
 
     /**
+     * Main Nav (Installer)
+     */
+    'change_language' => 'Sprache wechseln',
+
+    /**
      * Main Nav (Guest)
      */
     'login' => 'Einloggen',
