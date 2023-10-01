@@ -133,7 +133,7 @@
                             <div class="accordion-body">
                                 <p class="mt-2">{{ __('views/banner/configuration.disable_at_use_case') }}</p>
                                 <input class="form-control" type="datetime-local" id="validationDisableAt" name="disable_at"
-                                    value="{{ old('disable_at', (isset($banner_template)) ? $banner_template->disable_at : '') }}" aria-label="validationDisableAt">
+                                    value="{{ old('disable_at', (isset($banner_template) and !is_null($banner_template->disable_at)) ? Carbon\Carbon::parse($banner_template->disable_at)->setTimezone(Request::header('X-Timezone')) : '') }}" aria-label="validationDisableAt">
                                 <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
                                 <div class="invalid-feedback">{{ __('views/banner/configuration.disable_at_validation_error') }}</div>
                                 <div class="form-text">{{ __('views/banner/configuration.disable_at_help') }}</div>
@@ -163,7 +163,7 @@
                                     <div class="col-lg-6">
                                         <label for="validationTimeBasedEnableAt" class="form-label">{{ __('views/banner/configuration.time_based_de_activation_enable_at') }}</label>
                                         <input class="form-control" type="time" id="validationTimeBasedEnableAt" name="time_based_enable_at"
-                                            value="{{ old('time_based_enable_at', (isset($banner_template)) ? $banner_template->time_based_enable_at : '') }}" aria-label="validationTimeBasedEnableAt">
+                                            value="{{ old('time_based_enable_at', (isset($banner_template) and !is_null($banner_template->time_based_enable_at)) ? Carbon\Carbon::parse($banner_template->time_based_enable_at)->setTimezone(Request::header('X-Timezone'))->format('H:i') : '') }}" aria-label="validationTimeBasedEnableAt">
                                         <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
                                         <div class="invalid-feedback">{{ __('views/banner/configuration.time_based_de_activation_enable_at_validation_error') }}</div>
                                         <div class="form-text">{{ __('views/banner/configuration.time_based_de_activation_enable_at_help') }}</div>
@@ -172,7 +172,7 @@
                                     <div class="col-lg-6">
                                         <label for="validationTimeBasedDisableAt" class="form-label">{{ __('views/banner/configuration.time_based_de_activation_disable_at') }}</label>
                                         <input class="form-control" type="time" id="validationTimeBasedDisableAt" name="time_based_disable_at"
-                                            value="{{ old('time_based_disable_at', (isset($banner_template)) ? $banner_template->time_based_disable_at : '') }}" aria-label="validationTimeBasedDisableAt">
+                                            value="{{ old('time_based_disable_at', (isset($banner_template) and !is_null($banner_template->time_based_disable_at)) ? Carbon\Carbon::parse($banner_template->time_based_disable_at)->setTimezone(Request::header('X-Timezone'))->format('H:i') : '') }}" aria-label="validationTimeBasedDisableAt">
                                         <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
                                         <div class="invalid-feedback">{{ __('views/banner/configuration.time_based_de_activation_disable_at_validation_error') }}</div>
                                         <div class="form-text">{{ __('views/banner/configuration.time_based_de_activation_disable_at_help') }}</div>

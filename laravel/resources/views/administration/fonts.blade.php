@@ -69,7 +69,7 @@
                 @foreach($fonts as $font)
                 <tr>
                     <td>{{ $font->filename }}</td>
-                    <td>{{ $font->updated_at }}</td>
+                    <td>{{ Carbon\Carbon::parse($font->updated_at)->setTimezone(Request::header('X-Timezone')) }}</td>
                     <td>
                         <div class="d-flex">
                             @can('edit fonts')

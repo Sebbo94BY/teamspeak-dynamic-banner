@@ -81,7 +81,7 @@
                         @endforeach
                     </td>
                     <td class="col-lg-2">
-                        {{ \Illuminate\Support\Carbon::parse($user->created_at)->format('d.m.Y') }}
+                        {{ Carbon\Carbon::parse($user->created_at)->setTimezone(Request::header('X-Timezone')) }}
                     </td>
                     <td class="col-lg-2">
                         <div class="d-flex">

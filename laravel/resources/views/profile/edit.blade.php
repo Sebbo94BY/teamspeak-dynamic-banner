@@ -52,6 +52,22 @@
                         <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
                         <div class="invalid-feedback">{{ __('views/profile/edit.language_validation_error') }}</div>
                     </div>
+                    <div class="mb-2">
+                        <label for="validationTimezone" class="form-label fw-bold">{{ __('views/profile/edit.timezone_label') }}</label>
+                        <select class="form-select" name="timezone" id="validationTimezone" aria-describedby="timezoneHelp" required>
+                            <option value="null" @if (is_null($user->timezone)) selected @endif>{{ __('views/profile/edit.timezone_auto_detect_option') }}</option>
+                            @foreach (timezone_identifiers_list(DateTimeZone::ALL) as $timezone)
+                            @if (old('timezone', $user->timezone) == $timezone)
+                            <option value="{{ $timezone }}" selected>{{ $timezone }}</option>
+                            @else
+                            <option value="{{ $timezone }}">{{ $timezone }}</option>
+                            @endif
+                            @endforeach
+                        </select>
+                        <div id="timezoneHelp" class="form-text">{{ __('views/profile/edit.timezone_help') }}</div>
+                        <div class="valid-feedback">{{ __('views/profile/edit.form_validation_looks_good') }}</div>
+                        <div class="invalid-feedback">{{ __('views/profile/edit.timezone_validation_error') }}</div>
+                    </div>
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <button class="btn btn-primary" type="submit">{{ __('views/profile/edit.update_profile_button') }}</button>

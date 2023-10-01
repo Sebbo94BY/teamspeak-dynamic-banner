@@ -100,7 +100,7 @@
                     <a class="nav-link dropdown-toggle
                        {{ (str_starts_with(Route::currentRouteName(), 'profile.')) ? 'active' : '' }}"
                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {!! trans_choice("views/layouts/nav-main.greet_user", Carbon\Carbon::now()->format('H'), ['username' => Auth::user()->name]) !!}
+                        {!! trans_choice("views/layouts/nav-main.greet_user", Carbon\Carbon::now(Request::header('X-Timezone'))->format('H'), ['username' => Auth::user()->name]) !!}
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item {{ (Route::currentRouteName() == 'profile.edit') ? 'active' : '' }}" href="{{ route('profile.edit') }}">{{ __("views/layouts/nav-main.profile") }}</a></li>

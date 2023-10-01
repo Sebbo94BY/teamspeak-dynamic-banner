@@ -30,6 +30,6 @@ return [
     'table_status_stopped' => 'Gestoppt',
     'table_status_stopped_title' => 'Der Bot ist nicht in Betrieb und sammelt daher keine aktuellen Daten.',
     'table_status_running' => 'In Betrieb',
-    'table_status_running_title' => 'Der Bot läuft seit <b>:started_at UTC</b> unter der PID <b>:process_id</b> und sammelt aktuelle Daten.',
+    'table_status_running_title' => 'Der Bot läuft seit <b>:started_at (:timezone)</b> unter der PID <b>:process_id</b> und sammelt aktuelle Daten.',
 
 ];
