@@ -109,12 +109,12 @@ class InstanceController extends Controller
             $virtualserver_helper = new TeamSpeakVirtualserver($instance);
             $virtualserver = $virtualserver_helper->get_virtualserver_connection();
         } catch (TransportException $transport_exception) {
-            return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-edit-error',
                 'message' => $transport_exception->getMessage(),
             ]);
         } catch (ServerQueryException $serverquery_exception) {
-            return Redirect::route('instance.edit', ['instance_id' => $instance->id])->withInput($request->all())->with([
+            return Redirect::route('instances')->withInput($request->all())->with([
                 'error' => 'instance-edit-error',
                 'message' => $serverquery_exception->getMessage(),
             ]);
