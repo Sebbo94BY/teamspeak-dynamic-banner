@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Instance;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Predis\Connection\ConnectionException;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -234,6 +236,39 @@ class SystemStatusController extends Controller
     }
 
     /**
+     * Checks Queue health.
+     */
+    protected function check_queue_health(): array
+    {
+        $requirements = [];
+
+        $queue_size = Queue::size();
+
+        $requirements['SIZE']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size');
+        $requirements['SIZE']['current_value'] = $queue_size;
+
+        $total_cached_clients = 0;
+        try {
+            foreach (Instance::all() as $instance) {
+                $cached_clients = Redis::hkeys('instance_'.$instance->id.'_clientlist');
+                $total_cached_clients = substr_count(implode(',', $cached_clients), '_NICKNAME');
+            }
+        } catch (ConnectionException) {
+            // Do nothing; Simply catch and ignore this error
+        }
+
+        if ($total_cached_clients == 0) {
+            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = 25) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
+        } else {
+            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = $total_cached_clients * 1.5) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
+        }
+
+        $requirements['SIZE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size_required_value', ['max_expected_queue_size' => $max_expected_queue_size]);
+
+        return $requirements;
+    }
+
+    /**
      * Checks Redis connection.
      */
     protected function check_redis_connection(): array
@@ -379,6 +414,7 @@ class SystemStatusController extends Controller
         $system_status['DATABASE']['CONNECTION'] = $this->check_database_connection();
         $system_status['DATABASE']['SETTINGS'] = $this->check_database_settings();
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
+        $system_status['QUEUE']['HEALTH'] = $this->check_queue_health();
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
         $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
         $system_status['MAIL']['CONNECTION'] = $this->check_mail_connection();
@@ -404,6 +440,9 @@ class SystemStatusController extends Controller
 
         $permission_status = collect($system_status['PERMISSIONS']);
         $permission_status_dir = collect($permission_status['DIRECTORIES']);
+
+        $queue_status = collect($system_status['QUEUE']);
+        $queue_health_size = collect($queue_status['HEALTH']);
 
         $redis_staus = collect($system_status['REDIS']);
         $redis_staus_connection = collect($redis_staus['CONNECTION']);
@@ -433,6 +472,9 @@ class SystemStatusController extends Controller
             'permission_status_dir' => $permission_status_dir,
             'permission_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $permission_status),
             'permission_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $permission_status),
+            'queue_health_size'=>$queue_health_size,
+            'queue_health_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $queue_status),
+            'queue_health_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $queue_status),
             'redis_status_connection'=>$redis_staus_connection,
             'redis_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
             'redis_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),

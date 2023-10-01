@@ -59,6 +59,13 @@ return [
     'accordion_section_permissions_directories_required_value' => 'muss beschreibbar sein',
 
     /**
+     * Accordion Section "Queue Health"
+     */
+    'accordion_section_queue_health' => 'Gesundheit der Queue',
+    'accordion_section_queue_health_size' => 'Queue Größe',
+    'accordion_section_queue_health_size_required_value' => 'Sollte immer möglichst wenig Jobs listen, da man sonst mehr Supervisor Worker benötigt. Sollte aktuell weniger als :max_expected_queue_size Jobs sein.',
+
+    /**
      * Accordion Section "Redis"
      */
     'accordion_section_redis' => 'Redis',
