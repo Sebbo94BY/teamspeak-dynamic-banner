@@ -24,6 +24,8 @@ class BannerTemplate extends Model
         'file_path_drawed_text',
         'redirect_url',
         'disable_at',
+        'time_based_enable_at',
+        'time_based_disable_at',
         'enabled',
     ];
 

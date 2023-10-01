@@ -61,6 +61,16 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             Process::start('php '.base_path().'/artisan banners:disable-templates');
         })->name('banners:automatic-disabling')->everyFiveMinutes();
+
+        // BANNERS: Time-based Enabling
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan banners:enable-time-based');
+        })->name('banners:enable-time-based')->everyFiveMinutes();
+
+        // BANNERS: Time-based Disabling
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan banners:disable-time-based');
+        })->name('banners:disable-time-based')->everyFiveMinutes();
     }
 
     /**
