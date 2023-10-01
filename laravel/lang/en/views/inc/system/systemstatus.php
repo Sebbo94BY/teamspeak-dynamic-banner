@@ -76,6 +76,16 @@ return [
     'accordion_section_ffmpeg_version_required_value' => '`FFMpeg` should be installed to support GIF templates',
 
     /**
+     * Accordion Section "Mail"
+     */
+    'accordion_section_mail' => 'Email (SMTP)',
+    'accordion_section_mail_connection' => 'SMTP Connection',
+    'accordion_section_mail_connection_current_value_connected' => 'Connected',
+    'accordion_section_mail_connection_current_value_unsupported_mailer_for_testing' => 'Only SMTP based mailer can be currently tested.',
+    'accordion_section_mail_connection_current_value_error' => 'Error: :exception',
+    'accordion_section_mail_connection_required_value' => '`.env` should contain valid `MAIL_` settings',
+
+    /**
      * Accordion Section "Version"
      */
     'accordion_section_version' => 'Version',

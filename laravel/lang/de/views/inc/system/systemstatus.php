@@ -76,6 +76,16 @@ return [
     'accordion_section_ffmpeg_version_required_value' => '`FFMpeg` sollte installiert sein, um GIF Vorlagen zu unterstützen',
 
     /**
+     * Accordion Section "Mail"
+     */
+    'accordion_section_mail' => 'E-Mail (SMTP)',
+    'accordion_section_mail_connection' => 'SMTP Verbindung',
+    'accordion_section_mail_connection_current_value_connected' => 'Verbunden',
+    'accordion_section_mail_connection_current_value_unsupported_mailer_for_testing' => 'Nur SMTP basierte E-Mail Anbieter können aktuell getestet werden.',
+    'accordion_section_mail_connection_current_value_error' => 'Fehler: :exception',
+    'accordion_section_mail_connection_required_value' => '`.env` sollte gültige `MAIL_` Einstellungen haben',
+
+    /**
      * Accordion Section "Version"
      */
     'accordion_section_version' => 'Version',

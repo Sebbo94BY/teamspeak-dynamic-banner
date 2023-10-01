@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Predis\Connection\ConnectionException;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
  * Possible system status severities.
@@ -273,6 +274,44 @@ class SystemStatusController extends Controller
     }
 
     /**
+     * Checks Mail connection.
+     */
+    protected function check_mail_connection(): array
+    {
+        $requirements = [];
+
+        $requirements['TEST']['name'] = __('views/inc/system/systemstatus.accordion_section_mail_connection');
+        $requirements['TEST']['required_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_required_value');
+
+        switch (config('mail.default')) {
+            case 'smtp':
+                $reachable = false;
+
+                try {
+                    $transport = new EsmtpTransport(config('mail.mailers.smtp.host'), config('mail.mailers.smtp.port'), config('mail.mailers.smtp.encryption'));
+                    $transport->setUsername(config('mail.mailers.smtp.username') ?? '');
+                    $transport->setPassword(config('mail.mailers.smtp.password') ?? '');
+                    $transport->start();
+
+                    $reachable = true;
+                } catch (\Exception $e) {
+                    $mail_connection_exception = $e->getMessage();
+                }
+
+                $requirements['TEST']['current_value'] = ($reachable) ? __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_error', ['exception' => $mail_connection_exception]);
+                $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
+
+                break;
+            default:
+                $requirements['TEST']['current_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_unsupported_mailer_for_testing');
+                $requirements['TEST']['severity'] = SystemStatusSeverity::Warning;
+                break;
+        }
+
+        return $requirements;
+    }
+
+    /**
      * Checks versions.
      */
     protected function check_versions(): array
@@ -342,6 +381,7 @@ class SystemStatusController extends Controller
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
         $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
+        $system_status['MAIL']['CONNECTION'] = $this->check_mail_connection();
 
         if ($optional_information) {
             $system_status['VERSIONS']['SOFTWARE'] = $this->check_versions();
@@ -371,6 +411,9 @@ class SystemStatusController extends Controller
         $ffmpeg_status = collect($system_status['FFMPEG']);
         $ffmpeg_status_version = collect($ffmpeg_status['VERSION']);
 
+        $mail_status = collect($system_status['MAIL']);
+        $mail_status_connection = collect($mail_status['CONNECTION']);
+
         $versions_status = collect($system_status['VERSIONS']);
         $versions_status_software = collect($versions_status['SOFTWARE']);
 
@@ -396,6 +439,9 @@ class SystemStatusController extends Controller
             'ffmpeg_version'=>$ffmpeg_status_version,
             'ffmpeg_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $ffmpeg_status),
             'ffmpeg_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $ffmpeg_status),
+            'mail_status_connection'=>$mail_status_connection,
+            'mail_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $mail_status),
+            'mail_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $mail_status),
             'version_status_software'=>$versions_status_software,
             'version_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
             'version_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),
