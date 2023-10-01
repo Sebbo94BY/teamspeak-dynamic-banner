@@ -36,7 +36,7 @@
                                 <input type="number" class="form-control" id="validationServerQueryPort"
                                        name="serverquery_port"
                                        aria-describedby="validationServerQueryPortHelp validationServerQueryPortFeedback"
-                                       min="1" max="65535" value="{{ old('serverquery_port', 10022) }}"
+                                       min="1" max="65535" value="{{ old('serverquery_port', (extension_loaded('ssh2')) ? 10022 : 10011) }}"
                                        placeholder="{{ __('views/modals/instance/modal-add.serverquery_port_placeholder') }}" required>
                                 <div id="validationServerQueryPortHelp" class="form-text">{{ __('views/modals/instance/modal-add.serverquery_port_help') }}</div>
                                 <div class="valid-feedback">{{ __('views/modals/instance/modal-add.form_validation_looks_good') }}</div>
@@ -45,7 +45,12 @@
                             <div class="mb-3">
                                 <label for="validationServerqueryEncryption" class="form-check-label fw-bold">{{ __('views/modals/instance/modal-add.serverquery_encryption') }}</label>
                                 <input class="form-check-input ms-2" id="validationServerqueryEncryption" type="checkbox" name="is_ssh"
-                                       aria-describedby="validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback" @if (old('is_ssh')) checked @endif>
+                                       aria-describedby="phpExtensionSshMissing validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback"
+                                       @if (old('is_ssh')) checked @endif
+                                       @if (! extension_loaded('ssh2')) disabled @endif>
+                                @if (! extension_loaded('ssh2'))
+                                <div id="phpExtensionSshMissing" class="form-text text-danger">{{ __('views/modals/instance/modal-add.serverquery_encryption_php_extension_ssh_unavailable') }}</div>
+                                @endif
                                 <div id="validationServerqueryEncryptionHelp" class="form-text">{{ __('views/modals/instance/modal-add.serverquery_encryption_help') }}</div>
                                 <div class="valid-feedback">{{ __('views/modals/instance/modal-add.form_validation_looks_good') }}</div>
                                 <div id="validationServerqueryEncryptionFeedback" class="invalid-feedback">{{ __('views/modals/instance/modal-add.serverquery_encryption_validation_error') }}</div>

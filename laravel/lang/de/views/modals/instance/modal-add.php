@@ -23,6 +23,7 @@ return [
     'serverquery_port_help' => 'Der Serverquery Port des TeamSpeak Servers zum Ausführen von Befehlen und sammeln von Daten.',
 
     'serverquery_encryption' => 'Aktiviere ServerQuery Verschlüsselung (SSH)',
+    'serverquery_encryption_php_extension_ssh_unavailable' => 'Die PHP Erweiterung ssh2 ist auf diesem Webserver nicht verfügbar, wird aber für verschlüsselte Verbindungen benötigt.',
     'serverquery_encryption_help' => 'Wenn aktiviert, wird die ServerQuery Verbindung über eine verschlüsselte SSH-Verbindung hergestellt. Der entsprechende ServerQuery Port muss eingestellt werden.',
 
     'serverquery_username' => 'ServerQuery Benutzername',

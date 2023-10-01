@@ -44,7 +44,11 @@
                             <div class="mb-3">
                                 <label for="validationServerqueryEncryption" class="form-check-label fw-bold">{{ __('views/modals/instance/modal-edit.serverquery_encryption') }}</label>
                                 <input class="form-check-input ms-2" id="validationServerqueryEncryption" type="checkbox" name="is_ssh"
-                                       aria-describedby="validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback-{{$instanceModal->id}}" @if (old('is_ssh', $instance->is_ssh)) checked @endif>
+                                       aria-describedby="phpExtensionSshMissing validationServerqueryEncryptionHelp validationServerqueryEncryptionFeedback-{{$instanceModal->id}}"
+                                       @if (old('is_ssh', $instance->is_ssh)) checked @endif>
+                                @if (! extension_loaded('ssh2'))
+                                <div id="phpExtensionSshMissing" class="form-text text-danger">{{ __('views/modals/instance/modal-edit.serverquery_encryption_php_extension_ssh_unavailable') }}</div>
+                                @endif
                                 <div id="validationServerqueryEncryptionHelp" class="form-text">{{ __('views/modals/instance/modal-edit.serverquery_encryption_help') }}</div>
                                 <div class="valid-feedback">{{ __('views/modals/instance/modal-edit.form_validation_looks_good') }}</div>
                                 <div id="validationServerqueryEncryptionFeedback-{{$instanceModal->id}}" class="invalid-feedback">{{ __('views/modals/instance/modal-edit.serverquery_encryption_validation_error') }}</div>
