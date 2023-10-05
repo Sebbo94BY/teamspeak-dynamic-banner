@@ -39,7 +39,7 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
     * Supports the ServerQuery protocol RAW and SSH
     * Define the client nickname
     * Define the default channel, where the client should be in when connected
-* Upload one or more images as templates
+* Upload one or more images of the type PNG, JPEG or (animated) GIF as templates
 * Define one or more banners (each gets a dedicated link)
     * Supports various rotation configurations
         * Non-Random: Every client, which requests the banner, will always see the same template as all other clients.
@@ -103,6 +103,9 @@ After configuring it, don't forget to cache your configuration: `php artisan con
 * Git
 * [Composer](https://getcomposer.org/)
 * [npm](https://www.npmjs.com/) (Version 9.x or newer)
+* [FFmpeg](https://ffmpeg.org/) to support animated GIFs as template
+    * This is only required, if you want to use (animated) GIF images as templates for your banners
+    * Your environment variable `PATH` should include the path to your `ffmpeg` binary
 
 
 ## TeamSpeak Permissions

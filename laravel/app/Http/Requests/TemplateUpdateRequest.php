@@ -26,7 +26,7 @@ class TemplateUpdateRequest extends FormRequest
         return [
             'template_id' => ['required', 'integer', 'exists:App\Models\Template,id'],
             'alias' => ['required', 'string'],
-            'file' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'dimensions:min_width=468,min_height=60,max_width=1024,max_height=300', 'max:5120'],
+            'file' => ['nullable', 'image', 'mimes:png,jpg,jpeg,gif', 'dimensions:min_width=468,min_height=60,max_width=1024,max_height=300', 'max:5120'],
         ];
     }
 }

@@ -15,7 +15,7 @@ return [
     'alias_help' => 'Ein Alias für die Vorlage. (Nur eine Information für dich.)',
 
     'template_file' => 'Vorlagendatei',
-    'template_file_help' => 'Die Vorlagendatei. (min. 468x60px (Breite x Höhe), max. 1024x300px (Breite x Höhe), PNG/JPEG, max. 5 MB)',
+    'template_file_help' => 'Die Vorlagendatei. (min. 468x60px (Breite x Höhe), max. 1024x300px (Breite x Höhe), PNG/JPEG/GIF, max. 5 MB)',
 
     /**
      * Buttons

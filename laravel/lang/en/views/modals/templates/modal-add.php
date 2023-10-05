@@ -15,7 +15,7 @@ return [
     'alias_help' => 'An alias for the template. (Only an information for you.)',
 
     'template_file' => 'Template file',
-    'template_file_help' => 'The template file. (min. 468x60px (Width x Height), max. 1024x300px (Width x Height), PNG/JPEG, max. 5 MB)',
+    'template_file_help' => 'The template file. (min. 468x60px (Width x Height), max. 1024x300px (Width x Height), PNG/JPEG/GIF, max. 5 MB)',
 
     /**
      * Buttons

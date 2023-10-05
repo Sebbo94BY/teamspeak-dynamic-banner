@@ -110,6 +110,12 @@ class SystemStatusController extends Controller
      */
     protected function check_php_ini_settings(): array
     {
+        $disable_functions = ini_get('disable_functions');
+        $requirements['DISABLE_FUNCTIONS']['name'] = 'PHP disable_functions';
+        $requirements['DISABLE_FUNCTIONS']['current_value'] = (empty(trim($disable_functions))) ? __('views/inc/system/systemstatus.accordion_section_php_ini_disable_functions_current_value_empty_list') : $disable_functions;
+        $requirements['DISABLE_FUNCTIONS']['required_value'] = __('views/inc/system/systemstatus.accordion_section_php_ini_disable_functions_required_value');
+        $requirements['DISABLE_FUNCTIONS']['severity'] = (preg_match('/shell_exec/', $disable_functions)) ? SystemStatusSeverity::Warning : SystemStatusSeverity::Success;
+
         $max_execution_time = ini_get('max_execution_time');
         $requirements['MAX_EXECUTION_TIME']['name'] = 'PHP max_execution_time';
         $requirements['MAX_EXECUTION_TIME']['current_value'] = $max_execution_time;
@@ -250,6 +256,23 @@ class SystemStatusController extends Controller
     }
 
     /**
+     * Checks FFMpeg version.
+     */
+    protected function check_ffmpeg_version(): array
+    {
+        $requirements = [];
+
+        $command_output = (preg_match('/shell_exec/', ini_get('disable_functions'))) ? null : @shell_exec('ffmpeg -version | head -1');
+
+        $requirements['VERSION']['name'] = __('views/inc/system/systemstatus.accordion_section_ffmpeg_version');
+        $requirements['VERSION']['current_value'] = (is_null($command_output) or empty(trim($command_output))) ? __('views/inc/system/systemstatus.accordion_section_ffmpeg_version_current_value_error') : $command_output;
+        $requirements['VERSION']['required_value'] = __('views/inc/system/systemstatus.accordion_section_ffmpeg_version_required_value');
+        $requirements['VERSION']['severity'] = (is_null($command_output) or empty(trim($command_output))) ? SystemStatusSeverity::Warning : SystemStatusSeverity::Success;
+
+        return $requirements;
+    }
+
+    /**
      * Checks versions.
      */
     protected function check_versions(): array
@@ -318,6 +341,7 @@ class SystemStatusController extends Controller
         $system_status['DATABASE']['SETTINGS'] = $this->check_database_settings();
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
+        $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
 
         if ($optional_information) {
             $system_status['VERSIONS']['SOFTWARE'] = $this->check_versions();
@@ -344,6 +368,9 @@ class SystemStatusController extends Controller
         $redis_staus = collect($system_status['REDIS']);
         $redis_staus_connection = collect($redis_staus['CONNECTION']);
 
+        $ffmpeg_status = collect($system_status['FFMPEG']);
+        $ffmpeg_status_version = collect($ffmpeg_status['VERSION']);
+
         $versions_status = collect($system_status['VERSIONS']);
         $versions_status_software = collect($versions_status['SOFTWARE']);
 
@@ -366,6 +393,9 @@ class SystemStatusController extends Controller
             'redis_status_connection'=>$redis_staus_connection,
             'redis_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
             'redis_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),
+            'ffmpeg_version'=>$ffmpeg_status_version,
+            'ffmpeg_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $ffmpeg_status),
+            'ffmpeg_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $ffmpeg_status),
             'version_status_software'=>$versions_status_software,
             'version_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
             'version_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),

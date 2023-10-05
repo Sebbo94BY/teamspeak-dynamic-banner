@@ -315,6 +315,61 @@
                 </div>
             </div>
         </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusFfmpegHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($ffmpeg_warning_count == 0  && $ffmpeg_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusFfmpeg" aria-expanded="false" aria-controls="accordionSystemStatusFfmpeg">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_ffmpeg') }}</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($ffmpeg_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
+                        @elseif($ffmpeg_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusFfmpeg" class="accordion-collapse collapse @if($ffmpeg_warning_count > 0  || $ffmpeg_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusFfmpegHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($ffmpeg_version as $key => $ffmpeg_version)
+                                <tr>
+                                    <td class="border-0">{{$ffmpeg_version->name}} <code>{{$ffmpeg_version->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($ffmpeg_version->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$ffmpeg_version->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
         @if(Route::currentRouteName() != 'setup.installer.requirements')
         <div class="accordion-item">
             <h2 class="accordion-header" id="accordionSystemStatusVersionHeading">
