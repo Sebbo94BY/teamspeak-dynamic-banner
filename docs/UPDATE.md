@@ -94,4 +94,6 @@ sudo supervisorctl restart teamspeak-dynamic-banner-worker:*
 
 As last step, you should also restart all your currently running instances, so that they can pick up the latest code.
 
-Afterwards, your application has been successfully updated.
+It is recommended to open the **Administration** > **System Status** page in order to check, if everything is operational or needs attention.
+
+Afterwards, your application has been successfully updated. 

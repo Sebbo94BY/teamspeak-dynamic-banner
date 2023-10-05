@@ -261,6 +261,61 @@
             </div>
         </div>
         <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusQueueHealthHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($queue_health_warning_count == 0  && $queue_health_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusQueueHealth" aria-expanded="false" aria-controls="accordionSystemStatusQueueHealth">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_queue_health') }}</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($queue_health_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
+                        @elseif($queue_health_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusQueueHealth" class="accordion-collapse collapse @if($queue_health_warning_count > 0  || $queue_health_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusQueueHealthHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($queue_health_size as $key => $queueSize)
+                                <tr>
+                                    <td class="border-0">{{$queueSize->name}} <code>{{$queueSize->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($queueSize->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$queueSize->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
             <h2 class="accordion-header" id="accordionSystemStatusRedisHeading">
                 <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($redis_warning_count == 0  && $redis_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusRedis" aria-expanded="false" aria-controls="accordionSystemStatusRedis">
                     <div class="col-lg-9">
@@ -361,6 +416,61 @@
                                                 <i class="fa-solid fa-info-circle text-info me-3"></i>
                                         @endswitch
                                         {{$ffmpeg_version->current_value}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSystemStatusMailHeading">
+                <a class="accordion-button collapsed fw-bold bg-light text-decoration-none @if($mail_warning_count == 0  && $mail_error_count == 0 ) collapsed @endif" type="button" data-bs-toggle="collapse" data-bs-target="#accordionSystemStatusMail" aria-expanded="false" aria-controls="accordionSystemStatusMail">
+                    <div class="col-lg-9">
+                        <span class="fs-5 fw-bold text-dark">{{ __('views/inc/system/systemstatus.accordion_section_mail') }}</span>
+                    </div>
+                    <div class="col-lg-2 me-5">
+                        @if($mail_error_count > 0)
+                            <span class="fs-5 fw-bold text-danger"><i class="fa fa-circle-xmark"></i> {{ __('views/inc/system/systemstatus.accordion_error') }}</span>
+                        @elseif($mail_warning_count > 0)
+                            <span class="fs-5 fw-bold text-warning"><i class="fa fa-triangle-exclamation"></i> {{ __('views/inc/system/systemstatus.accordion_warning') }}</span>
+                        @else
+                            <span class="fs-5 fw-bold text-success"><i class="fa fa-check-circle"></i> {{ __('views/inc/system/systemstatus.accordion_operational') }}</span>
+                        @endif
+                    </div>
+                </a>
+            </h2>
+            <div id="accordionSystemStatusMail" class="accordion-collapse collapse @if($mail_warning_count > 0  || $mail_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusMailHeading">
+                <div class="accordion-body bg-light">
+                    <div class="col-lg-12">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                                <th class="col-lg-6 border-0" scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($mail_status_connection as $key => $mailConnection)
+                                <tr>
+                                    <td class="border-0">{{$mailConnection->name}} <code>{{$mailConnection->required_value}}</code></td>
+                                    <td class="border-0">
+                                        @switch($mailConnection->severity)
+                                            @case('success')
+                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
+                                                @break
+                                            @case('warning')
+                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
+                                                @break
+                                            @case('danger')
+                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
+                                                @break
+                                            @default
+                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
+                                        @endswitch
+                                        {{$mailConnection->current_value}}
                                     </td>
                                 </tr>
                             @endforeach

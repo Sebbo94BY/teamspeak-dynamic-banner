@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Instance;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Predis\Connection\ConnectionException;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
  * Possible system status severities.
@@ -233,6 +236,39 @@ class SystemStatusController extends Controller
     }
 
     /**
+     * Checks Queue health.
+     */
+    protected function check_queue_health(): array
+    {
+        $requirements = [];
+
+        $queue_size = Queue::size();
+
+        $requirements['SIZE']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size');
+        $requirements['SIZE']['current_value'] = $queue_size;
+
+        $total_cached_clients = 0;
+        try {
+            foreach (Instance::all() as $instance) {
+                $cached_clients = Redis::hkeys('instance_'.$instance->id.'_clientlist');
+                $total_cached_clients = substr_count(implode(',', $cached_clients), '_NICKNAME');
+            }
+        } catch (ConnectionException) {
+            // Do nothing; Simply catch and ignore this error
+        }
+
+        if ($total_cached_clients == 0) {
+            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = 25) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
+        } else {
+            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = $total_cached_clients * 1.5) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
+        }
+
+        $requirements['SIZE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size_required_value', ['max_expected_queue_size' => $max_expected_queue_size]);
+
+        return $requirements;
+    }
+
+    /**
      * Checks Redis connection.
      */
     protected function check_redis_connection(): array
@@ -268,6 +304,44 @@ class SystemStatusController extends Controller
         $requirements['VERSION']['current_value'] = (is_null($command_output) or empty(trim($command_output))) ? __('views/inc/system/systemstatus.accordion_section_ffmpeg_version_current_value_error') : $command_output;
         $requirements['VERSION']['required_value'] = __('views/inc/system/systemstatus.accordion_section_ffmpeg_version_required_value');
         $requirements['VERSION']['severity'] = (is_null($command_output) or empty(trim($command_output))) ? SystemStatusSeverity::Warning : SystemStatusSeverity::Success;
+
+        return $requirements;
+    }
+
+    /**
+     * Checks Mail connection.
+     */
+    protected function check_mail_connection(): array
+    {
+        $requirements = [];
+
+        $requirements['TEST']['name'] = __('views/inc/system/systemstatus.accordion_section_mail_connection');
+        $requirements['TEST']['required_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_required_value');
+
+        switch (config('mail.default')) {
+            case 'smtp':
+                $reachable = false;
+
+                try {
+                    $transport = new EsmtpTransport(config('mail.mailers.smtp.host'), config('mail.mailers.smtp.port'), config('mail.mailers.smtp.encryption'));
+                    $transport->setUsername(config('mail.mailers.smtp.username') ?? '');
+                    $transport->setPassword(config('mail.mailers.smtp.password') ?? '');
+                    $transport->start();
+
+                    $reachable = true;
+                } catch (\Exception $e) {
+                    $mail_connection_exception = $e->getMessage();
+                }
+
+                $requirements['TEST']['current_value'] = ($reachable) ? __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_error', ['exception' => $mail_connection_exception]);
+                $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
+
+                break;
+            default:
+                $requirements['TEST']['current_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_unsupported_mailer_for_testing');
+                $requirements['TEST']['severity'] = SystemStatusSeverity::Warning;
+                break;
+        }
 
         return $requirements;
     }
@@ -340,8 +414,10 @@ class SystemStatusController extends Controller
         $system_status['DATABASE']['CONNECTION'] = $this->check_database_connection();
         $system_status['DATABASE']['SETTINGS'] = $this->check_database_settings();
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
+        $system_status['QUEUE']['HEALTH'] = $this->check_queue_health();
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
         $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
+        $system_status['MAIL']['CONNECTION'] = $this->check_mail_connection();
 
         if ($optional_information) {
             $system_status['VERSIONS']['SOFTWARE'] = $this->check_versions();
@@ -365,11 +441,17 @@ class SystemStatusController extends Controller
         $permission_status = collect($system_status['PERMISSIONS']);
         $permission_status_dir = collect($permission_status['DIRECTORIES']);
 
+        $queue_status = collect($system_status['QUEUE']);
+        $queue_health_size = collect($queue_status['HEALTH']);
+
         $redis_staus = collect($system_status['REDIS']);
         $redis_staus_connection = collect($redis_staus['CONNECTION']);
 
         $ffmpeg_status = collect($system_status['FFMPEG']);
         $ffmpeg_status_version = collect($ffmpeg_status['VERSION']);
+
+        $mail_status = collect($system_status['MAIL']);
+        $mail_status_connection = collect($mail_status['CONNECTION']);
 
         $versions_status = collect($system_status['VERSIONS']);
         $versions_status_software = collect($versions_status['SOFTWARE']);
@@ -390,12 +472,18 @@ class SystemStatusController extends Controller
             'permission_status_dir' => $permission_status_dir,
             'permission_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $permission_status),
             'permission_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $permission_status),
+            'queue_health_size'=>$queue_health_size,
+            'queue_health_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $queue_status),
+            'queue_health_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $queue_status),
             'redis_status_connection'=>$redis_staus_connection,
             'redis_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
             'redis_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),
             'ffmpeg_version'=>$ffmpeg_status_version,
             'ffmpeg_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $ffmpeg_status),
             'ffmpeg_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $ffmpeg_status),
+            'mail_status_connection'=>$mail_status_connection,
+            'mail_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $mail_status),
+            'mail_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $mail_status),
             'version_status_software'=>$versions_status_software,
             'version_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
             'version_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),

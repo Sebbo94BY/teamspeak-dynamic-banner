@@ -59,6 +59,13 @@ return [
     'accordion_section_permissions_directories_required_value' => 'muss beschreibbar sein',
 
     /**
+     * Accordion Section "Queue Health"
+     */
+    'accordion_section_queue_health' => 'Gesundheit der Queue',
+    'accordion_section_queue_health_size' => 'Queue Größe',
+    'accordion_section_queue_health_size_required_value' => 'Sollte immer möglichst wenig Jobs listen, da man sonst mehr Supervisor Worker benötigt. Sollte aktuell weniger als :max_expected_queue_size Jobs sein.',
+
+    /**
      * Accordion Section "Redis"
      */
     'accordion_section_redis' => 'Redis',
@@ -74,6 +81,16 @@ return [
     'accordion_section_ffmpeg_version' => 'FFMpeg Version',
     'accordion_section_ffmpeg_version_current_value_error' => 'FFMpeg ist entweder nicht installiert oder `shell_exec()` ist deaktiviert',
     'accordion_section_ffmpeg_version_required_value' => '`FFMpeg` sollte installiert sein, um GIF Vorlagen zu unterstützen',
+
+    /**
+     * Accordion Section "Mail"
+     */
+    'accordion_section_mail' => 'E-Mail (SMTP)',
+    'accordion_section_mail_connection' => 'SMTP Verbindung',
+    'accordion_section_mail_connection_current_value_connected' => 'Verbunden',
+    'accordion_section_mail_connection_current_value_unsupported_mailer_for_testing' => 'Nur SMTP basierte E-Mail Anbieter können aktuell getestet werden.',
+    'accordion_section_mail_connection_current_value_error' => 'Fehler: :exception',
+    'accordion_section_mail_connection_required_value' => '`.env` sollte gültige `MAIL_` Einstellungen haben',
 
     /**
      * Accordion Section "Version"
