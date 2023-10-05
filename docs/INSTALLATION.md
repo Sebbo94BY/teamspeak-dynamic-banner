@@ -194,6 +194,8 @@ After enabling this virtual host, the web application should be available at the
 
 After you have completed the install wizard, you will see the dashboard of the application.
 
+It is recommended to open the **Administration** > **System Status** page in order to check, if everything is operational or needs attention.
+
 Your next steps should be the following:
 
 1. Download and install one or more TrueType Fonts as explained under Administration > Fonts
