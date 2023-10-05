@@ -16,9 +16,11 @@ class TemplateFactory extends Factory
      */
     public function definition(): array
     {
+        $random_name = str_replace('.', '', fake()->text(32));
+
         return [
-            'alias' => fake()->text(32),
-            'filename' => str_replace(' ', '_', fake()->text(32)).'.png',
+            'alias' => $random_name,
+            'filename' => str_replace(' ', '_', $random_name).'.png',
             'file_path_original' => 'uploads/templates',
             'file_path_drawed_grid' => 'uploads/templates/drawed_grid',
             'width' => fake()->numberBetween(468, 1024),
