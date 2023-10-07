@@ -33,9 +33,9 @@ class InstanceController extends Controller
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
                 $channel_list = $virtualserver->channelList();
                 $channelListForEachInstance[$instance->id]['channel_list'] = $channel_list;
-            } catch (ServerQueryException $serverquery_exception) {
+            } catch (TransportException | ServerQueryException $teamspeak_exception) {
                 $channelListForEachInstance[$instance->id]['channel_list'] = [];
-                $channelListForEachInstance[$instance->id]['error'] = $serverquery_exception->getMessage();
+                $channelListForEachInstance[$instance->id]['error'] = $teamspeak_exception->getMessage();
             }
         }
 
