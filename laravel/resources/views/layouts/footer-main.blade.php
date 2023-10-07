@@ -2,7 +2,7 @@
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <div class="col-md-12 d-flex align-items-center justify-content-between">
             <span class="text-muted">
-                &copy; {{\Illuminate\Support\Carbon::now()->format('Y')}} <a href="https://github.com/Sebbo94BY" target="_blank">Sebbo94BY</a>,
+                &copy; {{ Carbon\Carbon::now(Request::header('X-Timezone'))->format('Y')}} <a href="https://github.com/Sebbo94BY" target="_blank">Sebbo94BY</a>,
                 <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/graphs/contributors" target="_blank">{{ __("views/layouts/footer-main.contributors") }}</a> |
                 {{ __("views/layouts/footer-main.powered_by") }}
                 <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="HTML5"><i class="fa-brands fa-html5 text-primary fa-xl me-1"></i></span>

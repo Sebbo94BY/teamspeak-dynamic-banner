@@ -21,6 +21,10 @@ return [
     'language_label' => 'Language',
     'language_help' => 'Your preferred language.',
 
+    'timezone_label' => 'Timezone',
+    'timezone_auto_detect_option' => 'Detect automatically',
+    'timezone_help' => 'Your preferred timezone.',
+
     'update_profile_button' => 'Update Profile',
 
     /**
@@ -47,6 +51,7 @@ return [
     'name_validation_error' => 'Please provide a valid name!',
     'email_validation_error' => 'Please provide a valid email address!',
     'language_validation_error' => 'Please select an available language!',
+    'timezone_validation_error' => 'Please select an available timezone!',
     'current_password_validation_error' => 'Please provide your current valid password!',
     'new_password_validation_error' => 'Please provide a new valid password!',
     'confirm_password_validation_error' => 'Please repeat your new password!',

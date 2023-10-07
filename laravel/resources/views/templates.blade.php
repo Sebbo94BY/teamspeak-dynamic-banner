@@ -77,7 +77,7 @@
                         <p>{{ __('views/templates.table_alias') }}: <b>{{ $template->alias }}</b></p>
                         <p>{{ __('views/templates.table_file_size') }}: {{ ceil(filesize($template->file_path_original.'/'.$template->filename) / 1024) }} KiB</p>
                         <p>{{ __('views/templates.table_file_dimensions') }}: {{ $template->width }}x{{ $template->height }} Pixel</p>
-                        <p>{{ __('views/templates.table_last_modified') }}: {{ date('d.m.Y', strtotime($template->updated_at)) }}</p>
+                        <p>{{ __('views/templates.table_last_modified') }}: {{ Carbon\Carbon::parse($template->updated_at)->setTimezone(Request::header('X-Timezone')) }}</p>
                     </td>
                     <td class="col-lg-2">
                         @can('edit templates')

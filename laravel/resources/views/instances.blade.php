@@ -81,7 +81,11 @@
                             </span>
                         @else
                             <span class="badge text-bg-success" data-bs-toggle="tooltip" data-bs-html="true"
-                                title="{!! __('views/instances.table_status_running_title', ['process_id' => $instance->process->process_id, 'started_at' => $instance->process->created_at]) !!}"
+                                title="{!! __('views/instances.table_status_running_title', [
+                                        'process_id' => $instance->process->process_id,
+                                        'started_at' => Carbon\Carbon::parse($instance->process->created_at)->setTimezone(Request::header('X-Timezone')),
+                                        'timezone' => Request::header('X-Timezone'),
+                                    ]) !!}"
                                 id="status-badge-running">{{ __('views/instances.table_status_running') }}
                             </span>
                         @endif

@@ -2,11 +2,22 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Tests\TestCase;
 
 class WebAuthRouteTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Run the DatabaseSeeder
+        $this->seed();
+    }
+
     public function test_login_route_exists()
     {
         $response = $this->get('/login');
