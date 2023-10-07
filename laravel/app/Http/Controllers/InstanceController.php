@@ -10,6 +10,7 @@ use App\Http\Requests\InstanceStartRequest;
 use App\Http\Requests\InstanceStopRequest;
 use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Redirect;
@@ -33,7 +34,7 @@ class InstanceController extends Controller
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
                 $channel_list = $virtualserver->channelList();
                 $channelListForEachInstance[$instance->id]['channel_list'] = $channel_list;
-            } catch (TransportException | ServerQueryException $teamspeak_exception) {
+            } catch (TransportException | ServerQueryException | Exception $teamspeak_exception) {
                 $channelListForEachInstance[$instance->id]['channel_list'] = [];
                 $channelListForEachInstance[$instance->id]['error'] = $teamspeak_exception->getMessage();
             }
