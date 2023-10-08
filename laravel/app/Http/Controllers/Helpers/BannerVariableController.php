@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Instance;
+use App\Models\TwitchApi;
+use App\Models\TwitchStreamer;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
@@ -184,5 +186,25 @@ class BannerVariableController extends Controller
         }
 
         return array_change_key_case($client_info, CASE_UPPER);
+    }
+
+    /**
+     * Get Twitch streamer information.
+     */
+    public function get_twitch_streamer_information_from_database(?TwitchStreamer $twitch_streamer = null): array
+    {
+        $streamer_information = [];
+
+        if (is_null(TwitchApi::first()) or is_null($twitch_streamer)) {
+            return $streamer_information;
+        }
+
+        $streamer_information['twitch_stream_status'] = ($twitch_streamer['is_live']) ? 'LIVE' : 'Offline';
+        $streamer_information['twitch_stream_live_since'] = Carbon::parse($twitch_streamer['started_at'])->diffAsCarbonInterval();
+        $streamer_information['twitch_stream_game_name'] = $twitch_streamer['game_name'];
+        $streamer_information['twitch_stream_title'] = $twitch_streamer['title'];
+        $streamer_information['twitch_stream_viewer_count'] = $twitch_streamer['viewer_count'];
+
+        return array_change_key_case($streamer_information, CASE_UPPER);
     }
 }

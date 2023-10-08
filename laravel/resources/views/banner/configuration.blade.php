@@ -182,6 +182,51 @@
                         </div>
                     </div>
                     <div class="accordion-item">
+                        <h2 class="accordion-header" id="twitchDeActivationHeading">
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#twitchDeActivation" aria-expanded="false" aria-controls="twitchDeActivation">
+                                <div class="col-lg-9">
+                                    {{ __('views/banner/configuration.twitch_based_de_activation_accordion_headline') }}
+                                </div>
+                                <div class="col-lg-2 text-end">
+                                    @if (isset($banner_template) and !is_null($banner_template->twitch_streamer_id))
+                                        @if (is_null($twitch_api) or is_null($twitch_api->client_id) or is_null($twitch_api->client_secret))
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_configured_but_ignored') }}</span>
+                                        @else
+                                        <span class="badge text-bg-success ms-2">{{ __('views/banner/configuration.accordion_status_configured') }}</span>
+                                        @endif
+                                    @else
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_not_configured') }}</span>
+                                    @endif
+                                </div>
+                            </a>
+                        </h2>
+                        <div id="twitchDeActivation" class="accordion-collapse collapse" aria-labelledby="twitchDeActivation">
+                            <div class="accordion-body">
+                                @if (is_null($twitch_api) or is_null($twitch_api->client_id) or is_null($twitch_api->client_secret))
+                                <div class="row mt-2">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-warning">
+                                            <p>{{ __('views/banner/configuration.twitch_based_de_activation_no_twitch_api_credentials_are_configured') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+
+                                <p class="mt-2">{{ __('views/banner/configuration.twitch_based_de_activation_use_case') }}</p>
+                                <label for="validationTwitchBasedDeActivation" class="form-label">{{ __('views/banner/configuration.twitch_based_de_activation_twitch_streamer_id') }}</label>
+                                <select class="form-control" id="validationTwitchBasedDeActivation" name="twitch_streamer_id" aria-label="validationTwitchBasedDeActivation">
+                                    <option value="">Disable</option>
+                                    @foreach ($twitch_streamer as $streamer)
+                                    <option value="{{ $streamer->id }}" @if ($banner_template->twitch_streamer_id == $streamer->id) selected @endif>{{ $streamer->stream_url }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                <div class="invalid-feedback">{{ __('views/banner/configuration.twitch_streamer_id_validation_error') }}</div>
+                                <div class="form-text">{{ __('views/banner/configuration.twitch_based_de_activation_twitch_streamer_id_help') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="bannerConfigHeading">
                             <a class="accordion-button text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#bannerConfig" aria-expanded="false" aria-controls="bannerConfig">
                                 <div class="col-lg-9">
@@ -234,8 +279,9 @@
 
 @include('inc.form-validation')
 
-@foreach($instance as $instanceVariableModal)
-    @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
-@endforeach
+@include('modals.modal-variables', [
+        'twitch_streamer_variables' => $twitch_streamer_variables,
+        'instanceVariableModal' => $instance,
+    ])
 
 @endsection

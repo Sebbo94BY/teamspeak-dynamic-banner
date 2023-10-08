@@ -64,6 +64,6 @@ class Instance extends Model
     {
         $varController = new BannerVariableController();
 
-        return $varController->getInstanceVariables($this->id);
+        return $varController->getInstanceVariables($this);
     }
 }

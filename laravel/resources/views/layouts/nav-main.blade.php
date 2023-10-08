@@ -67,7 +67,7 @@
             </ul>
         </div>
         <div class="collapse navbar-collapse justify-content-end text-bg-dark">
-            @canany(['view users', 'view roles','view fonts','view system status','view php info'])
+            @canany(['view users', 'view roles', 'view fonts', 'view twitch', 'view system status', 'view php info'])
                 <ul class="navbar-nav my-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle
@@ -84,6 +84,9 @@
                             @endcan
                             @can('view fonts')
                             <li><a class="dropdown-item {{ (Route::currentRouteName() == 'administration.fonts') ? 'active' : '' }}" href="{{ route('administration.fonts') }}">{{ __("views/layouts/nav-main.administration_fonts") }}</a></li>
+                            @endcan
+                            @can('view twitch')
+                            <li><a class="dropdown-item {{ (Route::currentRouteName() == 'administration.twitch') ? 'active' : '' }}" href="{{ route('administration.twitch') }}">{{ __("views/layouts/nav-main.administration_twitch") }}</a></li>
                             @endcan
                             @can('view system status')
                             <li><a class="dropdown-item {{ (Route::currentRouteName() == 'administration.systemstatus') ? 'active' : '' }}" href="{{ route('administration.systemstatus') }}">{{ __("views/layouts/nav-main.administration_systemstatus") }}</a></li>

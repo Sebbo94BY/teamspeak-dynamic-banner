@@ -53,6 +53,37 @@ class RoleSeeder extends Seeder
             'delete fonts',
         ]);
 
+        // Administration: Twitch
+        $twitch_super_admin = Role::firstOrCreate(['name' => 'Twitch Super Admin']);
+        $twitch_super_admin->syncPermissions([
+            'view twitch',
+            'edit twitch api credentials',
+            'delete twitch api credentials',
+            'add twitch streamers',
+            'edit twitch streamers',
+            'delete twitch streamers',
+        ]);
+
+        $twitch_api_admin = Role::firstOrCreate(['name' => 'Twitch API Admin']);
+        $twitch_api_admin->syncPermissions([
+            'view twitch',
+            'edit twitch api credentials',
+            'delete twitch api credentials',
+        ]);
+
+        $twitch_streamer_admin = Role::firstOrCreate(['name' => 'Twitch Streamer Admin']);
+        $twitch_streamer_admin->syncPermissions([
+            'view twitch',
+            'add twitch streamers',
+            'edit twitch streamers',
+            'delete twitch streamers',
+        ]);
+
+        $twitch_viewer = Role::firstOrCreate(['name' => 'Twitch Viewer']);
+        $twitch_viewer->syncPermissions([
+            'view twitch',
+        ]);
+
         // Administration: System Status
         $system_status_viewer = Role::firstOrCreate(['name' => 'System Status Viewer']);
         $system_status_viewer->syncPermissions([

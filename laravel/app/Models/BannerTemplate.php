@@ -26,6 +26,7 @@ class BannerTemplate extends Model
         'disable_at',
         'time_based_enable_at',
         'time_based_disable_at',
+        'twitch_streamer_id',
         'enabled',
     ];
 
@@ -60,6 +61,14 @@ class BannerTemplate extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(Template::class);
+    }
+
+    /**
+     * Get the Twitch streamer associated with the model.
+     */
+    public function twitch_streamer(): BelongsTo
+    {
+        return $this->belongsTo(TwitchStreamer::class);
     }
 
     /**

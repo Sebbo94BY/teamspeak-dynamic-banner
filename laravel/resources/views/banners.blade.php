@@ -93,7 +93,6 @@
                             @can('edit banners')
                                 <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#editBanner-{{$banner->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
                             @endcan
-                                <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$banner->instance->id}}"><i class="fa-solid fa-square-root-variable text-primary fa-lg"></i></button>
                             @can('edit banners')
                                 <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}" class="btn btn-link px-0 me-2"><i class="fa-solid fa-image text-primary fa-lg"></i></a>
                             @endcan
@@ -124,10 +123,6 @@
     @can('delete banners')
         @include('modals.delete-feedback.modal-delete-banner', ['bannerDeleteModal'=>$bannerModal])
     @endcan
-@endforeach
-
-@foreach($instance_list as $instanceVariableModal)
-    @include('modals.modal-variables', ['instanceVariableModal'=>$instanceVariableModal])
 @endforeach
 
 @endsection
