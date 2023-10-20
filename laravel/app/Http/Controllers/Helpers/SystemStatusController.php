@@ -334,7 +334,7 @@ class SystemStatusController extends Controller
                 }
 
                 $requirements['TEST']['current_value'] = ($reachable) ? __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_error', ['exception' => $mail_connection_exception]);
-                $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
+                $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
 
                 break;
             default:
