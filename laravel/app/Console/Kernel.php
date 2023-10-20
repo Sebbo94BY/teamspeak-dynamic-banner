@@ -71,6 +71,26 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             Process::start('php '.base_path().'/artisan banners:disable-time-based');
         })->name('banners:disable-time-based')->everyFiveMinutes();
+
+        // BANNERS: Twitch-based Enabling
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan banners:twitch-based-enabling');
+        })->name('banners:twitch-based-enabling')->everyFiveMinutes();
+
+        // BANNERS: Twitch-based Disabling
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan banners:twitch-based-disabling');
+        })->name('banners:twitch-based-disabling')->everyFiveMinutes();
+
+        // TWITCH: Update API Access Token
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan twitch:update-api-access-token');
+        })->name('twitch:update-api-access-token')->everyFiveMinutes();
+
+        // TWITCH: Update Streamer information
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan twitch:update-streamer-information');
+        })->name('twitch:update-streamer-information')->everyMinute();
     }
 
     /**

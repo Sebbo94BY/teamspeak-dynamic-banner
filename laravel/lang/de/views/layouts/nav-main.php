@@ -25,6 +25,7 @@ return [
     'administration_users' => 'Benutzer',
     'administration_roles' => 'Rollen',
     'administration_fonts' => 'Schriftarten',
+    'administration_twitch' => 'Twitch',
     'administration_systemstatus' => 'System Status',
     'administration_phpinfo' => 'PHP Info',
 

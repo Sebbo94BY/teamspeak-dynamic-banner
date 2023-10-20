@@ -33,6 +33,14 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'edit fonts']);
         Permission::firstOrCreate(['name' => 'delete fonts']);
 
+        // Administration: Twitch
+        Permission::firstOrCreate(['name' => 'view twitch']);
+        Permission::firstOrCreate(['name' => 'edit twitch api credentials']);
+        Permission::firstOrCreate(['name' => 'delete twitch api credentials']);
+        Permission::firstOrCreate(['name' => 'add twitch streamers']);
+        Permission::firstOrCreate(['name' => 'edit twitch streamers']);
+        Permission::firstOrCreate(['name' => 'delete twitch streamers']);
+
         // Administration: System Status
         Permission::firstOrCreate(['name' => 'view system status']);
 

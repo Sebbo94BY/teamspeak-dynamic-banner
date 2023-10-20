@@ -13,12 +13,11 @@ class BannerVariableController extends Controller
     /**
      * Display the overview page.
      */
-    public function getInstanceVariables(int $instance_id): array
+    public function getInstanceVariables(Instance $instance): array
     {
-        $instance = Instance::find($instance_id);
-
         $redis_connection_error = null;
         $variables_and_values = [];
+
         try {
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$instance->id.'_datetime'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$instance->id.'_servergrouplist'));

@@ -8,6 +8,8 @@ use App\Models\BannerTemplate;
 use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Template;
+use App\Models\TwitchApi;
+use App\Models\TwitchStreamer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -109,6 +111,8 @@ class BannerTest extends TestCase
      */
     public function test_api_returns_an_image_with_respective_http_headers_when_everything_is_fine(): void
     {
+        TwitchApi::factory()->create();
+
         $banner_configuration = BannerConfiguration::factory()
             ->for(
                 $banner_template = BannerTemplate::factory()
@@ -116,6 +120,8 @@ class BannerTest extends TestCase
                         $this->banner
                     )->for(
                         Template::factory()->create()
+                    )->for(
+                        TwitchStreamer::factory()->create(), 'twitch_streamer'
                     )->create(['enabled' => true])
             )
             ->for(Font::factory()->create())

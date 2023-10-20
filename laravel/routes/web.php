@@ -4,6 +4,7 @@ use App\Http\Controllers\Administration\FontsController;
 use App\Http\Controllers\Administration\PhpInfoController;
 use App\Http\Controllers\Administration\RolesController;
 use App\Http\Controllers\Administration\SystemStatusController;
+use App\Http\Controllers\Administration\TwitchController;
 use App\Http\Controllers\Administration\UsersController;
 use App\Http\Controllers\BannerConfigurationController;
 use App\Http\Controllers\BannerController;
@@ -87,6 +88,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/administration/font/create', [FontsController::class, 'create'])->name('administration.font.create')->middleware('permission:add fonts');
     Route::patch('/administration/font/{font_id}/update', [FontsController::class, 'update'])->name('administration.font.update')->middleware('permission:edit fonts');
     Route::delete('/administration/font/{font_id}/delete', [FontsController::class, 'delete'])->name('administration.font.delete')->middleware('permission:delete fonts');
+
+    Route::get('/administration/twitch', [TwitchController::class, 'view'])->name('administration.twitch')->middleware('permission:view twitch');
+    Route::patch('/administration/twitch/update/api-credentials', [TwitchController::class, 'update_api_credentials'])->name('administration.twitch.update_api_credentials')->middleware('permission:edit twitch api credentials');
+    Route::delete('/administration/twitch/delete/api-credentials', [TwitchController::class, 'delete_api_credentials'])->name('administration.twitch.delete_api_credentials')->middleware('permission:delete twitch api credentials');
+    Route::post('/administration/twitch/create/streamer', [TwitchController::class, 'create_streamer'])->name('administration.twitch.create_streamer')->middleware('permission:add twitch streamers');
+    Route::patch('/administration/twitch/update/streamer/{twitch_streamer_id}', [TwitchController::class, 'update_streamer'])->name('administration.twitch.update_streamer')->middleware('permission:edit twitch streamers');
+    Route::delete('/administration/twitch/delete/streamer/{twitch_streamer_id}', [TwitchController::class, 'delete_streamer'])->name('administration.twitch.delete_streamer')->middleware('permission:delete twitch streamers');
 
     Route::get('/administration/systemstatus', [SystemStatusController::class, 'system_status'])->name('administration.systemstatus')->middleware('permission:view system status');
     Route::get('/administration/phpinfo', [PhpInfoController::class, 'php_info'])->name('administration.phpinfo')->middleware('permission:view php info');

@@ -136,6 +136,7 @@
                                     <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-rotate-left text-warning fa-lg"></i></button>
                                 </form>
                             @endcan
+                            <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalAvailableVariables-{{$instance->id}}"><i class="fa-solid fa-square-root-variable text-primary fa-lg"></i></button>
                             @can('edit instances')
                                 <button class="btn btn-link px-0 me-2" type="button" data-bs-toggle="modal" data-bs-target="#modalEditInstance-{{$instance->id}}"><i class="fa-solid fa-pencil text-primary fa-lg"></i></button>
                             @endcan
@@ -155,9 +156,12 @@
 @include('modals.instance.modal-add')
 
 @foreach($instances as $instanceModal)
+    @include('modals.modal-variables', ['instanceVariableModal' => $instanceModal])
+
     @can('edit instances')
         @include('modals.instance.modal-edit', ['instanceModal'=>$instanceModal,'channel_list'=>$channel_list])
     @endcan
+
     @can('delete instances')
         @include('modals.delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceModal])
     @endcan

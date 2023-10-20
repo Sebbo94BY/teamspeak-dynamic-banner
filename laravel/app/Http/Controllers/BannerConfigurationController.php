@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helpers\BannerVariableController;
 use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
 use App\Http\Requests\BannerConfigurationDeleteRequest;
 use App\Http\Requests\BannerConfigurationEditRequest;
@@ -9,7 +10,8 @@ use App\Http\Requests\BannerConfigurationUpsertRequest;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
 use App\Models\Font;
-use App\Models\Instance;
+use App\Models\TwitchApi;
+use App\Models\TwitchStreamer;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -23,10 +25,16 @@ class BannerConfigurationController extends Controller
      */
     public function edit(BannerConfigurationEditRequest $request): View|RedirectResponse
     {
+        $banner_template = BannerTemplate::find($request->banner_template_id);
+        $banner_variable_helper = new BannerVariableController(null);
+
         return view('banner.configuration')->with([
-            'banner_template' => BannerTemplate::find($request->banner_template_id),
+            'banner_template' => $banner_template,
             'fonts' => Font::all(),
-            'instance' => Instance::all(),
+            'instance' => $banner_template->banner->instance,
+            'twitch_api' => TwitchApi::first(),
+            'twitch_streamer' => TwitchStreamer::all(),
+            'twitch_streamer_variables' => $banner_variable_helper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer),
         ]);
     }
 
@@ -41,6 +49,7 @@ class BannerConfigurationController extends Controller
         $banner_template->disable_at = (is_null($request->disable_at)) ? null : Carbon::parse($request->disable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
         $banner_template->time_based_enable_at = (is_null($request->time_based_enable_at)) ? null : Carbon::parse($request->time_based_enable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
         $banner_template->time_based_disable_at = (is_null($request->time_based_disable_at)) ? null : Carbon::parse($request->time_based_disable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
+        $banner_template->twitch_streamer_id = (is_null($request->twitch_streamer_id)) ? null : $request->twitch_streamer_id;
 
         if (! $banner_template->save()) {
             return Redirect::route('banner.template.configuration.edit', ['banner_id' => $banner_template->banner_id, 'template_id' => $banner_template->template_id])

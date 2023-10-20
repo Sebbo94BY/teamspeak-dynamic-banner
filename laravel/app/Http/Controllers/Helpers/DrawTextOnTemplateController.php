@@ -132,6 +132,7 @@ class DrawTextOnTemplateController extends Controller
 
         $banner_variable_helper = new BannerVariableController(null);
         $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_client_specific_info_from_cache($banner_template->banner->instance, $ip_address));
+        $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer));
 
         foreach ($files_to_update as $source_path => $target_path) {
             // Permanently or temporary write it to the storage

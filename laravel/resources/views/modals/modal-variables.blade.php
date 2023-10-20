@@ -10,7 +10,7 @@
                     <div class="alert alert-warning" role="alert">
                         {{$instanceVariableModal->variables()['redis_connection_error']}}
                     </div>
-                @else
+                @endif
                 <div class="col-lg-12">
                     <table class="table" id="availableVariables">
                         <thead>
@@ -20,6 +20,15 @@
                         </tr>
                         </thead>
                         <tbody>
+                        @if (isset($twitch_streamer_variables))
+                            @foreach ($twitch_streamer_variables as $key => $value)
+                                <tr>
+                                    <td><code>%{{ $key }}%</code></td>
+                                    <td>{{ $value }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+
                         @foreach($instanceVariableModal->variables()['variables_and_values'] as $key => $value)
                             <tr>
                                 <td><code>%{{ $key }}%</code></td>
@@ -29,7 +38,6 @@
                         </tbody>
                     </table>
                 </div>
-                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('views/modals/modal-variables.dismiss_button') }}</button>
