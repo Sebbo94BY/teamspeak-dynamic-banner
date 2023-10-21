@@ -115,6 +115,32 @@
                         </div>
                     </div>
                     <div class="accordion-item">
+                        <h2 class="accordion-header" id="autoEnableHeading">
+                            <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#autoEnable" aria-expanded="false" aria-controls="autoEnable">
+                                <div class="col-lg-9">
+                                    {{ __('views/banner/configuration.enable_at_accordion_headline') }}
+                                </div>
+                                <div class="col-lg-2 text-end">
+                                    @if(isset($banner_template) && $banner_template->enable_at != null)
+                                        <span class="badge text-bg-success ms-2">{{ __('views/banner/configuration.accordion_status_configured') }}</span>
+                                    @else
+                                        <span class="badge text-bg-warning ms-2">{{ __('views/banner/configuration.accordion_status_not_configured') }}</span>
+                                    @endif
+                                </div>
+                            </a>
+                        </h2>
+                        <div id="autoEnable" class="accordion-collapse collapse" aria-labelledby="autoEnable">
+                            <div class="accordion-body">
+                                <p class="mt-2">{{ __('views/banner/configuration.enable_at_use_case') }}</p>
+                                <input class="form-control" type="datetime-local" id="validationEnableAt" name="enable_at"
+                                    value="{{ old('enable_at', (isset($banner_template) and !is_null($banner_template->enable_at)) ? Carbon\Carbon::parse($banner_template->enable_at)->setTimezone(Request::header('X-Timezone')) : '') }}" aria-label="validationEnableAt">
+                                <div class="valid-feedback">{{ __('views/banner/configuration.form_validation_looks_good') }}</div>
+                                <div class="invalid-feedback">{{ __('views/banner/configuration.enable_at_validation_error') }}</div>
+                                <div class="form-text">{{ __('views/banner/configuration.enable_at_help') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="autoDisableHeading">
                             <a class="accordion-button collapsed text-decoration-none text-dark fw-bold bg-light" data-bs-toggle="collapse" data-bs-target="#autoDisable" aria-expanded="false" aria-controls="autoDisable">
                                 <div class="col-lg-9">

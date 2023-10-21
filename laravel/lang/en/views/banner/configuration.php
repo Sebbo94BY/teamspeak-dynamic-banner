@@ -52,6 +52,10 @@ return [
     'redirect_url_placeholder' => 'e. g. https://example.com/news',
     'redirect_url_help' => 'An optional URL, where the user should get redirected, when he clicks on the banner. By default, the rendered template will be opened.',
 
+    'enable_at_accordion_headline' => 'Automatic Enabling',
+    'enable_at_use_case' => 'This function is for example useful when you want to prepare a banner, but don\'t want to enable it yet. When you set here the respective date (and time) the dynamic banner will automatically enable this configured template for you afterward, so that you don\'t have to enable it manually.',
+    'enable_at_help' => 'Define an optional date and time, when this configuration should be automatically enabled. Leave it unset to not automatically enable it.',
+
     'disable_at_accordion_headline' => 'Automatic Disabling',
     'disable_at_use_case' => 'This function is for example useful when you announce an event on your banner for a specific date (and time). When you set here the respective date (and time) the dynamic banner will automatically disable this configured template for you afterward, so that you don\'t have to disable it manually.',
     'disable_at_help' => 'Define an optional date and time, when this configuration should be automatically disabled. Leave it unset to not automatically disable it.',

@@ -23,6 +23,7 @@ class BannerTemplate extends Model
         'file_path_drawed_grid_text',
         'file_path_drawed_text',
         'redirect_url',
+        'enable_at',
         'disable_at',
         'time_based_enable_at',
         'time_based_disable_at',
@@ -43,6 +44,7 @@ class BannerTemplate extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'enable_at' => 'datetime',
         'disable_at' => 'datetime',
         'enabled' => 'boolean',
     ];

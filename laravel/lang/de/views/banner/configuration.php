@@ -52,6 +52,10 @@ return [
     'redirect_url_placeholder' => 'z.B. https://example.com/neuigkeiten',
     'redirect_url_help' => 'Eine optionale URL, an die der Benutzer weitergeleitet werden soll, wenn er auf den Banner klickt. Standardmäßig wird die gerenderte Vorlage geöffnet.',
 
+    'enable_at_accordion_headline' => 'Automatische Aktivierung',
+    'enable_at_use_case' => 'Diese Funktion ist zum Beispiel nützlich, wenn du einen Banner vorbereiten, aber noch nicht aktivieren willst. Wenn du hier das entsprechende Datum (und die Uhrzeit) einstellst, wird der dynamische Banner diese konfigurierte Vorlage anschließend automatisch für dich aktivieren, so dass du sie nicht manuell aktivieren musst.',
+    'enable_at_help' => 'Definiere ein optionales Datum und eine Uhrzeit, zu der diese Konfiguration automatisch aktiviert werden soll. Lass das Feld leer, um sie nicht automatisch zu aktivieren.',
+
     'disable_at_accordion_headline' => 'Automatische Deaktivierung',
     'disable_at_use_case' => 'Diese Funktion ist zum Beispiel nützlich, wenn du auf deinem Banner eine Veranstaltung für ein bestimmtes Datum (und eine bestimmte Uhrzeit) ankündigst. Wenn du hier das entsprechende Datum (und die Uhrzeit) einstellst, wird der dynamische Banner diese konfigurierte Vorlage anschließend automatisch für dich deaktivieren, so dass du sie nicht manuell deaktivieren musst.',
     'disable_at_help' => 'Definiere ein optionales Datum und eine Uhrzeit, zu der diese Konfiguration automatisch deaktiviert werden soll. Lass das Feld leer, um sie nicht automatisch zu deaktivieren.',
