@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Instance;
+use ErrorException;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Predis\Connection\ConnectionException;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
  * Possible system status severities.
@@ -309,6 +309,83 @@ class SystemStatusController extends Controller
     }
 
     /**
+     * Tests the SMTP connection based on the `MAIL_` environment settings.
+     */
+    protected function test_smtp_connection(): string|bool
+    {
+        if (config('mail.mailers.smtp.verify_peer')) {
+            $stream_context = stream_context_create();
+        } else {
+            $stream_context = stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ]);
+        }
+
+        switch (strtolower(config('mail.mailers.smtp.encryption'))) {
+            case 'starttls' || 'tls':
+                $connection_uri_scheme = 'tls://';
+                break;
+
+            case 'ssl':
+                $connection_uri_scheme = 'ssl://';
+                break;
+        }
+
+        // Example: tls://mail.example.com:587
+        $connection_uri = $connection_uri_scheme.config('mail.mailers.smtp.host').':'.config('mail.mailers.smtp.port');
+
+        try {
+            $connection = stream_socket_client($connection_uri, $error_code, $error_message, config('mail.mailers.smtp.timeout'), STREAM_CLIENT_CONNECT, $stream_context);
+        } catch (ErrorException $error_exception) {
+            return "SOCKET #$error_code: ".trim(str_replace('stream_socket_client():', '', $error_exception->getMessage()));
+        }
+
+        $res = fgets($connection, 256);
+        if (substr($res, 0, 3) !== '220') {
+            return "#$error_code: $error_message";
+        }
+
+        fwrite($connection, 'HELO '.config('mail.mailers.smtp.local_domain')."\n");
+        $res = fgets($connection, 256);
+        if (substr($res, 0, 3) !== '250') {
+            return "HELO #$error_code: $error_message";
+        }
+
+        if (config('mail.mailers.smtp.username') and config('mail.mailers.smtp.password')) {
+            fwrite($connection, "AUTH LOGIN\n");
+            $res = fgets($connection, 256);
+            if (substr($res, 0, 3) !== '334') {
+                return "AUTH LOGIN #$error_code: $error_message";
+            }
+
+            fwrite($connection, base64_encode(config('mail.mailers.smtp.username'))."\n");
+            $res = fgets($connection, 256);
+            if (substr($res, 0, 3) !== '334') {
+                return "AUTH USERNAME #$error_code: $error_message";
+            }
+
+            fwrite($connection, base64_encode(config('mail.mailers.smtp.password'))."\n");
+            $res = fgets($connection, 256);
+            if (substr($res, 0, 3) !== '235') {
+                return "AUTH PASSWORD #$error_code: $error_message";
+            }
+        }
+
+        fwrite($connection, "QUIT\n");
+        $res = fgets($connection, 256);
+        if (substr($res, 0, 3) !== '221') {
+            return "QUIT #$error_code: $error_message";
+        }
+
+        fclose($connection);
+
+        return true;
+    }
+
+    /**
      * Checks Mail connection.
      */
     protected function check_mail_connection(): array
@@ -320,21 +397,15 @@ class SystemStatusController extends Controller
 
         switch (config('mail.default')) {
             case 'smtp':
-                $reachable = false;
+                $smtp_connection_test_result = $this->test_smtp_connection();
 
-                try {
-                    $transport = new EsmtpTransport(config('mail.mailers.smtp.host'), config('mail.mailers.smtp.port'), config('mail.mailers.smtp.encryption'));
-                    $transport->setUsername(config('mail.mailers.smtp.username') ?? '');
-                    $transport->setPassword(config('mail.mailers.smtp.password') ?? '');
-                    $transport->start();
-
-                    $reachable = true;
-                } catch (\Exception $e) {
-                    $mail_connection_exception = $e->getMessage();
+                if (is_bool($smtp_connection_test_result)) {
+                    $requirements['TEST']['current_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_connected');
+                    $requirements['TEST']['severity'] = SystemStatusSeverity::Success;
+                } else {
+                    $requirements['TEST']['current_value'] = __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_error', ['exception' => $smtp_connection_test_result]);
+                    $requirements['TEST']['severity'] = SystemStatusSeverity::Warning;
                 }
-
-                $requirements['TEST']['current_value'] = ($reachable) ? __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_connected') : __('views/inc/system/systemstatus.accordion_section_mail_connection_current_value_error', ['exception' => $mail_connection_exception]);
-                $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
                 break;
             default:
