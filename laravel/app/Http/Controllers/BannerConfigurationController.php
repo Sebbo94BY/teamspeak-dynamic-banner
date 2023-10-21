@@ -46,6 +46,7 @@ class BannerConfigurationController extends Controller
         $banner_template = BannerTemplate::find($request->banner_template_id);
         $banner_template->name = $request->name;
         $banner_template->redirect_url = $request->redirect_url;
+        $banner_template->enable_at = (is_null($request->enable_at)) ? null : Carbon::parse($request->enable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
         $banner_template->disable_at = (is_null($request->disable_at)) ? null : Carbon::parse($request->disable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
         $banner_template->time_based_enable_at = (is_null($request->time_based_enable_at)) ? null : Carbon::parse($request->time_based_enable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));
         $banner_template->time_based_disable_at = (is_null($request->time_based_disable_at)) ? null : Carbon::parse($request->time_based_disable_at, $request->header('X-Timezone'))->setTimezone(config('app.timezone'));

@@ -43,6 +43,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'banner_template_id' => ['required', 'integer', 'exists:App\Models\BannerTemplate,id'],
             'name' => ['required', 'string'],
             'redirect_url' => ['nullable', 'url'],
+            'enable_at' => ['nullable', 'date'],
             'disable_at' => ['nullable', 'date'],
             'time_based_enable_at' => ['nullable', 'date_format:H:i,H:i:s'],
             'time_based_disable_at' => ['nullable', 'date_format:H:i,H:i:s'],

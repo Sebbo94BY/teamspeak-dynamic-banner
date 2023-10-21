@@ -57,6 +57,11 @@ class Kernel extends ConsoleKernel
             }
         })->environments(['staging', 'production'])->name('instances:autostart')->everyFiveMinutes();
 
+        // BANNERS: Automatic Enabling
+        $schedule->call(function () {
+            Process::start('php '.base_path().'/artisan banners:enable-templates');
+        })->name('banners:automatic-enabling')->everyFiveMinutes();
+
         // BANNERS: Automatic Disabling
         $schedule->call(function () {
             Process::start('php '.base_path().'/artisan banners:disable-templates');
