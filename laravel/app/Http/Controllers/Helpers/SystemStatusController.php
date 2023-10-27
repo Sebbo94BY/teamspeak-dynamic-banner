@@ -420,10 +420,17 @@ class SystemStatusController extends Controller
     {
         $requirements = [];
 
+        $is_git_deployment = file_exists('../../.git/');
+
         $requirements['IS_GIT_DEPLOYMENT']['name'] = __('views/inc/system/systemstatus.accordion_section_various_git_deployment');
-        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../.git/')) ? __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_yes') : __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_no');
+        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = ($is_git_deployment) ? __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_yes') : __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_no');
         $requirements['IS_GIT_DEPLOYMENT']['required_value'] = null;
         $requirements['IS_GIT_DEPLOYMENT']['severity'] = SystemStatusSeverity::Info;
+
+        $requirements['GIT_COMMIT_SHA']['name'] = __('views/inc/system/systemstatus.accordion_section_various_git_commit_sha');
+        $requirements['GIT_COMMIT_SHA']['current_value'] = ($is_git_deployment) ? trim(exec('tail -1 ../../.git/logs/HEAD | cut -d " " -f 2')) : __('views/inc/system/systemstatus.accordion_section_various_git_commit_sha_unknown');
+        $requirements['GIT_COMMIT_SHA']['required_value'] = null;
+        $requirements['GIT_COMMIT_SHA']['severity'] = SystemStatusSeverity::Info;
 
         $requirements['APP_ENVIRONMENT']['name'] = __('views/inc/system/systemstatus.accordion_section_various_app_env');
         $requirements['APP_ENVIRONMENT']['current_value'] = Config::get('app.env');

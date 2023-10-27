@@ -109,6 +109,8 @@ return [
     'accordion_section_various_git_deployment' => 'Ist ein Git Deployment',
     'accordion_section_various_git_deployment_current_value_yes' => 'Ja',
     'accordion_section_various_git_deployment_current_value_no' => 'Nein',
+    'accordion_section_various_git_commit_sha' => 'Installierter Git Commit SHA',
+    'accordion_section_various_git_commit_sha_unknown' => 'Unbekannt, da es kein Git Arbeitsverzeichnis ist',
     'accordion_section_various_app_env' => 'Application Environment',
     'accordion_section_various_app_env_required_value' => 'sollte in Produktion auf `production` gesetzt sein',
     'accordion_section_various_app_debug' => 'Application Debug',
