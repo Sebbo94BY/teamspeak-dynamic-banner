@@ -31,6 +31,9 @@ return [
     'password_confirmation_placeholder' => 'z.B. meinSup3r!geh31mesP4ssw0rD',
     'password_confirmation_help' => 'Wiederhole dein Passwort, um es zu bestätigen.',
 
+    'language_label' => 'Sprache',
+    'language_help' => 'Deine bevorzugte Sprache.',
+
     /**
      * Form Validation
      */
@@ -39,5 +42,6 @@ return [
     'email_validation_error' => 'Bitte gib eine gültige E-Mail Adresse an!',
     'password_validation_error' => 'Bitte gib ein gültiges und sicheres Passwort an!',
     'password_confirmation_validation_error' => 'Bitte wiederhole dein zuvor definiertes Passwort!',
+    'language_validation_error' => 'Bitte wähle eine verfügbare Sprache!',
 
 ];
