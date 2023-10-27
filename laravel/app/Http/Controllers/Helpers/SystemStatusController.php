@@ -421,7 +421,7 @@ class SystemStatusController extends Controller
         $requirements = [];
 
         $requirements['IS_GIT_DEPLOYMENT']['name'] = __('views/inc/system/systemstatus.accordion_section_various_git_deployment');
-        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../.git/')) ? __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_yes') : __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_no');
+        $requirements['IS_GIT_DEPLOYMENT']['current_value'] = (file_exists('../../.git/')) ? __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_yes') : __('views/inc/system/systemstatus.accordion_section_various_git_deployment_current_value_no');
         $requirements['IS_GIT_DEPLOYMENT']['required_value'] = null;
         $requirements['IS_GIT_DEPLOYMENT']['severity'] = SystemStatusSeverity::Info;
 
