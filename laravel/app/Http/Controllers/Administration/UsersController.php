@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserAddRequest;
 use App\Http\Requests\UserDeleteRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Mail\UserCreated;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -50,9 +53,11 @@ class UsersController extends Controller
             $user->assignRole($role_id);
         }
 
+        Mail::send(new UserCreated(Auth::user(), $user, $initial_password));
+
         return Redirect::route('administration.users')->with([
             'success' => 'user-add-successful',
-            'message' => "Successfully added the new user. Initial password: $initial_password",
+            'message' => 'Successfully sent the new user an invitation email.',
         ]);
     }
 
