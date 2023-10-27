@@ -13,8 +13,11 @@
                 <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="GITHUB"><i class="fa-brands fa-github text-primary fa-xl me-1"></i></span>
             </span>
             <span>
-                <i class="fa-solid fa-bullseye fa-fade fa-xl me-1 text-danger"></i>
-                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">{{ __("views/layouts/footer-main.feature_request_report_issue_link") }}</a>
+                <a href="https://github.com/Sebbo94BY/teamspeak-dynamic-banner/issues/new/choose" target="_blank">
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="{{ __('views/layouts/footer-main.feature_request_report_issue_link') }}">
+                        <i class="fa-solid fa-ticket text-primary fa-xl me-1"></i>
+                    </span>
+                </a>
             </span>
         </div>
     </footer>
