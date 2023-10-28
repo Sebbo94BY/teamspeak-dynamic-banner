@@ -7,6 +7,7 @@ use App\Http\Requests\UserAddRequest;
 use App\Http\Requests\UserDeleteRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Mail\UserCreated;
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,7 @@ class UsersController extends Controller
         return view('administration.users', [
             'users' => User::all(),
             'roles' => Role::all(),
+            'localizations' => Localization::all(),
         ]);
     }
 
@@ -41,6 +43,7 @@ class UsersController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($initial_password);
+        $user->localization_id = $request->localization_id;
 
         if (! $user->save()) {
             return Redirect::route('administration.user.add')->withInput($request->all())->with([
@@ -53,7 +56,7 @@ class UsersController extends Controller
             $user->assignRole($role_id);
         }
 
-        Mail::send(new UserCreated(Auth::user(), $user, $initial_password));
+        Mail::to($user)->send(new UserCreated(Auth::user(), $user, $initial_password));
 
         return Redirect::route('administration.users')->with([
             'success' => 'user-add-successful',
