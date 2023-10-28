@@ -31,6 +31,9 @@ return [
     'password_confirmation_placeholder' => 'e. g. myVery!S3cretP4ssw0rd',
     'password_confirmation_help' => 'Repeat your password to confirm it.',
 
+    'language_label' => 'Language',
+    'language_help' => 'Your preferred language.',
+
     /**
      * Form Validation
      */
@@ -39,5 +42,6 @@ return [
     'email_validation_error' => 'Please provide a valid email!',
     'password_validation_error' => 'Please provide a valid and secure password!',
     'password_confirmation_validation_error' => 'Please repeat your previous defined password!',
+    'language_validation_error' => 'Please select an available language!',
 
 ];

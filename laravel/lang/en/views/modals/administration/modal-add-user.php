@@ -21,6 +21,9 @@ return [
     'roles' => 'Roles',
     'roles_help' => 'The roles (and thus permissions), which the user should get.',
 
+    'language_label' => 'Language',
+    'language_help' => 'The preferred language of this user.',
+
     /**
      * Buttons
      */
@@ -34,5 +37,6 @@ return [
     'name_validation_error' => 'Please provide a valid name!',
     'email_validation_error' => 'Please provide a valid email address!',
     'role_validation_error' => 'Please select at least one available role!',
+    'language_validation_error' => 'Please select an available language!',
 
 ];

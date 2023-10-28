@@ -59,6 +59,21 @@
                     <div class="valid-feedback">{{ __('views/setup/installer/user.form_validation_looks_good') }}</div>
                     <div id="validationPasswordConfirmationFeedback" class="invalid-feedback">{{ __('views/setup/installer/user.password_confirmation_validation_error') }}</div>
                 </div>
+                <div class="mb-3">
+                    <label for="validationLocalizationId" class="form-label fw-bold">{{ __('views/setup/installer/user.language_label') }}</label>
+                    <select class="form-select" name="localization_id" id="validationLocalizationId" aria-describedby="localizationIdHelp" required>
+                        @foreach ($localizations as $localization)
+                        @if ((old('localization_id') == $localization->id) or (Request::route('locale') == $localization->locale)) "selected"
+                        <option value="{{ $localization->id }}" selected>{{ $localization->language_name }}</option>
+                        @else
+                        <option value="{{ $localization->id }}">{{ $localization->language_name }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                    <div id="localizationIdHelp" class="form-text">{{ __('views/setup/installer/user.language_help') }}</div>
+                    <div class="valid-feedback">{{ __('views/setup/installer/user.form_validation_looks_good') }}</div>
+                    <div class="invalid-feedback">{{ __('views/setup/installer/user.language_validation_error') }}</div>
+                </div>
             </div>
         </div>
     </form>

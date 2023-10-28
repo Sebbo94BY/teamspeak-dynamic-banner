@@ -29,6 +29,7 @@ class InstallerAddUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'localization_id' => ['required', 'integer', 'exists:App\Models\Localization,id'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }

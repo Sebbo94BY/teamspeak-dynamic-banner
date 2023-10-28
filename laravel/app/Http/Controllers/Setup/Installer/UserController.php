@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Setup\Installer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InstallerAddUserRequest;
+use App\Mail\SetupInstallerCompleted;
+use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -22,7 +25,9 @@ class UserController extends Controller
             return Redirect::route('dashboard');
         }
 
-        return view('setup.installer.user');
+        return view('setup.installer.user', [
+            'localizations' => Localization::all(),
+        ]);
     }
 
     /**
@@ -34,6 +39,7 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        $user->localization_id = $request->localization_id;
 
         if (! $user->save()) {
             return Redirect::route('setup.installer.user', ['locale' => $request->route()->parameter('locale')])->withInput($request->all())->with([
@@ -51,6 +57,8 @@ class UserController extends Controller
             'password' => $request->password,
         ]);
         $request->session()->regenerate();
+
+        Mail::to($user)->send(new SetupInstallerCompleted($user));
 
         return Redirect::route('dashboard')->with([
             'success' => 'installer-successful',

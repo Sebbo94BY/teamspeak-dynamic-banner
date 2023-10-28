@@ -36,6 +36,22 @@
                             <div class="valid-feedback">{{ __('views/modals/administration/modal-add-user.form_validation_looks_good') }}</div>
                             <div id="validationRolesFeedback" class="invalid-feedback">{{ __('views/modals/administration/modal-add-user.role_validation_error') }}</div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="validationLocalizationId" class="form-label fw-bold">{{ __('views/modals/administration/modal-add-user.language_label') }}</label>
+                            <select class="form-select" name="localization_id" id="validationLocalizationId" aria-describedby="localizationIdHelp" required>
+                                @foreach ($localizations as $localization)
+                                @if (old('localization_id', Auth::user()->localization_id) == $localization->id) "selected"
+                                <option value="{{ $localization->id }}" selected>{{ $localization->language_name }}</option>
+                                @else
+                                <option value="{{ $localization->id }}">{{ $localization->language_name }}</option>
+                                @endif
+                                @endforeach
+                            </select>
+                            <div id="localizationIdHelp" class="form-text">{{ __('views/modals/administration/modal-add-user.language_help') }}</div>
+                            <div class="valid-feedback">{{ __('views/modals/administration/modal-add-user.form_validation_looks_good') }}</div>
+                            <div class="invalid-feedback">{{ __('views/modals/administration/modal-add-user.language_validation_error') }}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

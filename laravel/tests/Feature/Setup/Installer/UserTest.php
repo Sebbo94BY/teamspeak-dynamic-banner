@@ -54,6 +54,7 @@ class UserTest extends TestCase
             'name' => fake()->name(),
             'email' => fake()->email(),
             'password' => fake()->password(8), // password needs to be confirmed
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['password']);
     }
@@ -70,6 +71,7 @@ class UserTest extends TestCase
             'email' => fake()->email(),
             'password' => $plain_password,
             'password_confirmation' => $plain_password,
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertRedirectToRoute('dashboard');
 
@@ -78,6 +80,7 @@ class UserTest extends TestCase
             'email' => fake()->email(),
             'password' => $plain_password,
             'password_confirmation' => $plain_password,
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $second_response->assertStatus(302);
     }
@@ -94,6 +97,7 @@ class UserTest extends TestCase
             'email' => fake()->email(),
             'password' => $plain_password,
             'password_confirmation' => $plain_password,
+            'localization_id' => Localization::factory()->create()->id,
         ]);
 
         $this->assertTrue(User::first()->hasRole('Super Admin'));
@@ -111,6 +115,7 @@ class UserTest extends TestCase
             'email' => fake()->email(),
             'password' => $plain_password,
             'password_confirmation' => $plain_password,
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertRedirectToRoute('dashboard');
         $response->assertLocation(route('dashboard'));

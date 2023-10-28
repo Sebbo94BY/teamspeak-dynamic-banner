@@ -57,18 +57,21 @@ class AdministrationUsersTest extends TestCase
         $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
             'email' => fake()->email(),
             'roles' => [1, 2, 8],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['name']);
 
         $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
             'name' => fake()->name(),
             'email' => fake()->email(),
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['roles']);
 
         $response = $this->actingAs($this->user)->post(route('administration.user.create'), [
             'name' => fake()->name(),
             'roles' => [1, 2, 8],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['email']);
     }
@@ -85,6 +88,7 @@ class AdministrationUsersTest extends TestCase
                 Role::where('name', '=', 'System Status Viewer')->first()->id,
                 Role::where('name', '=', 'PHP Info Viewer')->first()->id,
             ],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
 
         $new_user = User::whereNotIn('id', [$this->user->id])->first();
@@ -105,6 +109,7 @@ class AdministrationUsersTest extends TestCase
             'roles' => [
                 Role::where('name', '=', 'System Status Viewer')->first()->id,
             ],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertRedirectToRoute('administration.users');
         $response->assertSessionHas('success');
@@ -120,18 +125,21 @@ class AdministrationUsersTest extends TestCase
         $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'email' => fake()->email(),
             'roles' => [1, 2, 8],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['name']);
 
         $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'name' => fake()->name(),
             'email' => fake()->email(),
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['roles']);
 
         $response = $this->actingAs($this->user)->patch(route('administration.user.update', ['user_id' => $other_user->id]), [
             'name' => fake()->name(),
             'roles' => [1, 2, 8],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertSessionHasErrors(['email']);
     }
@@ -150,6 +158,7 @@ class AdministrationUsersTest extends TestCase
                 Role::where('name', '=', 'System Status Viewer')->first()->id,
                 Role::where('name', '=', 'PHP Info Viewer')->first()->id,
             ],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
 
         $this->assertTrue($other_user->hasRole('System Status Viewer'));
@@ -168,6 +177,7 @@ class AdministrationUsersTest extends TestCase
             'name' => fake()->name(),
             'email' => fake()->email(),
             'roles' => [1, 2, 8],
+            'localization_id' => Localization::factory()->create()->id,
         ]);
         $response->assertRedirectToRoute('administration.users');
         $response->assertSessionHas('success');
