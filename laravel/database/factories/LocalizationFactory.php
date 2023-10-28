@@ -18,7 +18,7 @@ class LocalizationFactory extends Factory
     {
         return [
             'language_name' => fake()->text(16),
-            'locale' => fake()->languageCode(),
+            'locale' => fake()->randomElement(['en', 'de']), // only list here available locales
         ];
     }
 }
