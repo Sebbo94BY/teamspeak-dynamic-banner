@@ -53,7 +53,7 @@ class UsersController extends Controller
         }
 
         foreach ($request->roles as $role_id) {
-            $user->assignRole($role_id);
+            $user->assignRole(intval($role_id));
         }
 
         Mail::to($user)->send(new UserCreated(Auth::user(), $user, $initial_password));
