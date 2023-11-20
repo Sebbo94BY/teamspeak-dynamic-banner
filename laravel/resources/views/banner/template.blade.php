@@ -25,7 +25,7 @@
     </div>
     <hr>
 </div>
-@can('add templates')
+@can('add banner template')
 <div class="container">
     <div class="row">
         <div class="col-lg-3">
@@ -44,7 +44,7 @@
             <div class="col-lg-12">
                 <div class="alert alert-primary" role="alert">
                     {{ __('views/banner/template.no_banner_templates_added_info') }}
-                    @can('add templates')
+                    @can('add banner template')
                         <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addBannerTemplate">{{ __('views/banner/template.add_banner_template_button') }}</button>
                     @endcan
                 </div>
@@ -71,24 +71,34 @@
                     <td class="col-lg-1 text-end">
                         <div class="d-flex">
                             @if ($banner_template->enabled)
+                                @can('disable banner template')
                                 <form method="post" action="{{ route('banner.template.disable', ['banner_template_id' => $banner_template->id]) }}">
                                     @method('patch')
                                     @csrf
                                     <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-toggle-on fa-lg"></i></button>
                                 </form>
+                                @endcan
                             @else
+                                @can('enable banner template')
                                 <form method="post" action="{{ route('banner.template.enable', ['banner_template_id' => $banner_template->id]) }}">
                                     @method('patch')
                                     @csrf
                                     <button class="btn btn-link px-0 me-2" type="submit"><i class="fa-solid fa-toggle-off fa-lg"></i></button>
                                 </form>
+                                @endcan
                             @endif
+
+                            @can('configure banner template')
                             <a href="{{ route('banner.template.configuration.edit', ['banner_template_id' => $banner_template->id]) }}" class="btn btn-link px-0 me-2"><i class="fa-solid fa-gear fa-lg"></i></a>
+                            @endcan
+
+                            @can('delete banner template')
                             <form method="post" action="{{ route('banner.template.remove', ['banner_template_id' => $banner_template->id]) }}">
                                 @method('delete')
                                 @csrf
                                 <button class="btn btn-link px-0 me-2" type="submit"><i class="fa fa-trash text-danger fa-lg"></i></button>
                             </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>
