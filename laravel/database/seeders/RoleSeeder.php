@@ -124,6 +124,11 @@ class RoleSeeder extends Seeder
             'add banners',
             'edit banners',
             'delete banners',
+            'add banner template',
+            'configure banner template',
+            'enable banner template',
+            'disable banner template',
+            'delete banner template',
         ]);
     }
 }
