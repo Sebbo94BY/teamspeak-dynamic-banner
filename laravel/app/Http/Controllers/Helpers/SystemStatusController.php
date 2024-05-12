@@ -377,7 +377,7 @@ class SystemStatusController extends Controller
                     $transport->stop();
 
                     $reachable = true;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $mail_connection_exception = $e->getMessage();
                 }
 
