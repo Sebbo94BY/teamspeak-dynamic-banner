@@ -48,8 +48,7 @@ class TimeBasedEnablingTest extends TestCase
      */
     public function test_banner_template_does_not_get_enabled_when_configured_but_in_the_future(): void
     {
-        $this->banner_template->time_based_enable_at = Carbon::now()->addMinutes(5);
-        $this->banner_template->time_based_disable_at = Carbon::now()->addMinutes(15);
+        $this->banner_template->time_based_enable_at = Carbon::now()->addMinutes(15);
         $this->banner_template->save();
 
         $this->artisan('banners:enable-time-based')
@@ -62,7 +61,7 @@ class TimeBasedEnablingTest extends TestCase
      */
     public function test_banner_template_gets_enabled_when_configured_and_in_the_past(): void
     {
-        $this->banner_template->time_based_enable_at = Carbon::now()->subMinutes(5);
+        $this->banner_template->time_based_enable_at = Carbon::now()->subMinutes(15);
         $this->banner_template->save();
 
         $this->artisan('banners:enable-time-based')
