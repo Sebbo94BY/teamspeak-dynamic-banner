@@ -40,7 +40,13 @@ class TimeBasedEnabling extends Command
             $carbon_time_based_enable_at = Carbon::parse($banner_template->time_based_enable_at);
 
             $should_be_enabled = false;
-            if ($carbon_time_based_enable_at > Carbon::parse($banner_template->time_based_disable_at)) {
+            if (is_null($banner_template->time_based_disable_at) and Carbon::now()->gt($carbon_time_based_enable_at)) {
+                // Should be enabled every day
+                // Example: 18:00
+                $should_be_enabled = true;
+            }
+
+            if (! is_null($banner_template->time_based_disable_at) and ($carbon_time_based_enable_at > Carbon::parse($banner_template->time_based_disable_at))) {
                 // Should be enabled on the same day
                 // Example: 16:00 - 20:00
                 if (Carbon::now()->lt($carbon_time_based_enable_at) and Carbon::now()->lt($banner_template->time_based_disable_at)) {
@@ -48,7 +54,7 @@ class TimeBasedEnabling extends Command
                 } elseif (Carbon::now()->gt($carbon_time_based_enable_at) and Carbon::now()->gt($banner_template->time_based_disable_at)) {
                     $should_be_enabled = true;
                 }
-            } else {
+            } elseif (! is_null($banner_template->time_based_disable_at)) {
                 // Should be enabled on the next day
                 // Example: 22:00 - 01:00
                 if (Carbon::now()->gt($carbon_time_based_enable_at) and Carbon::now()->lt($banner_template->time_based_disable_at)) {

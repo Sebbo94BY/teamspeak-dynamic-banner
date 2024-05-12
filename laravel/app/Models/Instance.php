@@ -39,15 +39,18 @@ class Instance extends Model
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'is_ssh' => 'boolean',
-        'serverquery_password' => 'encrypted',
-        'autostart_enabled' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_ssh' => 'boolean',
+            'serverquery_password' => 'encrypted',
+            'autostart_enabled' => 'boolean',
+        ];
+    }
 
     /**
      * Get the process associated with the model.

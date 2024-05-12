@@ -94,7 +94,7 @@ After configuring it, don't forget to cache your configuration: `php artisan con
 ### Software
 
 * Web server (e.g. apache, nginx)
-* PHP 8.1 or 8.2 with the following extensions:
+* PHP 8.2 or newer with the following extensions:
     * see [Laravel PHP requirements](https://laravel.com/docs/10.x/deployment#server-requirements)
     * ssh2 (if you want to connect your instance via SSH)
     * gd

@@ -31,12 +31,15 @@ class TwitchStreamer extends Model
     protected $hidden = [];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'is_live' => 'boolean',
-        'started_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_live' => 'boolean',
+            'started_at' => 'datetime',
+        ];
+    }
 }
