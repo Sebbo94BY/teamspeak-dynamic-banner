@@ -8,6 +8,7 @@
 .env
 .env.backup
 .env.production
+.phpunit.cache/
 .phpunit.result.cache
 clover.xml
 Homestead.json

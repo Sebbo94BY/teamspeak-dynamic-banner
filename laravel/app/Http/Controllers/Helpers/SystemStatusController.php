@@ -35,8 +35,8 @@ class SystemStatusController extends Controller
 
         $requirements['VERSION_ID']['name'] = __('views/inc/system/systemstatus.accordion_section_php_version');
         $requirements['VERSION_ID']['current_value'] = PHP_VERSION_ID.' ('.PHP_VERSION.')';
-        $requirements['VERSION_ID']['required_value'] = '>= 80100 (8.1.0)';
-        $requirements['VERSION_ID']['severity'] = (PHP_VERSION_ID >= 80100) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
+        $requirements['VERSION_ID']['required_value'] = '>= 80200 (8.2.0)';
+        $requirements['VERSION_ID']['severity'] = (PHP_VERSION_ID >= 80200) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         return $requirements;
     }

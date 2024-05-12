@@ -32,13 +32,16 @@ class TwitchApi extends Model
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'client_secret' => 'encrypted',
-        'access_token' => 'encrypted',
-        'expires_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'client_secret' => 'encrypted',
+            'access_token' => 'encrypted',
+            'expires_at' => 'datetime',
+        ];
+    }
 }
