@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: install php ${{ matrix.php_versions }} with extensions
       uses: shivammathur/setup-php@v2
