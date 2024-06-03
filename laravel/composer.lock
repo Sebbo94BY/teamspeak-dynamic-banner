@@ -1944,16 +1944,16 @@
         },
         {
             "name": "matomo/matomo-php-tracker",
-            "version": "3.3.0",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/matomo-php-tracker.git",
-                "reference": "6dd138ed98267d3bd09154531b4710ccecb44a3e"
+                "reference": "92c2ce658111c7d86a552521c619083e41ebd834"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/matomo-php-tracker/zipball/6dd138ed98267d3bd09154531b4710ccecb44a3e",
-                "reference": "6dd138ed98267d3bd09154531b4710ccecb44a3e",
+                "url": "https://api.github.com/repos/matomo-org/matomo-php-tracker/zipball/92c2ce658111c7d86a552521c619083e41ebd834",
+                "reference": "92c2ce658111c7d86a552521c619083e41ebd834",
                 "shasum": ""
             },
             "require": {
@@ -1961,7 +1961,7 @@
                 "php": "^7.2 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.3 || ^10.1"
+                "phpunit/phpunit": "^8.5 || ^9.3 || ^10.1"
             },
             "suggest": {
                 "ext-curl": "Using this extension to issue the HTTPS request to Matomo"
@@ -1996,7 +1996,7 @@
                 "issues": "https://github.com/matomo-org/matomo-php-tracker/issues",
                 "source": "https://github.com/matomo-org/matomo-php-tracker"
             },
-            "time": "2024-05-17T12:58:43+00:00"
+            "time": "2024-05-21T15:08:28+00:00"
         },
         {
             "name": "monolog/monolog",
