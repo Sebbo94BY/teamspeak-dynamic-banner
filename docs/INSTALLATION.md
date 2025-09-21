@@ -37,7 +37,7 @@ cd teamspeak-dynamic-banner
 Checkout the latest version:
 
 ```shell
-git checkout $(git tag | tail -1)
+git checkout $(git describe --tags "$(git rev-list --tags --max-count=1)")
 ```
 
 
