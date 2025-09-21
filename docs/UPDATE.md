@@ -33,7 +33,7 @@ git branch
 Checkout the latest version:
 
 ```shell
-git checkout $(git tag | tail -1)
+git checkout $(git describe --tags "$(git rev-list --tags --max-count=1)")
 ```
 
 Confirm, that you are on the respective new version (marked with a star in front of the line):
