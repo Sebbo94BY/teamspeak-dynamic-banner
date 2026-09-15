@@ -20,13 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install php ${{ matrix.php_versions }} with extensions
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php_versions }}
-        extensions: json ctype openssl ssh2 gd pcntl
+        extensions: json ctype openssl ssh2 gd pcntl curl pdo_sqlite
         coverage: none
         tools: none
 

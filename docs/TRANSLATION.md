@@ -23,4 +23,4 @@ Those subdirectories and PHP files should reflect the same structure as the actu
 
 ## Further Information
 
-This project is using the standard Laravel localization, so you can check out the official documentation for further information: https://laravel.com/docs/10.x/localization
+This project is using the standard Laravel localization, so you can check out the official documentation for further information: https://laravel.com/docs/13.x/localization

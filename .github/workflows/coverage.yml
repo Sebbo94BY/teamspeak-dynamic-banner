@@ -23,15 +23,20 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: json ctype openssl ssh2 gd pcntl
+          extensions: json ctype openssl ssh2 gd pcntl curl pdo_sqlite
           coverage: xdebug
           tools: none
 
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
 
       - name: install npm dependencies
-        run: npm install
+        run: npm ci
         working-directory: laravel
 
       - name: npm run build
@@ -57,7 +62,7 @@ jobs:
         working-directory: laravel
 
       - name: upload code coverage report to codecov.io
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           working-directory: laravel
           token: ${{ secrets.CODECOV_TOKEN }}
