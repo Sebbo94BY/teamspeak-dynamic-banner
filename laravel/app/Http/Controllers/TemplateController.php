@@ -36,7 +36,7 @@ class TemplateController extends Controller
         $filename = time().'_'.$request->file->getClientOriginalName();
         $request->file->move(public_path($this->upload_directory_original), $filename);
 
-        list($width, $height) = getimagesize($this->upload_directory_original.'/'.$filename);
+        list($width, $height) = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
 
         $template = new Template;
         $template->alias = $request->alias;
@@ -76,7 +76,7 @@ class TemplateController extends Controller
                 unlink($file_path_original);
             }
 
-            $upload_directory_drawed_grid = public_path($template->upload_directory_drawed_grid).'/'.$template->filename;
+            $upload_directory_drawed_grid = public_path($template->file_path_drawed_grid).'/'.$template->filename;
             if (file_exists($upload_directory_drawed_grid)) {
                 unlink($upload_directory_drawed_grid);
             }
@@ -84,7 +84,7 @@ class TemplateController extends Controller
             $filename = time().'_'.$request->file->getClientOriginalName();
             $request->file->move(public_path($this->upload_directory_original), $filename);
 
-            list($width, $height) = getimagesize($this->upload_directory_original.'/'.$filename);
+            list($width, $height) = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
 
             $template->filename = $filename;
             $template->file_path_original = $this->upload_directory_original;
@@ -122,12 +122,12 @@ class TemplateController extends Controller
             unlink($file_path_original);
         }
 
-        $upload_directory_drawed_grid = public_path($template->upload_directory_drawed_grid).'/'.$template->filename;
+        $upload_directory_drawed_grid = public_path($template->file_path_drawed_grid).'/'.$template->filename;
         if (file_exists($upload_directory_drawed_grid)) {
             unlink($upload_directory_drawed_grid);
         }
 
-        foreach ($template->banner_templates() as $banner_template) {
+        foreach ($template->banner_templates as $banner_template) {
             $file_path_drawed_grid_text = public_path($banner_template->file_path_drawed_grid_text).'/'.$template->filename;
             if (file_exists($file_path_drawed_grid_text)) {
                 unlink($file_path_drawed_grid_text);

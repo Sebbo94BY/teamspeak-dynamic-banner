@@ -5,7 +5,11 @@ namespace Tests\Feature;
 use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
+use App\Jobs\DrawGridSystemOnTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class TemplateTest extends TestCase
@@ -60,6 +64,32 @@ class TemplateTest extends TestCase
             'alias' => fake()->name(),
         ]);
         $response->assertSessionHasErrors(['file']);
+    }
+
+    /**
+     * Test that a valid image is stored and its dimensions are persisted.
+     */
+    public function test_adding_a_valid_template_stores_its_actual_dimensions(): void
+    {
+        Queue::fake();
+        File::ensureDirectoryExists(public_path('uploads/templates'));
+
+        $response = $this->actingAs($this->user)->post(route('template.save'), [
+            'alias' => 'Status banner',
+            'file' => UploadedFile::fake()->image('status-banner.png', 468, 60),
+        ]);
+
+        $response->assertRedirectToRoute('templates');
+        $response->assertSessionHas('success');
+
+        $stored_template = Template::query()->latest('id')->firstOrFail();
+        $this->assertSame('Status banner', $stored_template->alias);
+        $this->assertSame(468, $stored_template->width);
+        $this->assertSame(60, $stored_template->height);
+        $this->assertFileExists(public_path($stored_template->file_path_original.'/'.$stored_template->filename));
+        Queue::assertPushed(DrawGridSystemOnTemplate::class);
+
+        unlink(public_path($stored_template->file_path_original.'/'.$stored_template->filename));
     }
 
     /**
