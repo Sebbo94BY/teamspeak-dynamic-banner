@@ -6,6 +6,7 @@ use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class UpdateStreamerInformation extends Command
@@ -39,58 +40,74 @@ class UpdateStreamerInformation extends Command
 
         $this->info('Retrieving current Twitch stream information for '.$twitch_streamer->count().' streams...');
 
-        foreach ($twitch_streamer as $streamer) {
-            $streamer_login = str_replace('https://www.twitch.tv/', '', $streamer->stream_url);
+        // Twitch accepts up to 100 `login` or `user_id` values per request. Keep
+        // batches independent, so a failed request only leaves its own batch unchanged.
+        foreach ($twitch_streamer->chunk(100) as $streamer_batch) {
+            $streamers_by_login = $streamer_batch->keyBy(fn (TwitchStreamer $streamer) => strtolower(str_replace('https://www.twitch.tv/', '', $streamer->stream_url)));
+            $users_response = $this->twitch_get($twitch_api, 'users', 'login', $streamers_by_login->keys()->all());
 
-            $twitch_api_users_response = Http::withHeaders([
-                'Client-Id' => $twitch_api->client_id,
-            ])->withToken($twitch_api->access_token)->get("https://api.twitch.tv/helix/users?login=$streamer_login");
-
-            if ($twitch_api_users_response->failed()) {
-                $this->warn('The Twitch API request failed due to the following error: '.json_encode($twitch_api_users_response->json()));
+            if (! $users_response->successful()) {
+                $this->warn('The Twitch API request failed due to the following error: '.json_encode($users_response->json()));
                 continue;
             }
 
-            $twitch_api_users_response_json = $twitch_api_users_response->json();
+            $users_by_login = collect($users_response->json('data', []))->keyBy(fn (array $user) => strtolower($user['login']));
+            foreach ($streamers_by_login as $login => $streamer) {
+                if (! $users_by_login->has($login)) {
+                    $this->info('Could not find any Twitch streamer with the stream URL '.$streamer->stream_url.'.');
+                    $streamer->fill(['is_live' => false, 'started_at' => null, 'game_name' => null, 'title' => null, 'viewer_count' => 0]);
+                    if ($streamer->isDirty()) {
+                        $streamer->save();
+                    }
+                }
+            }
 
-            if (count($twitch_api_users_response_json['data']) == 0) {
-                $this->info('Could not find any Twitch streamer with the stream URL '.$streamer->stream_url.'.');
-
-                $streamer->is_live = false;
-                $streamer->started_at = null;
-                $streamer->game_name = null;
-                $streamer->title = null;
-                $streamer->viewer_count = 0;
-                $streamer->save();
-
+            $streamers_by_user_id = $users_by_login->mapWithKeys(fn (array $user) => isset($streamers_by_login[strtolower($user['login'])]) ? [$user['id'] => $streamers_by_login[strtolower($user['login'])]] : []);
+            if ($streamers_by_user_id->isEmpty()) {
                 continue;
             }
 
-            $twitch_api_streams_response = Http::withHeaders([
-                'Client-Id' => $twitch_api->client_id,
-            ])->withToken($twitch_api->access_token)->get('https://api.twitch.tv/helix/streams?user_id='.reset($twitch_api_users_response_json['data'])['id']);
-
-            $twitch_api_streams_response_json = $twitch_api_streams_response->json();
-
-            if (count($twitch_api_streams_response_json['data']) == 0 or (reset($twitch_api_streams_response_json['data'])['type'] != 'live')) {
-                $this->info('The Twitch streamer '.$streamer->stream_url.' is currently offline.');
-
-                $streamer->is_live = false;
-                $streamer->save();
-
+            $streams_response = $this->twitch_get($twitch_api, 'streams', 'user_id', $streamers_by_user_id->keys()->all());
+            if (! $streams_response->successful()) {
+                $this->warn('The Twitch API request failed due to the following error: '.json_encode($streams_response->json()));
                 continue;
             }
 
-            $this->info('The Twitch streamer '.$streamer->stream_url.' is currently online.');
+            $streams_by_user_id = collect($streams_response->json('data', []))->keyBy('user_id');
+            foreach ($streamers_by_user_id as $user_id => $streamer) {
+                $stream = $streams_by_user_id->get($user_id);
+                if (is_null($stream) || $stream['type'] !== 'live') {
+                    $this->info('The Twitch streamer '.$streamer->stream_url.' is currently offline.');
+                    $streamer->is_live = false;
+                } else {
+                    $this->info('The Twitch streamer '.$streamer->stream_url.' is currently online.');
+                    $streamer->fill([
+                        'is_live' => true,
+                        'started_at' => Carbon::parse($stream['started_at'])->setTimezone(config('app.timezone')),
+                        'game_name' => $stream['game_name'],
+                        'title' => $stream['title'],
+                        'viewer_count' => (int) $stream['viewer_count'],
+                    ]);
+                }
 
-            $twitch_api_streams_response_json = reset($twitch_api_streams_response_json['data']);
-
-            $streamer->is_live = true;
-            $streamer->started_at = Carbon::parse($twitch_api_streams_response_json['started_at'])->setTimezone(config('app.timezone'));
-            $streamer->game_name = $twitch_api_streams_response_json['game_name'];
-            $streamer->title = $twitch_api_streams_response_json['title'];
-            $streamer->viewer_count = intval($twitch_api_streams_response_json['viewer_count']);
-            $streamer->save();
+                if ($streamer->isDirty()) {
+                    $streamer->save();
+                }
+            }
         }
+    }
+
+    /** Build Twitch's repeated query parameter format without URL interpolation. */
+    protected function twitch_get(TwitchApi $twitch_api, string $endpoint, string $parameter, array $values): Response
+    {
+        $query = implode('&', array_map(
+            fn (string|int $value) => $parameter.'='.rawurlencode((string) $value),
+            $values
+        ));
+
+        return Http::withHeaders(['Client-Id' => $twitch_api->client_id])
+            ->withToken($twitch_api->access_token)
+            ->timeout(10)
+            ->get('https://api.twitch.tv/helix/'.$endpoint.'?'.$query);
     }
 }
