@@ -11,6 +11,7 @@ use GdImage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Predis\PredisException;
+use RedisException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Process\Process;
 
@@ -136,7 +137,7 @@ class DrawTextOnTemplateController extends Controller
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_datetime'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_servergrouplist'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_virtualserver_info'));
-        } catch (PredisException $connection_exception) {
+        } catch (RedisException | PredisException $connection_exception) {
             Log::error('Redis connection error: '.$connection_exception->getMessage());
         }
 

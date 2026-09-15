@@ -73,6 +73,8 @@ return [
     'accordion_section_redis_connection_current_value_connected' => 'Verbunden',
     'accordion_section_redis_connection_current_value_error' => 'Fehler: :exception',
     'accordion_section_redis_connection_required_value' => '`.env` sollte gültige `REDIS_` Einstellungen haben',
+    'accordion_section_redis_client' => 'Redis Client',
+    'accordion_section_redis_client_required_value' => '`phpredis` wird für bessere Performance empfohlen; `predis` wird weiterhin unterstützt',
 
     /**
      * Accordion Section "FFMpeg"
