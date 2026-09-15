@@ -12,7 +12,7 @@ class InstallerAddUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (User::all()->count() > 0) {
+        if (User::query()->exists()) {
             return false;
         }
 

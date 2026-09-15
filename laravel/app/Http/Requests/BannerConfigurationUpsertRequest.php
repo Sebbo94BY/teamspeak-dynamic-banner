@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\BannerTemplate;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BannerConfigurationUpsertRequest extends FormRequest
 {
@@ -43,6 +44,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'banner_template_id' => ['required', 'integer', 'exists:App\Models\BannerTemplate,id'],
             'name' => ['required', 'string'],
             'redirect_url' => ['nullable', 'url'],
+            'twitch_streamer_id' => ['nullable', 'integer', 'exists:App\Models\TwitchStreamer,id'],
             'enable_at' => ['nullable', 'date'],
             'disable_at' => ['nullable', 'date'],
             'time_based_enable_at' => ['nullable', 'date_format:H:i,H:i:s'],
@@ -50,16 +52,19 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],
 
             'configuration.banner_configuration_id' => ['sometimes', 'array'],
-            'configuration.banner_configuration_id.*' => ['integer', 'exists:App\Models\BannerConfiguration,id'],
+            'configuration.banner_configuration_id.*' => [
+                'integer',
+                Rule::exists('banner_configurations', 'id')->where('banner_template_id', $this->banner_template->id),
+            ],
 
             'configuration.x_coordinate' => ['required', 'array', 'min:1'],
-            'configuration.x_coordinate.*' => ['integer', 'min:0', 'max:'.$this->banner_template->template->width],
+            'configuration.x_coordinate.*' => ['integer', 'min:0', 'max:'.($this->banner_template->template->width - 1)],
 
             'configuration.y_coordinate' => ['required', 'array', 'min:1'],
             'configuration.y_coordinate.*' => ['integer', 'min:0', 'max:'.$this->banner_template->template->height],
 
             'configuration.text' => ['required', 'array', 'min:1'],
-            'configuration.text.*' => ['string', 'max:255'],
+            'configuration.text.*' => ['string', 'min:1', 'max:255'],
 
             'configuration.font_id' => ['required', 'array', 'min:1'],
             'configuration.font_id.*' => ['integer', 'exists:App\Models\Font,id'],

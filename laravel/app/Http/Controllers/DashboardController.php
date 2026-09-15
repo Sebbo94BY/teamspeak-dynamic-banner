@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Banner;
-use App\Models\BannerConfiguration;
 use App\Models\Instance;
 use App\Models\Template;
 use Illuminate\View\View;
@@ -16,9 +15,9 @@ class DashboardController extends Controller
     public function dashboard(): View
     {
         return view('dashboard')->with([
-            'instances_count' => Instance::all()->count(),
-            'templates_count' => Template::all()->count(),
-            'banners_count' => Banner::all()->count(),
+            'instances_count' => Instance::count(),
+            'templates_count' => Template::count(),
+            'banners_count' => Banner::count(),
         ]);
     }
 }

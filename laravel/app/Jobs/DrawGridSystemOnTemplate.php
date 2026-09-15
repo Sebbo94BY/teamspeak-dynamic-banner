@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 
 class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
 {
@@ -93,7 +94,8 @@ class DrawGridSystemOnTemplate implements ShouldQueue, ShouldBeUnique
      */
     protected function draw_grid_on_animated_image(string $source_image_filepath, string $target_image_filepath, int $spacing): void
     {
-        shell_exec("ffmpeg -hide_banner -loglevel error -nostdin -y -i $source_image_filepath -vf 'drawgrid=width=$spacing:height=$spacing:thickness=1:color=black@0.8' $target_image_filepath 2>&1");
+        $process = new Process(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin', '-y', '-i', $source_image_filepath, '-vf', "drawgrid=width=$spacing:height=$spacing:thickness=1:color=black@0.8", $target_image_filepath]);
+        $process->mustRun();
     }
 
     /**

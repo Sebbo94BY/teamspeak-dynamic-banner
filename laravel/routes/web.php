@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes(['register' => false]);
 
 Route::get('/', function () {
-    if (User::all()->count() == 0) {
+    if (! User::query()->exists()) {
         return Redirect::route('setup.installer.requirements', ['locale' => config('app.fallback_locale')]);
     }
 
