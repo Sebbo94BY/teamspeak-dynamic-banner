@@ -1,0 +1,5 @@
+.git
+laravel/node_modules
+laravel/vendor
+laravel/public/build
+laravel/.phpunit.cache
