@@ -9,6 +9,7 @@ use App\Models\Font;
 use App\Models\Instance;
 use App\Models\Localization;
 use App\Models\Template;
+use App\Models\TwitchStreamer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -93,6 +94,81 @@ class BannerConfigurationTest extends TestCase
                 'font_color_in_hexadecimal' => [fake()->hexColor()],
             ],
         ]);
+        $response->assertSessionHasErrors(['configuration.x_coordinate.0']);
+    }
+
+    /**
+     * Test that a configuration belonging to another template cannot be reassigned.
+     */
+    public function test_upserting_rejects_a_configuration_from_another_banner_template(): void
+    {
+        $other_banner_template = BannerTemplate::factory()
+            ->for(Banner::factory()->for(Instance::factory()->create())->create())
+            ->for(Template::factory()->create())
+            ->create();
+        $foreign_configuration = BannerConfiguration::factory()
+            ->for($other_banner_template)
+            ->for(Font::factory()->create())
+            ->create();
+
+        $response = $this->actingAs($this->user)->patch(route('banner.template.configuration.upsert', ['banner_template_id' => $this->banner_template->id]), [
+            'name' => 'Protected configuration',
+            'configuration' => [
+                'banner_configuration_id' => [$foreign_configuration->id],
+                'x_coordinate' => [0],
+                'y_coordinate' => [0],
+                'text' => ['Example'],
+                'font_id' => [Font::factory()->create()->id],
+                'font_size' => [12],
+                'font_angle' => [0],
+                'font_color_in_hexadecimal' => ['#000000'],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors(['configuration.banner_configuration_id.0']);
+        $this->assertSame($other_banner_template->id, $foreign_configuration->fresh()->banner_template_id);
+    }
+
+    /**
+     * Test that an unknown Twitch streamer is rejected before it can be saved.
+     */
+    public function test_upserting_rejects_an_unknown_twitch_streamer(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('banner.template.configuration.upsert', ['banner_template_id' => $this->banner_template->id]), [
+            'name' => 'Invalid streamer',
+            'twitch_streamer_id' => TwitchStreamer::query()->max('id') + 1,
+            'configuration' => [
+                'x_coordinate' => [0],
+                'y_coordinate' => [0],
+                'text' => ['Example'],
+                'font_id' => [Font::factory()->create()->id],
+                'font_size' => [12],
+                'font_angle' => [0],
+                'font_color_in_hexadecimal' => ['#000000'],
+            ],
+        ]);
+
+        $response->assertSessionHasErrors(['twitch_streamer_id']);
+    }
+
+    /**
+     * Test that text cannot start outside the right edge of the template.
+     */
+    public function test_upserting_rejects_a_text_position_outside_the_template(): void
+    {
+        $response = $this->actingAs($this->user)->patch(route('banner.template.configuration.upsert', ['banner_template_id' => $this->banner_template->id]), [
+            'name' => 'Outside template',
+            'configuration' => [
+                'x_coordinate' => [$this->banner_template->template->width],
+                'y_coordinate' => [0],
+                'text' => ['Example'],
+                'font_id' => [Font::factory()->create()->id],
+                'font_size' => [12],
+                'font_angle' => [0],
+                'font_color_in_hexadecimal' => ['#000000'],
+            ],
+        ]);
+
         $response->assertSessionHasErrors(['configuration.x_coordinate.0']);
     }
 
