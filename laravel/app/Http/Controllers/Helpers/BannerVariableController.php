@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 use Predis\PredisException;
+use RedisException;
 
 class BannerVariableController extends Controller
 {
@@ -69,17 +70,19 @@ class BannerVariableController extends Controller
 
         $clientlist = [];
         foreach ($virtualserver_clientlist as $client) {
-            $clientlist['client_'.$client->client_database_id.'_database_id'] = $client->client_database_id;
-            $clientlist['client_'.$client->client_database_id.'_id'] = $client->clid;
-            $clientlist['client_'.$client->client_database_id.'_nickname'] = $client->client_nickname;
-            $clientlist['client_'.$client->client_database_id.'_servergroups'] = $client->client_servergroups;
-            $clientlist['client_'.$client->client_database_id.'_version'] = $client->client_version;
-            $clientlist['client_'.$client->client_database_id.'_platform'] = $client->client_platform;
-            $clientlist['client_'.$client->client_database_id.'_country'] = $client->client_country;
-            $clientlist['client_'.$client->client_database_id.'_connection_client_ip'] = $client->connection_client_ip;
+            $clientlist[$client->client_database_id] = [
+                'DATABASE_ID' => $client->client_database_id,
+                'ID' => $client->clid,
+                'NICKNAME' => $client->client_nickname,
+                'SERVERGROUPS' => $client->client_servergroups,
+                'VERSION' => $client->client_version,
+                'PLATFORM' => $client->client_platform,
+                'COUNTRY' => $client->client_country,
+                'CONNECTION_CLIENT_IP' => $client->connection_client_ip,
+            ];
         }
 
-        return array_change_key_case($clientlist, CASE_UPPER);
+        return $clientlist;
     }
 
     /**
@@ -156,8 +159,19 @@ class BannerVariableController extends Controller
         $client_info = [];
 
         try {
+            $client_database_id = Redis::hget('instance_'.$instance->id.'_client_ip_index', $ip_address);
+
+            if (is_null($client_database_id)) {
+                $client_database_id = Redis::get('instance_'.$instance->id.'_client_default');
+            }
+
+            if (! is_null($client_database_id)) {
+                return Redis::hgetall('instance_'.$instance->id.'_client_'.$client_database_id);
+            }
+
+            // Compatibility fallback for data written before the per-client cache format.
             $client_variables = Redis::hgetall('instance_'.$instance->id.'_clientlist');
-        } catch (PredisException) {
+        } catch (RedisException | PredisException) {
             return $client_info;
         }
 

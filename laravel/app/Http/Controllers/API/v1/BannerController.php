@@ -45,7 +45,12 @@ class BannerController extends Controller
             return;
         }
 
-        $this->banner_templates = BannerTemplate::where(['banner_id' => $this->banner->id, 'enabled' => true])->get();
+        $this->banner->load('instance');
+        $this->banner_templates = BannerTemplate::with([
+            'template',
+            'configurations.font',
+            'twitch_streamer',
+        ])->where(['banner_id' => $this->banner->id, 'enabled' => true])->get();
 
         if ($this->banner_templates->count() == 0) {
             $this->response_text = 'The banner does either not have any configured templates or all of them are disabled.';
@@ -75,7 +80,11 @@ class BannerController extends Controller
             }
         }
 
-        if (count($this->selected_banner_template->configurations) == 0) {
+        // The template query above already loaded every relation used while rendering.
+        // Reuse the banner selected from the route rather than lazy-loading it again.
+        $this->selected_banner_template->setRelation('banner', $this->banner);
+
+        if ($this->selected_banner_template->configurations->isEmpty()) {
             $this->response_text = 'The template does not have any configurations. This seems wrong.';
             $this->response_code = 500;
 

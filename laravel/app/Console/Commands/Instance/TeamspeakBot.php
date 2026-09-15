@@ -20,6 +20,7 @@ use PlanetTeamSpeak\TeamSpeak3Framework\Helper\Signal;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Host;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 use Predis\Connection\ConnectionException;
+use RedisException;
 
 class TeamspeakBot extends Command
 {
@@ -174,7 +175,7 @@ class TeamspeakBot extends Command
             Redis::expire($redis_key, -2);
             Redis::hmset($redis_key, $data);
             Redis::expire($redis_key, $ttl);
-        } catch (ConnectionException | Exception) {
+        } catch (RedisException | ConnectionException | Exception) {
             // Do nothing when the Redis
             // - should not answer within the expected timeout time.
             // - should fail to expire / save data.
@@ -206,12 +207,31 @@ class TeamspeakBot extends Command
         $this->message('DEBUG', 'Caching the current client list...');
 
         $banner_variable_helper = new BannerVariableController($this->virtualserver);
+        $clients = $banner_variable_helper->get_current_client_list();
+        $cache_ttl = 60 * 60 * 12;
+        $ip_index_key = 'instance_'.$this->instance->id.'_client_ip_index';
 
-        $this->update_data_in_redis(
-            $banner_variable_helper->get_current_client_list(),
-            'instance_'.$this->instance->id.'_clientlist',
-            60 * 60 * 12 // 12 hours
-        );
+        try {
+            // Rebuild the small IP index atomically enough for this single bot. Client
+            // records may expire naturally; disconnected clients must not stay selectable.
+            Redis::del($ip_index_key);
+
+            foreach ($clients as $client_database_id => $client) {
+                $client_key = 'instance_'.$this->instance->id.'_client_'.$client_database_id;
+                Redis::hmset($client_key, $client);
+                Redis::expire($client_key, $cache_ttl);
+                Redis::hset($ip_index_key, $client['CONNECTION_CLIENT_IP'], $client_database_id);
+            }
+
+            if ($clients !== []) {
+                Redis::set('instance_'.$this->instance->id.'_client_default', array_key_first($clients), 'EX', $cache_ttl);
+                Redis::expire($ip_index_key, $cache_ttl);
+            } else {
+                Redis::del('instance_'.$this->instance->id.'_client_default');
+            }
+        } catch (RedisException | ConnectionException | Exception) {
+            // The next scheduled/event-driven update retries a failed cache refresh.
+        }
     }
 
     /**
