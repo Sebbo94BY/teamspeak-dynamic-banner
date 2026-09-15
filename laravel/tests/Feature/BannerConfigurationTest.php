@@ -181,7 +181,7 @@ class BannerConfigurationTest extends TestCase
             'banner_template_id' => $this->banner_template->id,
             'name' => fake()->name(),
             'configuration' => [
-                'x_coordinate' => [$this->banner_template->template->width],
+                'x_coordinate' => [$this->banner_template->template->width - 1],
                 'y_coordinate' => [$this->banner_template->template->height],
                 'text' => [fake()->text(32)],
                 'font_id' => [Font::factory()->create()->id],
