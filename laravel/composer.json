@@ -54,7 +54,7 @@
         ],
         "phpunit-tests": [
             "@php artisan config:clear",
-            "@php artisan test --without-tty --env=testing"
+            "@php artisan test --env=testing"
         ]
     },
     "extra": {

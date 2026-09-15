@@ -60,5 +60,5 @@ jobs:
         working-directory: laravel
 
       - name: run phpunit tests
-        run: php artisan test --without-tty --env=testing
+        run: php artisan test --env=testing
         working-directory: laravel

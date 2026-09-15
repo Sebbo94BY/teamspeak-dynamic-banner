@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
-use Predis\Connection\ConnectionException;
+use Predis\PredisException;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
@@ -253,7 +253,7 @@ class SystemStatusController extends Controller
                 $cached_clients = Redis::hkeys('instance_'.$instance->id.'_clientlist');
                 $total_cached_clients = substr_count(implode(',', $cached_clients), '_NICKNAME');
             }
-        } catch (ConnectionException) {
+        } catch (PredisException) {
             // Do nothing; Simply catch and ignore this error
         }
 
@@ -279,7 +279,7 @@ class SystemStatusController extends Controller
         try {
             Redis::ping();
             $reachable = true;
-        } catch (ConnectionException $connection_exception) {
+        } catch (PredisException $connection_exception) {
             $redis_connection_exception = $connection_exception->getMessage();
         }
 

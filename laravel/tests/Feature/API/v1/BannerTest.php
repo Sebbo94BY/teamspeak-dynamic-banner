@@ -10,6 +10,7 @@ use App\Models\Instance;
 use App\Models\Template;
 use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -149,7 +150,8 @@ class BannerTest extends TestCase
 
         $response = $this->get(route('api.banner', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertHeader('Cache-Control');
-        $response->assertHeader('Expires', '-1');
+        $response->assertHeader('Expires');
+        $this->assertTrue(Carbon::parse($response->headers->get('Expires'))->isPast());
         $response->assertHeader('ETag');
         $response->assertHeader('Last-Modified');
         $this->assertContains($response->headers->get('Content-Type'), ['image/png', 'image/jpeg', 'image/gif']);
