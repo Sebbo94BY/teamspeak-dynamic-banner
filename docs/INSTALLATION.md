@@ -50,7 +50,7 @@ cd laravel/
 ```
 
 ```shell
-npm install --omit=dev
+npm ci --omit=dev
 ```
 
 ```shell
@@ -78,7 +78,7 @@ Edit the `.env` file to your needs:
     * `local`: For local development using the here provided Docker setup use only
     * `staging`: For testing/staging use only
     * `production`: For production use only
-* `APP_KEY`: This should be set automatically by the `composer install` command.
+* `APP_KEY`: Generate this with `php artisan key:generate`.
     * Backup this key. It's used for encrypting and decrypting secrets in the database.
     * NEVER ever share this with anyone else!
 * `APP_DEBUG`: Should be `false` in testing/staging and production as it reveals sensitive data such as passwords.

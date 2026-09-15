@@ -9,6 +9,8 @@ First of all, you should read the release notes and understand them. You can fin
 
 There might be some breaking changes, which will affect your installation. Please check the release notes and do the necessary changes, if required.
 
+> **Laravel 13 upgrade:** Session data is serialized as JSON. Existing sessions from earlier releases are invalidated, so all users, including administrators, must sign in again after the update.
+
 
 ## Actual Update
 
@@ -47,7 +49,7 @@ If necessary, apply the necessary changes for the breaking changes from the rele
 Ensure, you have installed the required dependencies:
 
 ```shell
-npm install --omit=dev
+npm ci --omit=dev
 ```
 
 ```shell

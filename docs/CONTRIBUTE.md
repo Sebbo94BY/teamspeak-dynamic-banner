@@ -14,23 +14,23 @@ This documentation describes, how you can change and test things and contribute 
 Build the application:
 
 ```shell
-docker-compose build
+docker compose build
 ```
 
 Start the application:
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 Install the dependencies and adjust the DotEnv file for the Docker setup:
 
 ```shell
-cd laravel/ && npm install && npm run build && cd -
+cd laravel/ && npm ci && npm run build && cd -
 ```
 
 ```shell
-docker-compose exec -it backend bash
+docker compose exec -it backend bash
 ```
 
 ```shell
@@ -45,7 +45,7 @@ The application should be now accessible via http://localhost/.
 
 You should be also able to connect to the local TeamSpeak server test instance: [ts3server://localhost](ts3server://localhost)
 
-Get your Server Admin token using `docker-compose logs teamspeak | grep "|token="`.
+Get your Server Admin token using `docker compose logs teamspeak | grep "|token="`.
 
 
 ## Testing
@@ -55,7 +55,7 @@ This project uses PHPUnit for testing the application. You will find the PHPUnit
 You can run all tests by running a composer script command:
 
 ```shell
-composer run code-style
+composer run phpunit-tests
 ```
 
 
@@ -81,5 +81,5 @@ composer run code-style
 If you need to run any `artisan` command, run it for example on the `backend` container:
 
 ```shell
-docker-compose exec backend php artisan <command>
+docker compose exec backend php artisan <command>
 ```

@@ -10,7 +10,7 @@ use Exception;
 use GdImage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
-use Predis\Connection\ConnectionException;
+use Predis\PredisException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DrawTextOnTemplateController extends Controller
@@ -126,7 +126,7 @@ class DrawTextOnTemplateController extends Controller
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_datetime'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_servergrouplist'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_virtualserver_info'));
-        } catch (ConnectionException $connection_exception) {
+        } catch (PredisException $connection_exception) {
             Log::error('Redis connection error: '.$connection_exception->getMessage());
         }
 
@@ -195,7 +195,7 @@ class DrawTextOnTemplateController extends Controller
 
         return response()->file($image_file_path, [
             'Cache-Control' => 'no-cache, private',
-            'Expires' => '-1',
+            'Expires' => $current_rfc7231_datetime,
             'ETag' => md5($current_rfc7231_datetime),
             'Last-Modified' => $current_rfc7231_datetime,
             'Content-Type' => 'image/'.$source_image_file_extension,

@@ -94,15 +94,17 @@ After configuring it, don't forget to cache your configuration: `php artisan con
 ### Software
 
 * Web server (e.g. apache, nginx)
-* PHP 8.2 or newer with the following extensions:
-    * see [Laravel PHP requirements](https://laravel.com/docs/10.x/deployment#server-requirements)
+* PHP 8.3 or newer with the following extensions:
+    * see [Laravel PHP requirements](https://laravel.com/docs/13.x/deployment#server-requirements)
     * ssh2 (if you want to connect your instance via SSH)
     * gd
-* Database (see [supported databases by Laravel](https://laravel.com/docs/10.x/database#introduction))
+    * curl
+    * pdo_sqlite (for the test suite)
+* Database (see [supported databases by Laravel](https://laravel.com/docs/13.x/database#introduction))
 * [Redis](https://redis.io/)
 * Git
 * [Composer](https://getcomposer.org/)
-* [npm](https://www.npmjs.com/) (Version 9.x or newer)
+* [Node.js](https://nodejs.org/) 20.19+ or 22.12+ and [npm](https://www.npmjs.com/)
 * [FFmpeg](https://ffmpeg.org/) to support animated GIFs as template
     * This is only required, if you want to use (animated) GIF images as templates for your banners
     * Your environment variable `PATH` should include the path to your `ffmpeg` binary

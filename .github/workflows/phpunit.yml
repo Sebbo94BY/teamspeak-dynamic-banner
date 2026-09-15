@@ -14,8 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         php_versions: [
-          '8.2',
           '8.3',
+          '8.4',
+          '8.5',
         ]
     name: PHP ${{ matrix.php_versions }}
     runs-on: ubuntu-latest
@@ -24,15 +25,20 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: json ctype openssl ssh2 gd pcntl
+          extensions: json ctype openssl ssh2 gd pcntl curl pdo_sqlite
           coverage: xdebug
           tools: none
 
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
 
       - name: install npm dependencies
-        run: npm install
+        run: npm ci
         working-directory: laravel
 
       - name: npm run build
@@ -54,5 +60,5 @@ jobs:
         working-directory: laravel
 
       - name: run phpunit tests
-        run: php artisan test --without-tty --env=testing
+        run: php artisan test --env=testing
         working-directory: laravel

@@ -5,27 +5,27 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.2.0",
+        "php": "^8.3",
         "ext-gd": "*",
         "ext-pcntl": "*",
-        "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^12.0",
+        "guzzlehttp/guzzle": "^8.2",
+        "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.7",
+        "laravel/tinker": "^3.0",
         "laravel/ui": "^4.2",
-        "matomo/matomo-php-tracker": "^3.2",
+        "matomo/matomo-php-tracker": "^4.0",
         "planetteamspeak/ts3-php-framework": "dev-dev",
-        "predis/predis": "^2.1",
-        "spatie/laravel-permission": "^6.1"
+        "predis/predis": "^3.0",
+        "spatie/laravel-permission": "^8.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "friendsofphp/php-cs-fixer": "^3.14",
-        "laravel/pint": "^1.0",
-        "laravel/sail": "^1.0.1",
-        "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^11",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "laravel/pint": "^1.32",
+        "laravel/sail": "^1.67",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.9",
+        "phpunit/phpunit": "^12.5",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
@@ -54,7 +54,7 @@
         ],
         "phpunit-tests": [
             "@php artisan config:clear",
-            "@php artisan test --without-tty --env=testing"
+            "@php artisan test --env=testing"
         ]
     },
     "extra": {

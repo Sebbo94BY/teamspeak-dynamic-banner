@@ -6,7 +6,7 @@ use App\Http\Controllers\Helpers\BannerVariableController as HelpersBannerVariab
 use App\Models\Instance;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
-use Predis\Connection\ConnectionException;
+use Predis\PredisException;
 
 class BannerVariableController extends Controller
 {
@@ -22,7 +22,7 @@ class BannerVariableController extends Controller
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$instance->id.'_datetime'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$instance->id.'_servergrouplist'));
             $variables_and_values = array_merge($variables_and_values, Redis::hgetall('instance_'.$instance->id.'_virtualserver_info'));
-        } catch (ConnectionException $connection_exception) {
+        } catch (PredisException $connection_exception) {
             $redis_connection_error = $connection_exception->getMessage();
             $variables_and_values = [];
         }

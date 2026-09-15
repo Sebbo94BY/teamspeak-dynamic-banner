@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
-use Predis\Connection\ConnectionException;
+use Predis\PredisException;
 
 class BannerVariableController extends Controller
 {
@@ -157,7 +157,7 @@ class BannerVariableController extends Controller
 
         try {
             $client_variables = Redis::hgetall('instance_'.$instance->id.'_clientlist');
-        } catch (ConnectionException) {
+        } catch (PredisException) {
             return $client_info;
         }
 
