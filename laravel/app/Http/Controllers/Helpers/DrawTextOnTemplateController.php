@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Predis\PredisException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Process\Process;
 
 class DrawTextOnTemplateController extends Controller
 {
@@ -98,10 +99,19 @@ class DrawTextOnTemplateController extends Controller
             // Search for variables (`%SAMPLE_VARIABLE%`) and replace it with their current value, if possible
             $text = $this->replace_variables_with_actual_values($configuration->text, $variables_and_values);
 
-            $text_configs[] = "drawtext=text='$text':fontsize=$configuration->font_size:x=$configuration->x_coordinate:y=$configuration->y_coordinate:fontcolor=$configuration->font_color_in_hexadecimal:fontfile=".public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename);
+            $text_configs[] = "drawtext=text='".$this->escape_ffmpeg_filter_value($text)."':fontsize=$configuration->font_size:x=$configuration->x_coordinate:y=$configuration->y_coordinate:fontcolor=$configuration->font_color_in_hexadecimal:fontfile='".$this->escape_ffmpeg_filter_value(public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename))."'";
         }
 
-        shell_exec("ffmpeg -hide_banner -loglevel error -nostdin -y -i $source_image_filepath -vf \"".implode(',', $text_configs)."\" $target_image_filepath 2>&1");
+        $process = new Process(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin', '-y', '-i', $source_image_filepath, '-vf', implode(',', $text_configs), $target_image_filepath]);
+        $process->mustRun();
+    }
+
+    /**
+     * Escape an FFmpeg filter value without relying on shell escaping.
+     */
+    protected function escape_ffmpeg_filter_value(string $value): string
+    {
+        return str_replace(['\\', "'", ':', ','], ['\\\\', "\\'", '\\:', '\\,'], $value);
     }
 
     /**
@@ -149,13 +159,12 @@ class DrawTextOnTemplateController extends Controller
 
             switch ($source_image_file_extension) {
                 case 'png':
-                    // Save the generated image as file
                     $gd_image = imagecreatefrompng($source_image_filepath);
-                    if (! imagepng($this->draw_text_on_static_image($gd_image, $banner_template, $variables_and_values), public_path($target_path).'/'.$banner_template->template->filename, 0)) {
-                        throw new Exception("Could not save the template with the drawed text to `$target_path`.");
-                    }
+                    $this->draw_text_on_static_image($gd_image, $banner_template, $variables_and_values);
 
-                    imagepng($gd_image, $image_file_path, 0);
+                    if (! imagepng($gd_image, $image_file_path, 0)) {
+                        throw new Exception("Could not save the rendered template to `$image_file_path`.");
+                    }
 
                     // Destroy the generated image to free up the memory again
                     imagedestroy($gd_image);
@@ -164,13 +173,12 @@ class DrawTextOnTemplateController extends Controller
 
                 case 'jpg':
                 case 'jpeg':
-                    // Save the generated image as file
                     $gd_image = imagecreatefromjpeg($source_image_filepath);
-                    if (! imagejpeg($this->draw_text_on_static_image($gd_image, $banner_template, $variables_and_values), public_path($target_path).'/'.$banner_template->template->filename, 100)) {
-                        throw new Exception("Could not save the template with the drawed text to `$target_path`.");
-                    }
+                    $this->draw_text_on_static_image($gd_image, $banner_template, $variables_and_values);
 
-                    imagejpeg($gd_image, $image_file_path, 100);
+                    if (! imagejpeg($gd_image, $image_file_path, 100)) {
+                        throw new Exception("Could not save the rendered template to `$image_file_path`.");
+                    }
 
                     // Destroy the generated image to free up the memory again
                     imagedestroy($gd_image);
