@@ -14,7 +14,7 @@ class Authenticate extends Middleware
     protected function redirectTo(Request $request)
     {
         if (! $request->expectsJson()) {
-            if (User::all()->count() > 0) {
+            if (User::query()->exists()) {
                 return route('login');
             }
 

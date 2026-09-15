@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function show_view(): RedirectResponse|View
     {
-        if (User::all()->count() > 0) {
+        if (User::query()->exists()) {
             return Redirect::route('dashboard');
         }
 

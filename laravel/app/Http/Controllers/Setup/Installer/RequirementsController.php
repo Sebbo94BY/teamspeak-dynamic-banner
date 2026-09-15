@@ -18,7 +18,7 @@ class RequirementsController extends Controller
      */
     public function show_view(): View|Application|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        if (User::all()->count() > 0) {
+        if (User::query()->exists()) {
             return Redirect::route('dashboard');
         }
 
