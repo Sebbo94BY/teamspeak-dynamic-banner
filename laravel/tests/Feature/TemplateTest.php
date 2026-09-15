@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
-use App\Jobs\DrawGridSystemOnTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
