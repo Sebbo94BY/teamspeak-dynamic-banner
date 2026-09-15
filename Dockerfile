@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.5-fpm
 
 # Vite 8 requires Node.js 20.19+ (or 22.12+).
 COPY --from=node:22-bookworm-slim /usr/local/bin/node /usr/local/bin/node
