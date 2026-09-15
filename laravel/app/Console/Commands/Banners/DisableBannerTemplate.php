@@ -27,16 +27,14 @@ class DisableBannerTemplate extends Command
      */
     public function handle()
     {
-        $banner_templates_with_set_disable_at = BannerTemplate::whereNotNull('disable_at')->get(['id', 'disable_at', 'enabled']);
+        $banner_templates_with_set_disable_at = BannerTemplate::where('enabled', true)
+            ->whereNotNull('disable_at')
+            ->where('disable_at', '<', Carbon::now())
+            ->get(['id', 'disable_at', 'enabled']);
 
         $this->info('Checking '.count($banner_templates_with_set_disable_at).' banner templates...');
 
         foreach ($banner_templates_with_set_disable_at as $banner_template) {
-            if ($banner_template->disable_at->gte(Carbon::now())) {
-                $this->info("The configured date and time for the banner template with the ID $banner_template->id is still in the future. Skipping.");
-                continue;
-            }
-
             $banner_template->enabled = false;
 
             if (! $banner_template->save()) {

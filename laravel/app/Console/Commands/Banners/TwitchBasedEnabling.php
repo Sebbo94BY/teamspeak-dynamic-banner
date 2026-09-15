@@ -31,16 +31,14 @@ class TwitchBasedEnabling extends Command
             return $this->info('No twitch API has been configured yet. Skipping.');
         }
 
-        $banner_templates_with_set_twitch_streamer = BannerTemplate::whereNotNull('twitch_streamer_id')->get(['id', 'twitch_streamer_id', 'enabled']);
+        $banner_templates_with_set_twitch_streamer = BannerTemplate::with('twitch_streamer')
+            ->where('enabled', false)
+            ->whereNotNull('twitch_streamer_id')
+            ->get(['id', 'twitch_streamer_id', 'enabled']);
 
         $this->info('Checking '.count($banner_templates_with_set_twitch_streamer).' banner templates...');
 
         foreach ($banner_templates_with_set_twitch_streamer as $banner_template) {
-            if ($banner_template->enabled) {
-                $this->info("The banner template with the ID $banner_template->id is already enabled. Skipping.");
-                continue;
-            }
-
             if (! $banner_template->twitch_streamer->is_live) {
                 $this->info("The banner template with the ID $banner_template->id should NOT be enabled yet. Skipping.");
                 continue;
