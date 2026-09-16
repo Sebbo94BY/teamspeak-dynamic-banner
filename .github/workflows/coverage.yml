@@ -23,7 +23,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: json ctype openssl ssh2 gd pcntl curl pdo_sqlite
+          extensions: json ctype openssl ssh2 gd pcntl curl pdo_sqlite redis
           coverage: xdebug
           tools: none
 

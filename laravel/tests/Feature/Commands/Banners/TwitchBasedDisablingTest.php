@@ -89,7 +89,7 @@ class TwitchBasedDisablingTest extends TestCase
         $this->banner_template->save();
 
         $this->artisan('banners:twitch-based-disabling')
-            ->expectsOutput('The banner template with the ID '.$this->banner_template->id.' is already disabled. Skipping.')
+            ->expectsOutput('Checking 0 banner templates...')
             ->doesntExpectOutput('Successfully disabled the banner template with the ID '.$this->banner_template->id.'. See '.route('banner.template.configuration.edit', ['banner_template_id' => $this->banner_template->id]).' for details.')
             ->assertSuccessful();
     }

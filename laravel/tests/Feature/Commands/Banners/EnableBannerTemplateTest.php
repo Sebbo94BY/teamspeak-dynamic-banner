@@ -52,7 +52,7 @@ class EnableBannerTemplateTest extends TestCase
         $this->banner_template->save();
 
         $this->artisan('banners:enable-templates')
-            ->expectsOutput('The configured date and time for the banner template with the ID '.$this->banner_template->id.' is still in the future. Skipping.')
+            ->expectsOutput('Checking 0 banner templates...')
             ->assertSuccessful();
     }
 

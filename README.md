@@ -99,6 +99,7 @@ After configuring it, don't forget to cache your configuration: `php artisan con
     * ssh2 (if you want to connect your instance via SSH)
     * gd
     * curl
+    * redis / PhpRedis (recommended for lower CPU and memory consumption than pure-PHP Redis clients; Predis remains supported)
     * pdo_sqlite (for the test suite)
 * Database (see [supported databases by Laravel](https://laravel.com/docs/13.x/database#introduction))
 * [Redis](https://redis.io/)

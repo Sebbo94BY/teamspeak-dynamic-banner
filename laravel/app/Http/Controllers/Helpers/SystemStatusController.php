@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
 use Predis\PredisException;
+use RedisException;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
@@ -250,10 +251,9 @@ class SystemStatusController extends Controller
         $total_cached_clients = 0;
         try {
             foreach (Instance::all() as $instance) {
-                $cached_clients = Redis::hkeys('instance_'.$instance->id.'_clientlist');
-                $total_cached_clients = substr_count(implode(',', $cached_clients), '_NICKNAME');
+                $total_cached_clients += Redis::hlen('instance_'.$instance->id.'_client_ip_index');
             }
-        } catch (PredisException) {
+        } catch (RedisException | PredisException) {
             // Do nothing; Simply catch and ignore this error
         }
 
@@ -279,7 +279,7 @@ class SystemStatusController extends Controller
         try {
             Redis::ping();
             $reachable = true;
-        } catch (PredisException $connection_exception) {
+        } catch (RedisException | PredisException $connection_exception) {
             $redis_connection_exception = $connection_exception->getMessage();
         }
 
@@ -289,6 +289,23 @@ class SystemStatusController extends Controller
         $requirements['TEST']['severity'] = ($reachable) ? SystemStatusSeverity::Success : SystemStatusSeverity::Danger;
 
         return $requirements;
+    }
+
+    /**
+     * Reports the configured Redis client and recommends the native PhpRedis extension.
+     */
+    protected function check_redis_client(): array
+    {
+        $client = config('database.redis.client');
+
+        return [
+            'CLIENT' => [
+                'name' => __('views/inc/system/systemstatus.accordion_section_redis_client'),
+                'current_value' => $client,
+                'required_value' => __('views/inc/system/systemstatus.accordion_section_redis_client_required_value'),
+                'severity' => ($client === 'phpredis') ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning,
+            ],
+        ];
     }
 
     /**
@@ -472,6 +489,7 @@ class SystemStatusController extends Controller
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
         $system_status['QUEUE']['HEALTH'] = $this->check_queue_health();
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
+        $system_status['REDIS']['CLIENT'] = $this->check_redis_client();
         $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
         $system_status['MAIL']['CONNECTION'] = $this->check_mail_connection();
 
@@ -501,7 +519,8 @@ class SystemStatusController extends Controller
         $queue_health_size = collect($queue_status['HEALTH']);
 
         $redis_staus = collect($system_status['REDIS']);
-        $redis_staus_connection = collect($redis_staus['CONNECTION']);
+        $redis_staus_connection = collect($redis_staus['CONNECTION'])
+            ->merge(collect($redis_staus['CLIENT']));
 
         $ffmpeg_status = collect($system_status['FFMPEG']);
         $ffmpeg_status_version = collect($ffmpeg_status['VERSION']);

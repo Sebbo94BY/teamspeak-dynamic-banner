@@ -31,8 +31,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath curl -j$(nproc) gd opcache
-RUN pecl install ssh2-1.4 xdebug
-RUN docker-php-ext-enable ssh2 gd xdebug
+RUN pecl install redis ssh2-1.4 xdebug
+RUN docker-php-ext-enable redis ssh2 gd xdebug
 
 # Configure PHP
 COPY ./docker/php/conf.d/* /usr/local/etc/php/conf.d/
