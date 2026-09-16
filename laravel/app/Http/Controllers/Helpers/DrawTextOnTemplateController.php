@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteTemporaryRenderedBannerTemplates;
 use App\Models\BannerTemplate;
+use App\Support\BannerTextFormatter;
 use Carbon\Carbon;
 use Exception;
 use GdImage;
@@ -27,19 +28,7 @@ class DrawTextOnTemplateController extends Controller
      */
     protected function replace_variables_with_actual_values(string $text, array $variables_and_values): string
     {
-        if (preg_match_all("/%[A-Z0-9\_?]+%/", $text, $text_variables)) {
-            foreach ($text_variables[0] as $variable) {
-                $variable_name = strtoupper(str_replace('%', '', $variable));
-
-                if (array_key_exists($variable_name, $variables_and_values)) {
-                    $text = str_replace("$variable", $variables_and_values[$variable_name], $text);
-                } else {
-                    $text = str_replace("$variable", 'Unknown', $text);
-                }
-            }
-        }
-
-        return $text;
+        return (new BannerTextFormatter())->format($text, $variables_and_values);
     }
 
     /**

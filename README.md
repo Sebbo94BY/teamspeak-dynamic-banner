@@ -47,6 +47,7 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
 * Add and configure one or more templates for each banner
     * Configure (different) URL redirects for each banner (e.g. one banner redirects to your homepage, the other to your social media account)
     * Over 140 standard variables (e.g. current time, count of online clients, client nickname, etc.)
+    * Calculate and format numeric variable values in text configurations
     * Use your preferred TrueType Font (TTF)
     * Set the font size for your texts
     * Set the font angel for your texts
@@ -56,6 +57,26 @@ Be a [stargazer](https://github.com/Sebbo94BY/teamspeak-dynamic-banner/stargazer
     * This avoids annoying connects / disconnects to get all necessary data every time
     * The required data gets fetched event based (e.g. client joins the server) and partitially regulary (e.g. every 5 minutes)
     * All fetched data will be stored in the Redis to speed up the entire application
+
+
+## Variables, calculations, and number formatting
+
+Use a variable in a template text by enclosing its name in percent signs, for example `%VIRTUALSERVER_CLIENTSONLINE%`. The **Available Variables** button on the template configuration page shows the values available for the selected instance.
+
+Numeric values can be calculated using `$(...)`. The supported operators are `+`, `-`, `*`, `/`, and parentheses. For example, this excludes ServerQuery clients from the displayed online count:
+
+```
+Online: $(%VIRTUALSERVER_CLIENTSONLINE% - %VIRTUALSERVER_QUERYCLIENTSONLINE%) Users
+```
+
+Use `$format()` to control how a numeric variable is displayed:
+
+```
+$format(%VIRTUALSERVER_CLIENTSONLINE%, "000")
+$format(%CONNECTION_BYTES_SENT_KEEPALIVE%, "#,##0.00")
+```
+
+Number patterns use `0` for a required digit, `#` for an optional digit, `.` as the decimal separator, and `,` as the grouping separator. Thus, `"000"` renders `1` as `001`, while `"#,##0.00"` renders `12345.6` as `12,345.60`. Invalid calculations, unknown variables, and attempts to format non-numeric values render as `Unknown`.
 
 
 ## Supported Languages

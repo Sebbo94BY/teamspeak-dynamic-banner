@@ -21,7 +21,7 @@ return [
 
     'text' => 'Text',
     'text_placeholder' => 'e. g. %VIRTUALSERVER_TOTAL_PING% ms',
-    'text_help' => 'The text, which should get printed to the template.',
+    'text_help' => 'Use %VARIABLE% for a value, $(%VALUE_A% - %VALUE_B%) for arithmetic, or $format(%VARIABLE%, "000") to format a number. Click the variables button above for available values.',
 
     'font_id' => 'Font',
     'font_id_help' => 'Please select the font for this specific text.',
