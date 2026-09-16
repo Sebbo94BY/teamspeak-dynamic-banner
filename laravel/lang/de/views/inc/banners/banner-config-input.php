@@ -21,7 +21,7 @@ return [
 
     'text' => 'Text',
     'text_placeholder' => 'z.B. %VIRTUALSERVER_TOTAL_PING% ms',
-    'text_help' => 'Der Text, der auf die Vorlage gedruckt werden soll.',
+    'text_help' => 'Nutze %VARIABLE% für einen Wert, $(%WERT_A% - %WERT_B%) für Berechnungen oder $format(%VARIABLE%, "000") zum Formatieren einer Zahl. Über die Schaltfläche für Variablen oben werden alle verfügbaren Werte angezeigt.',
 
     'font_id' => 'Schriftart',
     'font_id_help' => 'Bitte wähle die Schriftart für diesen bestimmten Text.',
