@@ -14,7 +14,7 @@
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.2",
         "matomo/matomo-php-tracker": "^4.0",
-        "planetteamspeak/ts3-php-framework": "dev-dev",
+        "planetteamspeak/ts3-php-framework": "^2.0",
         "predis/predis": "^3.0",
         "spatie/laravel-permission": "^8.0"
     },
