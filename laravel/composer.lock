@@ -3002,16 +3002,16 @@
         },
         {
             "name": "planetteamspeak/ts3-php-framework",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/planetteamspeak/ts3phpframework.git",
-                "reference": "22c0c8b18bee3f1d2b36091e27c385b99b778682"
+                "reference": "311019ad6276a5249f75751db8af9d242b4ec462"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/22c0c8b18bee3f1d2b36091e27c385b99b778682",
-                "reference": "22c0c8b18bee3f1d2b36091e27c385b99b778682",
+                "url": "https://api.github.com/repos/planetteamspeak/ts3phpframework/zipball/311019ad6276a5249f75751db8af9d242b4ec462",
+                "reference": "311019ad6276a5249f75751db8af9d242b4ec462",
                 "shasum": ""
             },
             "require": {
@@ -3064,9 +3064,9 @@
                 "docs": "https://docs.planetteamspeak.com/ts3/php/framework",
                 "email": "info@planetteamspeak.com",
                 "issues": "https://github.com/planetteamspeak/ts3phpframework/issues",
-                "source": "https://github.com/planetteamspeak/ts3phpframework/tree/2.0.0"
+                "source": "https://github.com/planetteamspeak/ts3phpframework/tree/2.0.1"
             },
-            "time": "2026-09-16T13:34:22+00:00"
+            "time": "2026-09-21T20:48:31+00:00"
         },
         {
             "name": "predis/predis",
