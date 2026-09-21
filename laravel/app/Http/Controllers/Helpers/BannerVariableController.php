@@ -71,14 +71,14 @@ class BannerVariableController extends Controller
         $clientlist = [];
         foreach ($virtualserver_clientlist as $client) {
             $clientlist[$client->client_database_id] = [
-                'DATABASE_ID' => $client->client_database_id,
-                'ID' => $client->clid,
-                'NICKNAME' => $client->client_nickname,
-                'SERVERGROUPS' => $client->client_servergroups,
-                'VERSION' => $client->client_version,
-                'PLATFORM' => $client->client_platform,
-                'COUNTRY' => $client->client_country,
-                'CONNECTION_CLIENT_IP' => $client->connection_client_ip,
+                'CLIENT_DATABASE_ID' => $client->client_database_id,
+                'CLIENT_ID' => $client->clid,
+                'CLIENT_NICKNAME' => $client->client_nickname,
+                'CLIENT_SERVERGROUPS' => $client->client_servergroups,
+                'CLIENT_VERSION' => $client->client_version,
+                'CLIENT_PLATFORM' => $client->client_platform,
+                'CLIENT_COUNTRY' => $client->client_country,
+                'CLIENT_CONNECTION_CLIENT_IP' => $client->connection_client_ip,
             ];
         }
 

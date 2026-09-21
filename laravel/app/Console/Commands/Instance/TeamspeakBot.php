@@ -173,7 +173,7 @@ class TeamspeakBot extends Command
 
         try {
             Redis::expire($redis_key, -2);
-            Redis::hmset($redis_key, $data);
+            Redis::hmset($redis_key, $this->normalize_data_for_redis($data));
             Redis::expire($redis_key, $ttl);
         } catch (RedisException | ConnectionException | Exception) {
             // Do nothing when the Redis
@@ -181,6 +181,20 @@ class TeamspeakBot extends Command
             // - should fail to expire / save data.
             // The next iteration will retry it.
         }
+    }
+
+    /**
+     * Converts framework value objects into Redis-compatible scalar values.
+     */
+    protected function normalize_data_for_redis(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof \Stringable) {
+                $data[$key] = (string) $value;
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -218,9 +232,11 @@ class TeamspeakBot extends Command
 
             foreach ($clients as $client_database_id => $client) {
                 $client_key = 'instance_'.$this->instance->id.'_client_'.$client_database_id;
+                $client = $this->normalize_data_for_redis($client);
+                Redis::del($client_key);
                 Redis::hmset($client_key, $client);
                 Redis::expire($client_key, $cache_ttl);
-                Redis::hset($ip_index_key, $client['CONNECTION_CLIENT_IP'], $client_database_id);
+                Redis::hset($ip_index_key, $client['CLIENT_CONNECTION_CLIENT_IP'], $client_database_id);
             }
 
             if ($clients !== []) {
