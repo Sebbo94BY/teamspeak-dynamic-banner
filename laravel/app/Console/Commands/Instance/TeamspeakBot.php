@@ -289,7 +289,7 @@ class TeamspeakBot extends Command
     {
         $this->message('INFO', 'Starting TeamSpeak bot instance: '.$this->instance->virtualserver_name);
 
-        $virtualserver_helper = new TeamSpeakVirtualserver($this->instance);
+        $virtualserver_helper = $this->create_virtualserver_helper();
 
         try {
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
@@ -307,11 +307,7 @@ class TeamspeakBot extends Command
             return;
         }
 
-        // Update all data once immediately, when the bot initially starts
-        $this->updateDatetime();
-        $this->updateClientList();
-        $this->updateServergroupList();
-        $this->updateVirtualserverInfo();
+        $this->refresh_cached_data();
 
         // register for server events
         $this->virtualserver->notifyRegister('server');
@@ -324,8 +320,60 @@ class TeamspeakBot extends Command
 
         // wait for events
         while ($this->keep_running) {
-            $this->virtualserver->getAdapter()->wait();
+            try {
+                $this->virtualserver->getAdapter()->wait();
+            } catch (TransportException $transport_exception) {
+                $this->message('WARNING', "Connection to `{$this->instance->host}` was lost. Reconnecting...");
+                $this->reconnect_to_virtualserver($virtualserver_helper);
+            }
         }
+    }
+
+    /**
+     * Creates the virtual server connector.
+     */
+    protected function create_virtualserver_helper(): TeamSpeakVirtualserver
+    {
+        return new TeamSpeakVirtualserver($this->instance);
+    }
+
+    /**
+     * Reconnects the bot and restores its event subscriptions and cached data.
+     */
+    protected function reconnect_to_virtualserver(TeamSpeakVirtualserver $virtualserver_helper): bool
+    {
+        try {
+            $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
+            $this->refresh_cached_data();
+            $this->virtualserver->notifyRegister('server');
+        } catch (TransportException | ServerQueryException $connection_exception) {
+            $this->message('ERROR', "Reconnect to `{$this->instance->host}` failed: ".$connection_exception->getMessage());
+            $this->wait_before_reconnect();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Limits reconnect attempts after a failed connection attempt.
+     */
+    protected function wait_before_reconnect(): void
+    {
+        sleep(5);
+    }
+
+    /**
+     * Updates all cached TeamSpeak data after connecting or reconnecting.
+     */
+    protected function refresh_cached_data(): void
+    {
+        // Update all data once immediately, when the bot initially starts
+        $this->updateDatetime();
+        $this->updateClientList();
+        $this->updateServergroupList();
+        $this->updateVirtualserverInfo();
     }
 
     /**
