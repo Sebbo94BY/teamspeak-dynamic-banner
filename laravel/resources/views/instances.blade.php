@@ -45,6 +45,21 @@
 @endcan
 <div class="container mt-3">
 @include('inc.standard-alerts')
+    <div id="instance-lifecycle-progress" class="alert alert-info d-none" role="status" aria-live="polite">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        <span id="instance-lifecycle-progress-message"></span>
+    </div>
+    @if (session('refresh_status_after_seconds'))
+        <div id="instance-status-refresh" class="alert alert-info" role="status" aria-live="polite" data-refresh-after-seconds="{{ session('refresh_status_after_seconds') }}">
+            <div class="d-flex align-items-center mb-2">
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                <span>{{ __('views/instances.status_refresh_scheduled', ['seconds' => session('refresh_status_after_seconds')]) }}</span>
+            </div>
+            <div class="progress" role="progressbar" aria-label="{{ __('views/instances.status_refresh_progress') }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+        </div>
+    @endif
     @if($attention === 'stopped')
         <div class="alert alert-warning" role="alert">{{ __('views/instances.attention_stopped_filter') }}</div>
     @endif
@@ -120,21 +135,21 @@
                         <div class="d-flex">
                             @if (is_null($instance->process))
                                 @can('start instances')
-                                    <form method="post" action="{{ route('instance.start', ['instance_id' => $instance->id]) }}">
+                                    <form method="post" action="{{ route('instance.start', ['instance_id' => $instance->id]) }}" class="instance-lifecycle-form" data-progress-message="{{ __('views/instances.starting_instance') }}">
                                         @csrf
                                         <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-play text-success fa-lg"></i></button>
                                     </form>
                                 @endcan
                             @else
                                 @can('stop instances')
-                                    <form method="post" action="{{ route('instance.stop', ['instance_id' => $instance->id]) }}">
+                                    <form method="post" action="{{ route('instance.stop', ['instance_id' => $instance->id]) }}" class="instance-lifecycle-form" data-progress-message="{{ __('views/instances.stopping_instance') }}">
                                         @csrf
                                         <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-power-off text-warning fa-lg"></i></button>
                                     </form>
                                 @endcan
                             @endif
                             @can('restart instances')
-                                <form method="post" action="{{ route('instance.restart', ['instance_id' => $instance->id]) }}">
+                                <form method="post" action="{{ route('instance.restart', ['instance_id' => $instance->id]) }}" class="instance-lifecycle-form" data-progress-message="{{ __('views/instances.restarting_instance') }}">
                                     @csrf
                                     <button type="submit" class="btn btn-link px-0 me-2"><i class="fa-solid fa-rotate-left text-warning fa-lg"></i></button>
                                 </form>
@@ -175,5 +190,44 @@
         @include('modals.delete-feedback.modal-delete-instance', ['instanceDeleteModal'=>$instanceModal])
     @endcan
 @endforeach
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const lifecycleProgress = document.querySelector('#instance-lifecycle-progress');
+        const lifecycleMessage = document.querySelector('#instance-lifecycle-progress-message');
+
+        document.querySelectorAll('.instance-lifecycle-form').forEach((form) => {
+            form.addEventListener('submit', () => {
+                lifecycleMessage.textContent = form.dataset.progressMessage;
+                lifecycleProgress.classList.remove('d-none');
+
+                document.querySelectorAll('.instance-lifecycle-form button[type="submit"]').forEach((button) => {
+                    button.disabled = true;
+                });
+            });
+        });
+
+        const scheduledRefresh = document.querySelector('#instance-status-refresh');
+        if (!scheduledRefresh) {
+            return;
+        }
+
+        const refreshAfterSeconds = Number(scheduledRefresh.dataset.refreshAfterSeconds);
+        const progressBar = scheduledRefresh.querySelector('.progress-bar');
+        const startedAt = Date.now();
+        const updateProgress = () => {
+            const elapsedSeconds = (Date.now() - startedAt) / 1000;
+            const remainingPercent = Math.max(0, 100 - (elapsedSeconds / refreshAfterSeconds * 100));
+            progressBar.style.width = `${remainingPercent}%`;
+            progressBar.setAttribute('aria-valuenow', String(Math.round(remainingPercent)));
+        };
+
+        const progressTimer = window.setInterval(updateProgress, 250);
+        window.setTimeout(() => {
+            window.clearInterval(progressTimer);
+            window.location.reload();
+        }, refreshAfterSeconds * 1000);
+    });
+</script>
 
 @endsection

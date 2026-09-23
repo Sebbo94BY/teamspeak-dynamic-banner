@@ -102,6 +102,7 @@ class InstanceTest extends TestCase
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
         $response->assertSessionHas('message', 'Successfully started the instance. Refreshing status in 30 seconds...');
+        $response->assertSessionHas('refresh_status_after_seconds', 30);
     }
 
     /**
@@ -127,5 +128,6 @@ class InstanceTest extends TestCase
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
         $response->assertSessionHas('message', 'Successfully restarted the instance. Refreshing status in 30 seconds...');
+        $response->assertSessionHas('refresh_status_after_seconds', 30);
     }
 }

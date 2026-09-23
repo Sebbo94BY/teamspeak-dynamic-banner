@@ -32,5 +32,10 @@ return [
     'table_status_running' => 'Running',
     'table_status_running_title' => 'The bot is running as PID <b>:process_id</b> since <b>:started_at (:timezone)</b> and collecting current data.',
     'attention_stopped_filter' => 'Showing only stopped instances that need attention.',
+    'starting_instance' => 'Starting instance. This may take a moment…',
+    'stopping_instance' => 'Stopping instance. This may take a moment…',
+    'restarting_instance' => 'Restarting instance. This may take a moment…',
+    'status_refresh_scheduled' => 'The status refreshes automatically in :seconds seconds.',
+    'status_refresh_progress' => 'Waiting for instance status refresh',
 
 ];

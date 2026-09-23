@@ -193,6 +193,7 @@ class InstanceController extends Controller
         return Redirect::route('instances')->with([
             'success' => 'instance-start-successful',
             'message' => 'Successfully started the instance. Refreshing status in 30 seconds...',
+            'refresh_status_after_seconds' => 30,
         ]);
     }
 
@@ -276,6 +277,7 @@ class InstanceController extends Controller
         return Redirect::route('instances')->with([
             'success' => 'instance-restart-successful',
             'message' => 'Successfully restarted the instance. Refreshing status in 30 seconds...',
+            'refresh_status_after_seconds' => 30,
         ]);
     }
 
