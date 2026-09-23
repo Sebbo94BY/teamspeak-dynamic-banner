@@ -609,6 +609,10 @@ class TeamspeakBot extends Command
      */
     protected function log_cache_refresh_failure(string $source, ?\Throwable $exception = null): void
     {
+        if (! $this->keep_running) {
+            return;
+        }
+
         $message = "TeamSpeak $source cache refresh failed for instance {$this->instance->id}";
         if (! is_null($exception)) {
             $message .= ': '.$exception->getMessage();

@@ -366,6 +366,30 @@ class TeamspeakBotCacheTest extends TestCase
         Log::shouldHaveReceived('error')->once()->with('TeamSpeak client cache refresh failed for instance 123');
     }
 
+    public function test_stopping_bot_does_not_log_a_cache_refresh_failure(): void
+    {
+        Log::spy();
+        $instance = new Instance();
+        $instance->id = 123;
+        $command = new class extends TeamspeakBot
+        {
+            public function stopAndLogFailureForTest(Instance $instance): void
+            {
+                $this->instance = $instance;
+                $this->keep_running = false;
+                $this->log_cache_refresh_failure('server group', new \Exception('Connection closed'));
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->stopAndLogFailureForTest($instance);
+
+        Log::shouldNotHaveReceived('error');
+    }
+
     public function test_caches_each_connected_client_in_a_separate_hash_and_indexes_its_ip(): void
     {
         $instance = new Instance();
