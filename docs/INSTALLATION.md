@@ -154,13 +154,29 @@ For the queue, you probably want to set up Supervisor, which automatically monit
     redirect_stderr=true
     stdout_logfile=/var/www/teamspeak-dynamic-banner/laravel/storage/logs/worker.log
     stopwaitsecs=3600
+
+    ; Required only when MATOMO_ENABLED=true
+    [program:teamspeak-dynamic-banner-matomo-worker]
+    process_name=%(program_name)s_%(process_num)02d
+    directory=/var/www/teamspeak-dynamic-banner/laravel
+    command=/usr/bin/php artisan queue:work --queue matomo --timeout 10 --sleep=3 --tries=1 --max-time=3600
+    autostart=true
+    autorestart=true
+    stopasgroup=true
+    killasgroup=true
+    user=www-data
+    numprocs=1
+    redirect_stderr=true
+    stdout_logfile=/var/www/teamspeak-dynamic-banner/laravel/storage/logs/matomo-worker.log
+    stopwaitsecs=3600
     ```
 
 3. Save the file
 4. Reread the Supervisor config: `sudo supervisorctl reread`
 5. Update the Supervisor config: `sudo supervisorctl update`
-6. Start the workers: `sudo supervisorctl start teamspeak-dynamic-banner-worker:*`
-7. Ensure, that the workers are running: `supervisorctl status teamspeak-dynamic-banner-worker:*`
+6. Start the default workers: `sudo supervisorctl start teamspeak-dynamic-banner-worker:*`
+7. When `MATOMO_ENABLED=true`, also start the Matomo worker: `sudo supervisorctl start teamspeak-dynamic-banner-matomo-worker:*`
+8. Ensure, that the workers are running: `supervisorctl status`
 
 You can verify, if it's working as expected, when you later upload your first templates. Those get processed by the queue:
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\API\v1;
 
+use App\Jobs\TrackMatomoPageView;
 use App\Models\Banner;
 use App\Models\BannerConfiguration;
 use App\Models\BannerTemplate;
@@ -12,6 +13,7 @@ use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -26,7 +28,7 @@ class BannerTest extends TestCase
 
     protected Banner $banner;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -199,6 +201,9 @@ class BannerTest extends TestCase
      */
     public function test_redirect_url_api_redirects_to_the_configure_url_when_an_url_has_been_configured(): void
     {
+        Queue::fake();
+        config(['matomo.enabled' => false]);
+
         $redirect_url = 'https://localhost/test-redirect';
 
         BannerConfiguration::factory()
@@ -216,5 +221,31 @@ class BannerTest extends TestCase
         $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertRedirect($redirect_url);
         $response->assertStatus(302);
+        Queue::assertNothingPushed();
+    }
+
+    /**
+     * Test that enabled Matomo tracking is queued and does not delay banner requests.
+     */
+    public function test_api_queues_matomo_tracking_when_enabled(): void
+    {
+        Queue::fake();
+        config(['matomo.enabled' => true]);
+
+        BannerConfiguration::factory()
+            ->for(
+                BannerTemplate::factory()
+                    ->for($this->banner)
+                    ->for(Template::factory()->create())
+                    ->create(['redirect_url' => 'https://localhost/test-redirect', 'enabled' => true])
+            )
+            ->for(Font::factory()->create())
+            ->create();
+
+        $response = $this->get(route('api.banner.redirect_url', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
+
+        $response->assertRedirect('https://localhost/test-redirect');
+        Queue::assertPushedOn('matomo', TrackMatomoPageView::class);
+        Queue::assertPushed(TrackMatomoPageView::class, 1);
     }
 }
