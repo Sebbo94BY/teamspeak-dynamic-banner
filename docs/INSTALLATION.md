@@ -133,6 +133,15 @@ For the scheduling, you need to set up a regular cronjob, which runs every minut
 You can verify, if the scheduling works as expected when it automatically creates the `scheduler.log` with some output.
 
 
+### Queue history in System Status
+
+The **Administration** > **System Status** > **Background tasks** section records one snapshot per minute for every active queue. This makes it possible to see whether a queue is growing or being processed, rather than relying on a single current value. When Matomo tracking is enabled, its dedicated `matomo` queue is displayed separately from the general background-task queue.
+
+Use the **Period** selector in that section to show the last 30 minutes (default), 6 hours, 1 day, 7 days, or 30 days. Snapshots are retained for 30 days and the graph is condensed automatically for longer periods.
+
+The scheduler from the previous section must run every minute for this history to be collected. The first graph is available after two scheduler runs; existing history from before an installation or update cannot be reconstructed. The history is available for database-backed queues.
+
+
 ### Setup Queue
 
 For the queue, you probably want to set up Supervisor, which automatically monitors your queue processes and restarts them, if necessary.
@@ -150,7 +159,9 @@ For the queue, you probably want to set up Supervisor, which automatically monit
     stopasgroup=true
     killasgroup=true
     user=www-data
-    numprocs=8
+    # Start with two workers. Increase this value only when background tasks
+    # regularly wait for more than five minutes and the server has capacity.
+    numprocs=2
     redirect_stderr=true
     stdout_logfile=/var/www/teamspeak-dynamic-banner/laravel/storage/logs/worker.log
     stopwaitsecs=3600
@@ -177,6 +188,12 @@ For the queue, you probably want to set up Supervisor, which automatically monit
 6. Start the default workers: `sudo supervisorctl start teamspeak-dynamic-banner-worker:*`
 7. When `MATOMO_ENABLED=true`, also start the Matomo worker: `sudo supervisorctl start teamspeak-dynamic-banner-matomo-worker:*`
 8. Ensure, that the workers are running: `supervisorctl status`
+
+There is no universally correct number of workers: it depends on job duration and available server capacity. Start with two workers and check **Administration > System Status > Background tasks** after normal use. If the oldest task regularly waits for more than five minutes, first make sure the workers are running, then increase `numprocs` one step at a time and reload the Supervisor configuration.
+
+The System Status page detects active workers through a Redis heartbeat. After updating to a version with this feature, restart the workers once so that they load the new code. A worker that has not reported for 90 seconds is shown as inactive for its queue.
+
+The page also records completed jobs and their processing time. After at least five minutes of normal activity, it can recommend additional workers when a queue has a sustained backlog. Treat this as a capacity recommendation: confirm that the server has sufficient CPU and memory before increasing `numprocs`.
 
 You can verify, if it's working as expected, when you later upload your first templates. Those get processed by the queue:
 

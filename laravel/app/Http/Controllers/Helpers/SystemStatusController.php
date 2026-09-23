@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Instance;
+use App\Models\QueueMetricSnapshot;
+use App\Support\QueueWorkerHeartbeat;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Config;
@@ -27,6 +28,14 @@ enum SystemStatusSeverity: string
 
 class SystemStatusController extends Controller
 {
+    public const QUEUE_METRIC_HISTORY_RANGES = [
+        '30m' => 30,
+        '6h' => 360,
+        '1d' => 1440,
+        '7d' => 10080,
+        '30d' => 43200,
+    ];
+
     /**
      * Checks PHP version.
      */
@@ -239,33 +248,192 @@ class SystemStatusController extends Controller
     /**
      * Checks Queue health.
      */
-    protected function check_queue_health(): array
+    protected function check_queue_health(string $queue_name): array
     {
         $requirements = [];
 
-        $queue_size = Queue::size();
+        $active_workers = app(QueueWorkerHeartbeat::class)->active_workers($queue_name);
+        $requirements['WORKERS']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_workers');
+        $requirements['WORKERS']['current_value'] = is_null($active_workers)
+            ? __('views/inc/system/systemstatus.accordion_section_queue_health_workers_unavailable')
+            : trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_workers_current_value', $active_workers, ['count' => $active_workers]);
+        $requirements['WORKERS']['required_value'] = is_null($active_workers)
+            ? __('views/inc/system/systemstatus.accordion_section_queue_health_workers_unavailable_action')
+            : ($active_workers > 0
+                ? __('views/inc/system/systemstatus.accordion_section_queue_health_workers_required_value')
+                : __('views/inc/system/systemstatus.accordion_section_queue_health_workers_missing_action'));
+        $requirements['WORKERS']['severity'] = is_null($active_workers)
+            ? SystemStatusSeverity::Info
+            : ($active_workers > 0 ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning);
+
+        $recent_throughput = $this->recent_queue_throughput($queue_name);
+        $requirements['THROUGHPUT']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_throughput');
+        $requirements['THROUGHPUT']['history_key'] = 'processed';
+        $requirements['THROUGHPUT']['current_value'] = trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_throughput_current_value', $recent_throughput, ['count' => $recent_throughput]);
+        $requirements['THROUGHPUT']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_throughput_required_value');
+        $requirements['THROUGHPUT']['severity'] = SystemStatusSeverity::Info;
 
         $requirements['SIZE']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size');
-        $requirements['SIZE']['current_value'] = $queue_size;
+        $requirements['SIZE']['history_key'] = 'total';
+        $requirements['SIZE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size_required_value');
+        $requirements['SIZE']['severity'] = SystemStatusSeverity::Info;
 
-        $total_cached_clients = 0;
-        try {
-            foreach (Instance::all() as $instance) {
-                $total_cached_clients += Redis::hlen('instance_'.$instance->id.'_client_ip_index');
-            }
-        } catch (RedisException | PredisException) {
-            // Do nothing; Simply catch and ignore this error
+        $queue_connection = config('queue.default');
+        $queue_configuration = config('queue.connections.'.$queue_connection);
+
+        if (($queue_configuration['driver'] ?? null) !== 'database') {
+            $requirements['SIZE']['current_value'] = Queue::connection()->size($queue_name);
+            $requirements['OLDEST_JOB']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job');
+            $requirements['OLDEST_JOB']['current_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job_unavailable');
+            $requirements['OLDEST_JOB']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job_unavailable_action');
+            $requirements['OLDEST_JOB']['severity'] = SystemStatusSeverity::Info;
+
+            return $requirements;
         }
 
-        if ($total_cached_clients == 0) {
-            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = 25) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
-        } else {
-            $requirements['SIZE']['severity'] = ($queue_size < $max_expected_queue_size = $total_cached_clients * 1.5) ? SystemStatusSeverity::Success : SystemStatusSeverity::Warning;
-        }
+        $now = now()->timestamp;
+        $retry_after = $queue_configuration['retry_after'] ?? 90;
+        $queue_jobs = DB::table($queue_configuration['table'])->where('queue', $queue_name);
+        $ready_jobs = (clone $queue_jobs)
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $now);
+        $processing_jobs = (clone $queue_jobs)
+            ->whereNotNull('reserved_at')
+            ->where('reserved_at', '>=', $now - $retry_after);
+        $scheduled_jobs = (clone $queue_jobs)
+            ->whereNull('reserved_at')
+            ->where('available_at', '>', $now);
+        $stale_jobs = (clone $queue_jobs)
+            ->whereNotNull('reserved_at')
+            ->where('reserved_at', '<', $now - $retry_after);
 
-        $requirements['SIZE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size_required_value', ['max_expected_queue_size' => $max_expected_queue_size]);
+        $requirements['SIZE']['current_value'] = $queue_jobs->count();
+        $requirements['SIZE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_size_required_value');
+        $requirements['READY']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_ready_jobs');
+        $requirements['READY']['history_key'] = 'ready';
+        $requirements['READY']['current_value'] = (clone $ready_jobs)->count();
+        $requirements['READY']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_ready_jobs_required_value');
+        $requirements['READY']['severity'] = SystemStatusSeverity::Info;
+
+        $requirements['PROCESSING']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_processing_jobs');
+        $requirements['PROCESSING']['history_key'] = 'processing';
+        $requirements['PROCESSING']['current_value'] = $processing_jobs->count();
+        $requirements['PROCESSING']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_processing_jobs_required_value');
+        $requirements['PROCESSING']['severity'] = SystemStatusSeverity::Info;
+
+        $requirements['SCHEDULED']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_scheduled_jobs');
+        $requirements['SCHEDULED']['history_key'] = 'scheduled';
+        $next_scheduled_job = (clone $scheduled_jobs)->orderBy('available_at')->first();
+        $next_scheduled_job_in = $next_scheduled_job ? max(0, $next_scheduled_job->available_at - $now) : 0;
+        $scheduled_job_count = $scheduled_jobs->count();
+        $scheduled_jobs_are_unusually_delayed = $next_scheduled_job_in > 300;
+        $requirements['SCHEDULED']['current_value'] = ($scheduled_job_count > 0)
+            ? __('views/inc/system/systemstatus.accordion_section_queue_health_scheduled_jobs_current_value', ['count' => $scheduled_job_count, 'wait' => $this->format_queue_age($next_scheduled_job_in)])
+            : 0;
+        $requirements['SCHEDULED']['required_value'] = $scheduled_jobs_are_unusually_delayed
+            ? __('views/inc/system/systemstatus.accordion_section_queue_health_scheduled_jobs_delayed_action')
+            : __('views/inc/system/systemstatus.accordion_section_queue_health_scheduled_jobs_required_value');
+        $requirements['SCHEDULED']['severity'] = $scheduled_jobs_are_unusually_delayed ? SystemStatusSeverity::Warning : SystemStatusSeverity::Info;
+
+        $requirements['STALE']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_stale_jobs');
+        $requirements['STALE']['history_key'] = 'stale';
+        $requirements['STALE']['current_value'] = $stale_jobs->count();
+        $requirements['STALE']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_stale_jobs_required_value');
+        $requirements['STALE']['severity'] = ($requirements['STALE']['current_value'] > 0) ? SystemStatusSeverity::Warning : SystemStatusSeverity::Success;
+
+        $oldest_job = $ready_jobs->orderBy('created_at')->first();
+
+        $maximum_wait_seconds = 300;
+        $oldest_job_age = $oldest_job ? max(0, now()->timestamp - $oldest_job->created_at) : 0;
+        $queue_is_delayed = $oldest_job_age > $maximum_wait_seconds;
+
+        $requirements['OLDEST_JOB']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job');
+        $requirements['OLDEST_JOB']['history_key'] = 'oldest_wait_seconds';
+        $requirements['OLDEST_JOB']['current_value'] = $oldest_job ? $this->format_queue_age($oldest_job_age) : __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job_empty');
+        $requirements['OLDEST_JOB']['required_value'] = $queue_is_delayed
+            ? __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job_delayed_action')
+            : __('views/inc/system/systemstatus.accordion_section_queue_health_oldest_job_required_value', ['minutes' => intdiv($maximum_wait_seconds, 60)]);
+        $requirements['OLDEST_JOB']['severity'] = $queue_is_delayed ? SystemStatusSeverity::Warning : SystemStatusSeverity::Success;
+
+        $requirements['RECOMMENDATION']['name'] = __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation');
+        $requirements['RECOMMENDATION']['current_value'] = $this->queue_worker_recommendation($requirements['READY']['current_value'], $oldest_job_age, $active_workers, $recent_throughput);
+        $requirements['RECOMMENDATION']['required_value'] = __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_required_value');
+        $requirements['RECOMMENDATION']['severity'] = ($requirements['READY']['current_value'] > 0 && $oldest_job_age > $maximum_wait_seconds) ? SystemStatusSeverity::Warning : SystemStatusSeverity::Info;
+
+        $priority = ['WORKERS' => 0, 'RECOMMENDATION' => 1];
+        uksort($requirements, fn (string $left, string $right) => ($priority[$left] ?? 2) <=> ($priority[$right] ?? 2));
 
         return $requirements;
+    }
+
+    protected function recent_queue_throughput(string $queue_name): int
+    {
+        return (int) QueueMetricSnapshot::where('queue', $queue_name)
+            ->where('recorded_at', '>=', now()->subMinutes(5))
+            ->sum('processed');
+    }
+
+    protected function queue_worker_recommendation(int $ready_jobs, int $oldest_job_age, ?int $active_workers, int $recent_throughput): string
+    {
+        if ($ready_jobs === 0) {
+            return __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_no_action');
+        }
+
+        if ($active_workers === 0) {
+            return __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_start_worker');
+        }
+
+        if (is_null($active_workers) || $oldest_job_age <= 300 || $recent_throughput === 0) {
+            return __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_observe');
+        }
+
+        $jobs_per_worker_per_minute = $recent_throughput / 5 / $active_workers;
+        $additional_workers = (int) ceil(max(0, ($ready_jobs / 5 - $recent_throughput / 5) / $jobs_per_worker_per_minute));
+
+        return $additional_workers > 0
+            ? trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_add_workers', $additional_workers, ['count' => $additional_workers])
+            : __('views/inc/system/systemstatus.accordion_section_queue_health_recommendation_no_action');
+    }
+
+    /**
+     * Formats a queue waiting time in a concise, human-readable form.
+     */
+    protected function format_queue_age(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_age_seconds', $seconds, ['count' => $seconds]);
+        }
+
+        if ($seconds < 3600) {
+            $minutes = intdiv($seconds, 60);
+
+            return trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_age_minutes', $minutes, ['count' => $minutes]);
+        }
+
+        $hours = intdiv($seconds, 3600);
+
+        return trans_choice('views/inc/system/systemstatus.accordion_section_queue_health_age_hours', $hours, ['count' => $hours]);
+    }
+
+    /**
+     * Returns the queue measurements from the last thirty minutes.
+     */
+    protected function queue_metric_history(string $range, string $queue_name)
+    {
+        $history = QueueMetricSnapshot::where('queue', $queue_name)
+            ->where('recorded_at', '>=', now()->subMinutes(self::QUEUE_METRIC_HISTORY_RANGES[$range]))
+            ->orderBy('recorded_at')
+            ->get();
+
+        $maximum_points = 240;
+        if ($history->count() <= $maximum_points) {
+            return $history;
+        }
+
+        $step = (int) ceil($history->count() / $maximum_points);
+        $last_index = $history->count() - 1;
+
+        return $history->filter(fn ($snapshot, $index) => $index % $step === 0 || $index === $last_index)->values();
     }
 
     /**
@@ -279,7 +447,7 @@ class SystemStatusController extends Controller
         try {
             Redis::ping();
             $reachable = true;
-        } catch (RedisException | PredisException $connection_exception) {
+        } catch (RedisException|PredisException $connection_exception) {
             $redis_connection_exception = $connection_exception->getMessage();
         }
 
@@ -487,7 +655,12 @@ class SystemStatusController extends Controller
         $system_status['DATABASE']['CONNECTION'] = $this->check_database_connection();
         $system_status['DATABASE']['SETTINGS'] = $this->check_database_settings();
         $system_status['PERMISSIONS']['DIRECTORIES'] = $this->check_directories();
-        $system_status['QUEUE']['HEALTH'] = $this->check_queue_health();
+        $queue_connection = config('queue.default');
+        $default_queue = config('queue.connections.'.$queue_connection.'.queue', 'default');
+        $system_status['QUEUE']['HEALTH'] = $this->check_queue_health($default_queue);
+        if (config('matomo.enabled')) {
+            $system_status['QUEUE']['MATOMO'] = $this->check_queue_health('matomo');
+        }
         $system_status['REDIS']['CONNECTION'] = $this->check_redis_connection();
         $system_status['REDIS']['CLIENT'] = $this->check_redis_client();
         $system_status['FFMPEG']['VERSION'] = $this->check_ffmpeg_version();
@@ -501,8 +674,12 @@ class SystemStatusController extends Controller
         return $system_status;
     }
 
-    public function system_status(): array
+    public function system_status(string $queue_history_range = '30m'): array
     {
+        if (! array_key_exists($queue_history_range, self::QUEUE_METRIC_HISTORY_RANGES)) {
+            $queue_history_range = '30m';
+        }
+
         $system_status = collect(json_decode(json_encode($this->system_status_json())));
         $php_status = collect($system_status['PHP']);
         $php_extensions = collect($php_status['EXTENSIONS']);
@@ -517,6 +694,18 @@ class SystemStatusController extends Controller
 
         $queue_status = collect($system_status['QUEUE']);
         $queue_health_size = collect($queue_status['HEALTH']);
+        $queue_health_sections = [[
+            'name' => __('views/inc/system/systemstatus.accordion_section_queue_health_default_queue'),
+            'metrics' => $queue_health_size,
+            'history' => $this->queue_metric_history($queue_history_range, config('queue.connections.'.config('queue.default').'.queue', 'default')),
+        ]];
+        if ($queue_status->has('MATOMO')) {
+            $queue_health_sections[] = [
+                'name' => __('views/inc/system/systemstatus.accordion_section_queue_health_matomo_queue'),
+                'metrics' => collect($queue_status['MATOMO']),
+                'history' => $this->queue_metric_history($queue_history_range, 'matomo'),
+            ];
+        }
 
         $redis_staus = collect($system_status['REDIS']);
         $redis_staus_connection = collect($redis_staus['CONNECTION'])
@@ -535,36 +724,39 @@ class SystemStatusController extends Controller
         $various_status_information = collect($various_status['INFORMATION']);
 
         return [
-            'php_status'=>$php_status,
-            'php_status_extension'=>$php_extensions,
-            'php_status_ini_settings'=>$php_ini_settings,
-            'php_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $php_status),
-            'php_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $php_status),
-            'db_status_connection'=>$db_status_connection,
-            'db_status_Settings'=>$db_status_settings,
-            'db_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $db_status),
-            'db_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $db_status),
+            'php_status' => $php_status,
+            'php_status_extension' => $php_extensions,
+            'php_status_ini_settings' => $php_ini_settings,
+            'php_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $php_status),
+            'php_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $php_status),
+            'db_status_connection' => $db_status_connection,
+            'db_status_Settings' => $db_status_settings,
+            'db_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $db_status),
+            'db_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $db_status),
             'permission_status_dir' => $permission_status_dir,
-            'permission_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $permission_status),
-            'permission_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $permission_status),
-            'queue_health_size'=>$queue_health_size,
-            'queue_health_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $queue_status),
-            'queue_health_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $queue_status),
-            'redis_status_connection'=>$redis_staus_connection,
-            'redis_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
-            'redis_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),
-            'ffmpeg_version'=>$ffmpeg_status_version,
-            'ffmpeg_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $ffmpeg_status),
-            'ffmpeg_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $ffmpeg_status),
-            'mail_status_connection'=>$mail_status_connection,
-            'mail_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $mail_status),
-            'mail_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $mail_status),
-            'version_status_software'=>$versions_status_software,
-            'version_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
-            'version_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),
-            'various_status_information'=>$various_status_information,
-            'various_warning_count'=>preg_match_all("/\"severity\"\:\"warning\"/", $various_status),
-            'various_error_count'=>preg_match_all("/\"severity\"\:\"danger\"/", $various_status),
+            'permission_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $permission_status),
+            'permission_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $permission_status),
+            'queue_health_size' => $queue_health_size,
+            'queue_health_sections' => $queue_health_sections,
+            'queue_metric_history_ranges' => self::QUEUE_METRIC_HISTORY_RANGES,
+            'queue_history_range' => $queue_history_range,
+            'queue_health_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $queue_status),
+            'queue_health_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $queue_status),
+            'redis_status_connection' => $redis_staus_connection,
+            'redis_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $redis_staus),
+            'redis_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $redis_staus),
+            'ffmpeg_version' => $ffmpeg_status_version,
+            'ffmpeg_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $ffmpeg_status),
+            'ffmpeg_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $ffmpeg_status),
+            'mail_status_connection' => $mail_status_connection,
+            'mail_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $mail_status),
+            'mail_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $mail_status),
+            'version_status_software' => $versions_status_software,
+            'version_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $versions_status),
+            'version_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $versions_status),
+            'various_status_information' => $various_status_information,
+            'various_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $various_status),
+            'various_error_count' => preg_match_all("/\"severity\"\:\"danger\"/", $various_status),
             'system_status_warning_count' => preg_match_all("/\"severity\"\:\"warning\"/", $system_status),
             'system_status_danger_count' => preg_match_all("/\"severity\"\:\"danger\"/", $system_status),
         ];
