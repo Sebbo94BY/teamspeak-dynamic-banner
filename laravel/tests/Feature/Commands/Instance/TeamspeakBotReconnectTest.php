@@ -11,6 +11,63 @@ use Tests\TestCase;
 
 class TeamspeakBotReconnectTest extends TestCase
 {
+    public function test_initial_connection_retries_after_a_transient_failure(): void
+    {
+        $server = new class extends Server
+        {
+            public function __construct()
+            {
+            }
+        };
+        $helper = new class($server) extends TeamSpeakVirtualserver
+        {
+            public int $connections = 0;
+
+            public function __construct(private Server $server)
+            {
+            }
+
+            public function get_virtualserver_connection(bool $blocking = true): Server
+            {
+                $this->connections++;
+                if ($this->connections === 1) {
+                    throw new \Exception('Connection is still closing');
+                }
+
+                return $this->server;
+            }
+        };
+        $command = $this->command();
+
+        $this->assertTrue($command->connectForTest($helper));
+        $this->assertSame(2, $helper->connections);
+        $this->assertSame(1, $command->initialConnectionRetryCount);
+    }
+
+    public function test_initial_connection_stops_after_the_configured_attempts(): void
+    {
+        $helper = new class extends TeamSpeakVirtualserver
+        {
+            public int $connections = 0;
+
+            public function __construct()
+            {
+            }
+
+            public function get_virtualserver_connection(bool $blocking = true): Server
+            {
+                $this->connections++;
+
+                throw new \Exception('Connection is still closing');
+            }
+        };
+        $command = $this->command();
+
+        $this->assertFalse($command->connectForTest($helper));
+        $this->assertSame(3, $helper->connections);
+        $this->assertSame(2, $command->initialConnectionRetryCount);
+    }
+
     public function test_reconnect_refreshes_cached_data_and_registers_for_events(): void
     {
         $server = new class extends Server
@@ -66,6 +123,31 @@ class TeamspeakBotReconnectTest extends TestCase
         $this->assertSame(['ERROR: Reconnect to `ts.sample.com` failed: Connection refused'], $command->messages);
     }
 
+    public function test_stopping_bot_does_not_reconnect_after_a_transport_failure(): void
+    {
+        $helper = new class extends TeamSpeakVirtualserver
+        {
+            public int $connections = 0;
+
+            public function __construct()
+            {
+            }
+
+            public function get_virtualserver_connection(bool $blocking = true): Server
+            {
+                $this->connections++;
+
+                throw new \Exception('This connection attempt must not happen');
+            }
+        };
+        $command = $this->command();
+        $command->stopForTest();
+
+        $this->assertFalse($command->reconnectForTest($helper));
+        $this->assertSame(0, $helper->connections);
+        $this->assertSame(0, $command->retryCount);
+    }
+
     private function command(): TeamspeakBot
     {
         $instance = new Instance();
@@ -77,6 +159,8 @@ class TeamspeakBotReconnectTest extends TestCase
 
             public int $retryCount = 0;
 
+            public int $initialConnectionRetryCount = 0;
+
             public array $messages = [];
 
             public function setInstanceForTest(Instance $instance): void
@@ -87,6 +171,16 @@ class TeamspeakBotReconnectTest extends TestCase
             public function reconnectForTest(TeamSpeakVirtualserver $helper): bool
             {
                 return $this->reconnect_to_virtualserver($helper);
+            }
+
+            public function connectForTest(TeamSpeakVirtualserver $helper): bool
+            {
+                return $this->connect_to_virtualserver_with_retries($helper);
+            }
+
+            public function stopForTest(): void
+            {
+                $this->keep_running = false;
             }
 
             public function __destruct()
@@ -101,6 +195,11 @@ class TeamspeakBotReconnectTest extends TestCase
             protected function wait_before_reconnect(): void
             {
                 $this->retryCount++;
+            }
+
+            protected function wait_before_initial_connection_retry(): void
+            {
+                $this->initialConnectionRetryCount++;
             }
 
             protected function message(string $log_level, string $message)

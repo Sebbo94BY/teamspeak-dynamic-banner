@@ -56,6 +56,7 @@ class UpdateApiAccessTokenTest extends TestCase
     public function test_command_aborts_when_invalid_api_credentials_have_been_provided(): void
     {
         $this->twitch_api->access_token = 'invalid_access_token';
+        $this->twitch_api->expires_at = Carbon::now();
         $this->twitch_api->save();
 
         $this->artisan('twitch:update-api-access-token')

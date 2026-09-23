@@ -32,5 +32,10 @@ return [
     'table_status_running' => 'In Betrieb',
     'table_status_running_title' => 'Der Bot läuft seit <b>:started_at (:timezone)</b> unter der PID <b>:process_id</b> und sammelt aktuelle Daten.',
     'attention_stopped_filter' => 'Es werden nur gestoppte Instanzen angezeigt, die Aufmerksamkeit benötigen.',
+    'starting_instance' => 'Instanz wird gestartet. Dies kann einen Moment dauern…',
+    'stopping_instance' => 'Instanz wird gestoppt. Dies kann einen Moment dauern…',
+    'restarting_instance' => 'Instanz wird neu gestartet. Dies kann einen Moment dauern…',
+    'status_refresh_scheduled' => 'Der Status wird in :seconds Sekunden automatisch aktualisiert.',
+    'status_refresh_progress' => 'Warten auf die Statusaktualisierung der Instanz',
 
 ];

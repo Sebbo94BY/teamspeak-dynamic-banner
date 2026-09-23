@@ -10,6 +10,8 @@ use App\Http\Requests\InstanceStartRequest;
 use App\Http\Requests\InstanceStopRequest;
 use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
+use App\Models\InstanceProcess;
+use App\Support\TeamSpeakBotLauncher;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,18 @@ use PlanetTeamSpeak\TeamSpeak3Framework\Exception\TransportException;
 
 class InstanceController extends Controller
 {
+    private const BOT_STOP_TIMEOUT_SECONDS = 15;
+
+    private const BOT_STOP_POLL_MICROSECONDS = 100000;
+
+    private const BOT_START_TIMEOUT_SECONDS = 5;
+
+    private const BOT_START_POLL_MICROSECONDS = 100000;
+
+    public function __construct(private readonly TeamSpeakBotLauncher $teamSpeakBotLauncher)
+    {
+    }
+
     /**
      * Display the main page.
      */
@@ -177,9 +191,7 @@ class InstanceController extends Controller
     {
         $instance = Instance::find($request->instance_id);
 
-        $process = Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
-
-        if (! $process->running()) {
+        if (! $this->start_bot($instance)) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-start-error',
                 'message' => 'Failed to start the instance.',
@@ -188,7 +200,8 @@ class InstanceController extends Controller
 
         return Redirect::route('instances')->with([
             'success' => 'instance-start-successful',
-            'message' => 'Successfully started the instance. Refreshing status in 5 seconds...',
+            'message' => 'Successfully started the instance. Refreshing status in 30 seconds...',
+            'refresh_status_after_seconds' => 30,
         ]);
     }
 
@@ -206,6 +219,13 @@ class InstanceController extends Controller
             return Redirect::route('instances')->with([
                 'error' => 'instance-stop-error',
                 'message' => 'Failed to stop the instance.',
+            ]);
+        }
+
+        if (! $this->wait_for_bot_to_stop($process_id)) {
+            return Redirect::route('instances')->with([
+                'error' => 'instance-stop-error',
+                'message' => 'The bot did not stop within the expected time. Please try again.',
             ]);
         }
 
@@ -239,6 +259,13 @@ class InstanceController extends Controller
             ]);
         }
 
+        if (! $this->wait_for_bot_to_stop($process_id)) {
+            return Redirect::route('instances')->with([
+                'error' => 'instance-stop-error',
+                'message' => 'The bot did not stop within the expected time. Please try again.',
+            ]);
+        }
+
         if (! $instance->process->delete()) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-process-error',
@@ -246,9 +273,7 @@ class InstanceController extends Controller
             ]);
         }
 
-        $process = Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
-
-        if (! $process->running()) {
+        if (! $this->start_bot($instance)) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-restart-error',
                 'message' => 'Failed to restart the instance.',
@@ -257,7 +282,44 @@ class InstanceController extends Controller
 
         return Redirect::route('instances')->with([
             'success' => 'instance-restart-successful',
-            'message' => 'Successfully restarted the instance. Refreshing status in 5 seconds...',
+            'message' => 'Successfully restarted the instance. Refreshing status in 30 seconds...',
+            'refresh_status_after_seconds' => 30,
         ]);
+    }
+
+    /** Wait until the signalled bot has actually exited before starting a replacement. */
+    protected function wait_for_bot_to_stop(int $process_id): bool
+    {
+        $deadline = microtime(true) + self::BOT_STOP_TIMEOUT_SECONDS;
+
+        while (file_exists("/proc/$process_id")) {
+            if (microtime(true) >= $deadline) {
+                return false;
+            }
+
+            usleep(self::BOT_STOP_POLL_MICROSECONDS);
+        }
+
+        return true;
+    }
+
+    /** Start the detached bot and confirm that it registered its PID. */
+    protected function start_bot(Instance $instance): bool
+    {
+        if (! $this->teamSpeakBotLauncher->start($instance)) {
+            return false;
+        }
+
+        $deadline = microtime(true) + self::BOT_START_TIMEOUT_SECONDS;
+
+        while (! InstanceProcess::where('instance_id', $instance->id)->exists()) {
+            if (microtime(true) >= $deadline) {
+                return false;
+            }
+
+            usleep(self::BOT_START_POLL_MICROSECONDS);
+        }
+
+        return true;
     }
 }

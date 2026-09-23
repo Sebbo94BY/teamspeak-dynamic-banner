@@ -100,7 +100,8 @@ class TeamSpeakVirtualserver extends Controller
         $connection_attempt = 1;
         $maximum_connection_attempts = 3;
         $serverquery_exception_nickname_already_in_use = false;
-        while ($connection_attempt < $maximum_connection_attempts) {
+        $last_serverquery_exception = null;
+        while ($connection_attempt <= $maximum_connection_attempts) {
             try {
                 $this->virtualserver = $TS3PHPFramework->factory($this->get_connection_uri($blocking, ($serverquery_exception_nickname_already_in_use) ? true : false));
             } catch (TransportException $transport_exception) {
@@ -109,6 +110,7 @@ class TeamSpeakVirtualserver extends Controller
                 if ($serverquery_exception->getCode() == 513) {
                     // Error: nickname is already in use
                     $serverquery_exception_nickname_already_in_use = true;
+                    $last_serverquery_exception = $serverquery_exception;
                 } else {
                     throw new ServerQueryException($serverquery_exception->getMessage(), $serverquery_exception->getCode());
                 }
@@ -123,6 +125,10 @@ class TeamSpeakVirtualserver extends Controller
         }
 
         if (! isset($this->virtualserver)) {
+            if (! is_null($last_serverquery_exception)) {
+                throw new ServerQueryException($last_serverquery_exception->getMessage(), $last_serverquery_exception->getCode());
+            }
+
             throw new Exception('Failed to establish a connection to the TeamSpeak host.');
         }
 

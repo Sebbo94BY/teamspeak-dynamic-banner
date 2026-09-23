@@ -7,6 +7,7 @@ use App\Models\InstanceProcess;
 use App\Models\Localization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Process;
 use Tests\TestCase;
 
 class InstanceTest extends TestCase
@@ -98,9 +99,18 @@ class InstanceTest extends TestCase
      */
     public function test_starting_an_instance_is_possible(): void
     {
+        Process::fake(function ($process) {
+            InstanceProcess::factory()->for($this->instance)->create();
+
+            return Process::result();
+        });
+
         $response = $this->actingAs($this->user)->post(route('instance.start', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
+        $response->assertSessionHas('message', 'Successfully started the instance. Refreshing status in 30 seconds...');
+        $response->assertSessionHas('refresh_status_after_seconds', 30);
+        Process::assertRan(fn ($process) => str_contains($process->command, 'nohup php'));
     }
 
     /**
@@ -108,7 +118,7 @@ class InstanceTest extends TestCase
      */
     public function test_stopping_an_instance_is_possible(): void
     {
-        InstanceProcess::factory()->for($this->instance)->create();
+        InstanceProcess::factory()->for($this->instance)->create(['process_id' => PHP_INT_MAX]);
 
         $response = $this->actingAs($this->user)->post(route('instance.stop', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
@@ -120,10 +130,34 @@ class InstanceTest extends TestCase
      */
     public function test_restarting_an_instance_is_possible(): void
     {
-        InstanceProcess::factory()->for($this->instance)->create();
+        InstanceProcess::factory()->for($this->instance)->create(['process_id' => PHP_INT_MAX]);
+        Process::fake(function ($process) {
+            if (str_contains($process->command, 'nohup php')) {
+                InstanceProcess::factory()->for($this->instance)->create();
+            }
+
+            return Process::result();
+        });
 
         $response = $this->actingAs($this->user)->post(route('instance.restart', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
+        $response->assertSessionHas('message', 'Successfully restarted the instance. Refreshing status in 30 seconds...');
+        $response->assertSessionHas('refresh_status_after_seconds', 30);
+        Process::assertRan(fn ($process) => str_contains($process->command, 'nohup php'));
+    }
+
+    /**
+     * Test that the UI reports an error when the bot does not register after launch.
+     */
+    public function test_starting_an_instance_fails_when_the_bot_does_not_register(): void
+    {
+        Process::fake();
+
+        $response = $this->actingAs($this->user)->post(route('instance.start', ['instance_id' => $this->instance->id]));
+
+        $response->assertRedirectToRoute('instances');
+        $response->assertSessionHas('error', 'instance-start-error');
+        $response->assertSessionHas('message', 'Failed to start the instance.');
     }
 }
