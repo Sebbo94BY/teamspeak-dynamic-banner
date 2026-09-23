@@ -2,11 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\TemplateController;
 use App\Jobs\DrawGridSystemOnTemplate;
+use App\Models\Banner;
+use App\Models\BannerTemplate;
+use App\Models\Instance;
 use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
@@ -20,7 +25,7 @@ class TemplateTest extends TestCase
 
     protected Template $template;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,6 +58,24 @@ class TemplateTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('templates'));
         $response->assertStatus(200);
         $response->assertViewIs('templates');
+    }
+
+    /**
+     * Test that the unused-template filter excludes templates assigned to a banner.
+     */
+    public function test_unused_template_filter_only_returns_unassigned_templates(): void
+    {
+        $assignedTemplate = Template::factory()->create();
+        BannerTemplate::factory()
+            ->for(Banner::factory()->for(Instance::factory()->create())->create())
+            ->for($assignedTemplate)
+            ->create();
+
+        $view = app(TemplateController::class)->overview(Request::create('/templates', 'GET', ['attention' => 'unused']));
+        $templates = $view->getData()['templates'];
+
+        $this->assertTrue($templates->contains('id', $this->template->id));
+        $this->assertFalse($templates->contains('id', $assignedTemplate->id));
     }
 
     /**

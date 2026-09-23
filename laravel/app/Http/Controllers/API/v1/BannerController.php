@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class BannerController extends Controller
@@ -114,7 +115,12 @@ class BannerController extends Controller
         $draw_text_on_template_helper = new DrawTextOnTemplateController;
 
         try {
-            return $draw_text_on_template_helper->draw_text_to_image($this->selected_banner_template, false, true, $request->ip(), false);
+            $response = $draw_text_on_template_helper->draw_text_to_image($this->selected_banner_template, false, true, $request->ip(), false);
+            DB::table('banner_templates')
+                ->where('id', $this->selected_banner_template->id)
+                ->update(['last_rendered_at' => now()]);
+
+            return $response;
         } catch (Exception $exception) {
             return response($exception->getMessage(), 500);
         }

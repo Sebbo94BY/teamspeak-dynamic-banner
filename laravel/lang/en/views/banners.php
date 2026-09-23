@@ -25,6 +25,9 @@ return [
     'table_name' => 'Name',
     'table_instance' => 'Instance',
     'table_templates_in_use' => 'Templates in use',
+    'table_active_templates' => '{0} none active|{1} :count active|[2,*] :count active',
     'table_actions' => 'Actions',
+    'attention_without-templates_filter' => 'Showing only banners without a template.',
+    'attention_without-active-templates_filter' => 'Showing only banners without an active template.',
 
 ];

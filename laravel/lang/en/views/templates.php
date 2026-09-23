@@ -28,5 +28,8 @@ return [
     'table_file_size' => 'File Size',
     'table_file_dimensions' => 'File Dimensions',
     'table_last_modified' => 'Last Modified',
+    'table_used_by' => 'Used by',
+    'table_used_by_none' => 'No banner',
+    'attention_unused_filter' => 'Showing only templates that are not assigned to a banner.',
 
 ];

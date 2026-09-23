@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksUpdatedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class BannerTemplate extends Model
 {
     use HasFactory;
+    use TracksUpdatedBy;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +31,7 @@ class BannerTemplate extends Model
         'time_based_disable_at',
         'twitch_streamer_id',
         'enabled',
+        'last_rendered_at',
     ];
 
     /**
@@ -48,6 +51,7 @@ class BannerTemplate extends Model
         return [
             'enable_at' => 'datetime',
             'disable_at' => 'datetime',
+            'last_rendered_at' => 'datetime',
             'enabled' => 'boolean',
         ];
     }

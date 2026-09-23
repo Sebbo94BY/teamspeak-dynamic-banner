@@ -12,6 +12,7 @@ use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -23,9 +24,18 @@ class InstanceController extends Controller
     /**
      * Display the main page.
      */
-    public function overview(): View
+    public function overview(Request $request): View
     {
-        $instances = Instance::all();
+        $attention = $request->query('attention');
+        $instances = Instance::query();
+
+        if ($attention === 'stopped') {
+            $instances->doesntHave('process');
+        } else {
+            $attention = null;
+        }
+
+        $instances = $instances->get();
 
         $channelListForEachInstance = [];
         foreach ($instances as $instance) {
@@ -34,7 +44,7 @@ class InstanceController extends Controller
                 $virtualserver = $virtualserver_helper->get_virtualserver_connection();
                 $channel_list = $virtualserver->channelList();
                 $channelListForEachInstance[$instance->id]['channel_list'] = $channel_list;
-            } catch (TransportException | ServerQueryException | Exception $teamspeak_exception) {
+            } catch (TransportException|ServerQueryException|Exception $teamspeak_exception) {
                 $channelListForEachInstance[$instance->id]['channel_list'] = [];
                 $channelListForEachInstance[$instance->id]['error'] = $teamspeak_exception->getMessage();
             }
@@ -43,6 +53,7 @@ class InstanceController extends Controller
         return view('instances')->with([
             'instances' => $instances,
             'channel_list' => $channelListForEachInstance,
+            'attention' => $attention,
         ]);
     }
 

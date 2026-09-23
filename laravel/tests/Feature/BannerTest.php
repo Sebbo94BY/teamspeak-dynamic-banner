@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Banner;
+use App\Models\BannerTemplate;
 use App\Models\Instance;
 use App\Models\Localization;
+use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -19,7 +21,7 @@ class BannerTest extends TestCase
 
     protected Banner $banner;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,6 +57,35 @@ class BannerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('banners');
         $response->assertViewHas('banners');
+    }
+
+    /**
+     * Test that attention filters list only the banners matching the selected issue.
+     */
+    public function test_attention_filters_only_show_banners_needing_attention(): void
+    {
+        $bannerWithActiveTemplate = Banner::factory()->for($this->instance)->create();
+        BannerTemplate::factory()
+            ->for($bannerWithActiveTemplate)
+            ->for(Template::factory()->create())
+            ->create(['enabled' => true]);
+        $bannerWithoutActiveTemplate = Banner::factory()->for($this->instance)->create();
+        BannerTemplate::factory()
+            ->for($bannerWithoutActiveTemplate)
+            ->for(Template::factory()->create())
+            ->create(['enabled' => false]);
+
+        $withoutTemplates = $this->actingAs($this->user)->get(route('banners', ['attention' => 'without-templates']));
+        $withoutTemplates->assertOk();
+        $withoutTemplates->assertViewHas('banners', fn ($banners) => $banners->contains('id', $this->banner->id)
+            && ! $banners->contains('id', $bannerWithActiveTemplate->id)
+            && ! $banners->contains('id', $bannerWithoutActiveTemplate->id));
+
+        $withoutActiveTemplates = $this->actingAs($this->user)->get(route('banners', ['attention' => 'without-active-templates']));
+        $withoutActiveTemplates->assertOk();
+        $withoutActiveTemplates->assertViewHas('banners', fn ($banners) => $banners->contains('id', $bannerWithoutActiveTemplate->id)
+            && ! $banners->contains('id', $this->banner->id)
+            && ! $banners->contains('id', $bannerWithActiveTemplate->id));
     }
 
     /**

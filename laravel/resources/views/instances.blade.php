@@ -45,6 +45,9 @@
 @endcan
 <div class="container mt-3">
 @include('inc.standard-alerts')
+    @if($attention === 'stopped')
+        <div class="alert alert-warning" role="alert">{{ __('views/instances.attention_stopped_filter') }}</div>
+    @endif
     @if ($instances->count() == 0)
     <div class="row">
         <div class="col-lg-12">
@@ -154,6 +157,12 @@
     @endif
 </div>
 @include('modals.instance.modal-add')
+
+@if(request()->boolean('create'))
+<script>
+    document.addEventListener('DOMContentLoaded', () => new bootstrap.Modal('#modalAddInstance').show());
+</script>
+@endif
 
 @foreach($instances as $instanceModal)
     @include('modals.modal-variables', ['instanceVariableModal' => $instanceModal])
