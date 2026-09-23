@@ -80,6 +80,48 @@ class TeamspeakBotCacheTest extends TestCase
         $this->assertSame(['datetime', 'clients', 'servergroups', 'virtualserver'], $command->refreshedSources);
     }
 
+    public function test_stopped_bot_does_not_start_a_cache_refresh(): void
+    {
+        $command = new class extends TeamspeakBot
+        {
+            public array $refreshedSources = [];
+
+            public function stopAndRefreshForTest(): void
+            {
+                $this->keep_running = false;
+                $this->refresh_cached_data();
+            }
+
+            public function updateDatetime()
+            {
+                $this->refreshedSources[] = 'datetime';
+            }
+
+            public function updateClientList()
+            {
+                $this->refreshedSources[] = 'clients';
+            }
+
+            public function updateServergroupList()
+            {
+                $this->refreshedSources[] = 'servergroups';
+            }
+
+            public function updateVirtualserverInfo()
+            {
+                $this->refreshedSources[] = 'virtualserver';
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->stopAndRefreshForTest();
+
+        $this->assertSame([], $command->refreshedSources);
+    }
+
     public function test_timeout_does_not_start_a_nested_teamspeak_refresh(): void
     {
         $serverQuery = new class extends ServerQuery

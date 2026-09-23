@@ -264,6 +264,10 @@ class TeamspeakBot extends Command
      */
     public function updateDatetime()
     {
+        if (! $this->keep_running) {
+            return false;
+        }
+
         $this->message('DEBUG', 'Caching the current datetime in various formats...');
 
         $banner_variable_helper = new BannerVariableController($this->virtualserver);
@@ -280,7 +284,7 @@ class TeamspeakBot extends Command
      */
     public function updateClientList()
     {
-        if ($this->teamspeak_refresh_in_progress) {
+        if (! $this->keep_running || $this->teamspeak_refresh_in_progress) {
             return false;
         }
 
@@ -337,7 +341,7 @@ class TeamspeakBot extends Command
      */
     public function updateServergroupList()
     {
-        if ($this->teamspeak_refresh_in_progress) {
+        if (! $this->keep_running || $this->teamspeak_refresh_in_progress) {
             return false;
         }
 
@@ -381,7 +385,7 @@ class TeamspeakBot extends Command
      */
     public function updateVirtualserverInfo()
     {
-        if ($this->teamspeak_refresh_in_progress) {
+        if (! $this->keep_running || $this->teamspeak_refresh_in_progress) {
             return false;
         }
 
@@ -429,8 +433,16 @@ class TeamspeakBot extends Command
             return;
         }
 
+        if (! $this->keep_running) {
+            return;
+        }
+
         $this->refresh_cached_data();
         $this->retry_cache_refresh_during_startup($virtualserver_helper);
+
+        if (! $this->keep_running) {
+            return;
+        }
 
         // register for server events
         $this->virtualserver->notifyRegister('server');
@@ -470,7 +482,7 @@ class TeamspeakBot extends Command
      */
     protected function connect_to_virtualserver_with_retries(TeamSpeakVirtualserver $virtualserver_helper): bool
     {
-        for ($attempt = 1; $attempt <= self::INITIAL_CONNECTION_ATTEMPTS; $attempt++) {
+        for ($attempt = 1; $this->keep_running && $attempt <= self::INITIAL_CONNECTION_ATTEMPTS; $attempt++) {
             try {
                 $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
 
@@ -528,6 +540,10 @@ class TeamspeakBot extends Command
      */
     protected function refresh_cached_data()
     {
+        if (! $this->keep_running) {
+            return false;
+        }
+
         // Update all data once immediately, when the bot initially starts
         $this->teamspeak_connection_lost = false;
         $this->cache_refresh_status = ['datetime' => (bool) $this->updateDatetime()];
@@ -555,9 +571,13 @@ class TeamspeakBot extends Command
      */
     protected function retry_cache_refresh_during_startup(?TeamSpeakVirtualserver $virtualserver_helper = null): void
     {
-        for ($attempt = 2; in_array(false, $this->cache_refresh_status, true) && $attempt <= self::STARTUP_REFRESH_ATTEMPTS; $attempt++) {
+        for ($attempt = 2; $this->keep_running && in_array(false, $this->cache_refresh_status, true) && $attempt <= self::STARTUP_REFRESH_ATTEMPTS; $attempt++) {
             $this->message('WARNING', "Retrying the complete TeamSpeak cache refresh (attempt $attempt/".self::STARTUP_REFRESH_ATTEMPTS.').');
             $this->wait_before_startup_refresh_retry();
+
+            if (! $this->keep_running) {
+                return;
+            }
 
             if ($this->teamspeak_connection_lost) {
                 if (is_null($virtualserver_helper)) {
@@ -633,6 +653,11 @@ class TeamspeakBot extends Command
             $this->cleanup_instance_process_id();
 
             $this->message('INFO', 'Successfully stopped the bot.');
+
+            // A signal can arrive in the middle of a TeamSpeak request. Returning
+            // from the handler would let that request continue and potentially mix
+            // its reply with the replacement bot's requests.
+            exit(0);
         });
 
         $instance_id = intval($this->argument('instance_id'));
