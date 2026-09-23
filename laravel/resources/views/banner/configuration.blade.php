@@ -26,7 +26,7 @@
 </div>
 <div class="container mt-3">
     @include('inc.standard-alerts')
-    <div class="row">
+    <div class="row banner-preview-sticky">
         <div class="col-lg-6">
             <p class="fs-5 m-0 mb-3 fw-bold">{{ __('views/banner/configuration.preview_with_grid_system') }}</p>
             <canvas class="live-preview img-fluid shadow-lg rounded"

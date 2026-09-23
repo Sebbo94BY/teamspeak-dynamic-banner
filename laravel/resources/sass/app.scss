@@ -12,3 +12,19 @@
 
 // Font Awesome
 @import "@fortawesome/fontawesome-free/css/all.min.css";
+
+@media (min-width: 992px) {
+    .banner-preview-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 1.5rem 0 1.25rem;
+        background-color: var(--bs-body-bg);
+        box-shadow: 0 0.75rem 1rem -0.75rem rgba(0, 0, 0, 0.35);
+    }
+
+    .banner-preview-sticky .live-preview {
+        max-height: 36vh;
+        width: auto;
+    }
+}
