@@ -23,6 +23,7 @@ class TeamspeakBotTest extends TestCase
             'VIRTUALSERVER_PLATFORM' => new StringHelper('Linux'),
             'VIRTUALSERVER_VERSION' => new StringHelper('3.13.7'),
             'VIRTUALSERVER_CLIENTSONLINE' => 4,
+            'INVALID_NESTED_VALUE' => ['unexpected'],
         ]);
 
         $this->assertSame([

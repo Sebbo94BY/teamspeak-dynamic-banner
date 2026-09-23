@@ -12,6 +12,7 @@ use App\Models\BannerTemplate;
 use App\Models\Font;
 use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
+use App\Support\BannerVariables;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -62,11 +63,11 @@ class BannerConfigurationController extends Controller
 
         $variableHelper = new BannerVariableController(null);
 
-        $variables = array_change_key_case(array_merge(
+        $variables = BannerVariables::sanitize(array_merge(
             $variables,
             $variableHelper->get_client_specific_info_from_cache($banner_template->banner->instance, $ipAddress),
             $variableHelper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer),
-        ), CASE_UPPER);
+        ));
 
         return array_map(static fn (mixed $value): mixed => is_scalar($value) || is_null($value) ? $value : (string) $value, $variables);
     }

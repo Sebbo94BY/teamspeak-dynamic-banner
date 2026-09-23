@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\BannerVariableController as HelpersBannerVariableController;
 use App\Models\Instance;
+use App\Support\BannerVariables;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Predis\PredisException;
@@ -33,7 +34,7 @@ class BannerVariableController extends Controller
 
         return [
             'redis_connection_error' => $redis_connection_error,
-            'variables_and_values' => $variables_and_values,
+            'variables_and_values' => BannerVariables::sanitize($variables_and_values),
         ];
     }
 }

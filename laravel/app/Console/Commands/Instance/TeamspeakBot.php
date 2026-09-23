@@ -194,6 +194,8 @@ class TeamspeakBot extends Command
         foreach ($data as $key => $value) {
             if ($value instanceof \Stringable) {
                 $data[$key] = (string) $value;
+            } elseif (! is_scalar($value)) {
+                unset($data[$key]);
             }
         }
 
