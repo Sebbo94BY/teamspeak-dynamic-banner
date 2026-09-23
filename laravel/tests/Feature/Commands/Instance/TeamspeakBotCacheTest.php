@@ -3,7 +3,10 @@
 namespace Tests\Feature\Commands\Instance;
 
 use App\Console\Commands\Instance\TeamspeakBot;
+use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Models\Instance;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Helper\StringHelper;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Client;
@@ -12,6 +15,257 @@ use Tests\TestCase;
 
 class TeamspeakBotCacheTest extends TestCase
 {
+    public function test_polled_cache_ttls_allow_multiple_failed_refreshes(): void
+    {
+        $constants = [];
+        foreach ((new \ReflectionClass(TeamspeakBot::class))->getReflectionConstants() as $constant) {
+            $constants[$constant->getName()] = $constant->getValue();
+        }
+
+        $this->assertGreaterThanOrEqual(
+            $constants['DATETIME_REFRESH_INTERVAL_SECONDS'] * 4,
+            $constants['DATETIME_CACHE_TTL_SECONDS']
+        );
+        $this->assertGreaterThanOrEqual(
+            $constants['SERVERGROUP_REFRESH_INTERVAL_SECONDS'] * 3,
+            $constants['SERVERGROUP_CACHE_TTL_SECONDS']
+        );
+        $this->assertGreaterThanOrEqual(
+            $constants['VIRTUALSERVER_REFRESH_INTERVAL_SECONDS'] * 4,
+            $constants['VIRTUALSERVER_CACHE_TTL_SECONDS']
+        );
+        $this->assertGreaterThanOrEqual(60 * 60 * 12, $constants['CLIENT_CACHE_TTL_SECONDS']);
+    }
+
+    public function test_full_cache_refresh_loads_every_banner_data_source(): void
+    {
+        $command = new class extends TeamspeakBot
+        {
+            public array $refreshedSources = [];
+
+            public function refreshForTest(): void
+            {
+                $this->refresh_cached_data();
+            }
+
+            public function updateDatetime()
+            {
+                $this->refreshedSources[] = 'datetime';
+            }
+
+            public function updateClientList()
+            {
+                $this->refreshedSources[] = 'clients';
+            }
+
+            public function updateServergroupList()
+            {
+                $this->refreshedSources[] = 'servergroups';
+            }
+
+            public function updateVirtualserverInfo()
+            {
+                $this->refreshedSources[] = 'virtualserver';
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->refreshForTest();
+
+        $this->assertSame(['datetime', 'clients', 'servergroups', 'virtualserver'], $command->refreshedSources);
+    }
+
+    public function test_startup_retries_the_complete_cache_refresh(): void
+    {
+        $command = new class extends TeamspeakBot
+        {
+            public int $cacheRefreshes = 0;
+
+            public int $retryWaits = 0;
+
+            public function retryCacheForTest(): void
+            {
+                $this->retry_cache_refresh_during_startup();
+            }
+
+            public function refreshCacheForTest(): void
+            {
+                $this->refresh_cached_data();
+            }
+
+            protected function refresh_cached_data()
+            {
+                $this->cacheRefreshes++;
+                $this->cache_refresh_status = [
+                    'datetime' => true,
+                    'clients' => $this->cacheRefreshes === 2,
+                    'servergroups' => $this->cacheRefreshes === 2,
+                    'virtualserver' => $this->cacheRefreshes === 2,
+                ];
+
+                return ! in_array(false, $this->cache_refresh_status, true);
+            }
+
+            protected function wait_before_startup_refresh_retry(): void
+            {
+                $this->retryWaits++;
+            }
+
+            protected function message(string $log_level, string $message)
+            {
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        // The initial complete refresh is performed before this retry loop.
+        $command->refreshCacheForTest();
+        $command->retryCacheForTest();
+
+        $this->assertSame(2, $command->cacheRefreshes);
+        $this->assertSame(1, $command->retryWaits);
+    }
+
+    public function test_startup_reconnects_before_retrying_a_lost_teamspeak_connection(): void
+    {
+        $server = new class extends Server
+        {
+            public function __construct()
+            {
+            }
+        };
+        $helper = new class($server) extends TeamSpeakVirtualserver
+        {
+            public int $connections = 0;
+
+            public function __construct(private Server $server)
+            {
+            }
+
+            public function get_virtualserver_connection(bool $blocking = true): Server
+            {
+                $this->connections++;
+
+                return $this->server;
+            }
+        };
+        $command = new class extends TeamspeakBot
+        {
+            public int $cacheRefreshes = 0;
+
+            public function retryCacheForTest(TeamSpeakVirtualserver $helper): void
+            {
+                $this->cache_refresh_status = ['clients' => false];
+                $this->teamspeak_connection_lost = true;
+                $this->retry_cache_refresh_during_startup($helper);
+            }
+
+            protected function refresh_cached_data()
+            {
+                $this->cacheRefreshes++;
+                $this->cache_refresh_status = ['datetime' => true, 'clients' => true, 'servergroups' => true, 'virtualserver' => true];
+
+                return true;
+            }
+
+            protected function wait_before_startup_refresh_retry(): void
+            {
+            }
+
+            protected function message(string $log_level, string $message)
+            {
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->retryCacheForTest($helper);
+
+        $this->assertSame(1, $helper->connections);
+        $this->assertSame(1, $command->cacheRefreshes);
+    }
+
+    public function test_startup_stops_retrying_after_the_configured_attempts(): void
+    {
+        $command = new class extends TeamspeakBot
+        {
+            public int $cacheRefreshes = 0;
+
+            public int $retryWaits = 0;
+
+            public array $messages = [];
+
+            public function startRetryForTest(): void
+            {
+                $this->cache_refresh_status = ['clients' => false];
+                $this->retry_cache_refresh_during_startup();
+            }
+
+            protected function refresh_cached_data()
+            {
+                $this->cacheRefreshes++;
+                $this->cache_refresh_status = ['datetime' => false, 'clients' => false, 'servergroups' => false, 'virtualserver' => false];
+
+                return false;
+            }
+
+            protected function wait_before_startup_refresh_retry(): void
+            {
+                $this->retryWaits++;
+            }
+
+            protected function message(string $log_level, string $message)
+            {
+                $this->messages[] = $log_level.': '.$message;
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->startRetryForTest();
+
+        $this->assertSame(2, $command->cacheRefreshes);
+        $this->assertSame(2, $command->retryWaits);
+        $this->assertSame([
+            'WARNING: Retrying the complete TeamSpeak cache refresh (attempt 2/3).',
+            'WARNING: Retrying the complete TeamSpeak cache refresh (attempt 3/3).',
+        ], $command->messages);
+    }
+
+    public function test_regular_cache_refresh_failures_are_throttled_in_the_log(): void
+    {
+        Cache::store('file')->clear();
+        Log::spy();
+        $instance = new Instance();
+        $instance->id = 123;
+        $command = new class extends TeamspeakBot
+        {
+            public function logFailureForTest(Instance $instance): void
+            {
+                $this->instance = $instance;
+                $this->log_cache_refresh_failure('client');
+                $this->log_cache_refresh_failure('client');
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->logFailureForTest($instance);
+
+        Log::shouldHaveReceived('error')->once()->with('TeamSpeak client cache refresh failed for instance 123');
+    }
+
     public function test_caches_each_connected_client_in_a_separate_hash_and_indexes_its_ip(): void
     {
         $instance = new Instance();

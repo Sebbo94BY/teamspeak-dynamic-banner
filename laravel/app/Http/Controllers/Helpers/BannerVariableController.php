@@ -9,7 +9,6 @@ use App\Models\TwitchStreamer;
 use App\Support\BannerVariables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
-use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 use Predis\PredisException;
 use RedisException;
@@ -42,7 +41,7 @@ class BannerVariableController extends Controller
      */
     public function get_current_time_data(): array
     {
-        $current_datetime = Carbon::now()->addMinute();
+        $current_datetime = Carbon::now();
 
         $datetimes = [
             'current_time_utc_hi' => $current_datetime->setTimezone('UTC')->format('H:i'),
@@ -63,11 +62,7 @@ class BannerVariableController extends Controller
     {
         $this->virtualserver->clientListReset();
 
-        try {
-            $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
-        } catch (ServerQueryException) {
-            $virtualserver_clientlist = [];
-        }
+        $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
 
         $clientlist = [];
         foreach ($virtualserver_clientlist as $client) {
@@ -97,11 +92,7 @@ class BannerVariableController extends Controller
         /**
          * SERVERGROUP MEMBER ONLINE COUNTER VARIABLE
          */
-        try {
-            $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
-        } catch (ServerQueryException) {
-            $virtualserver_clientlist = [];
-        }
+        $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
 
         $client_servergroup_ids = [];
         foreach ($virtualserver_clientlist as $client) {
@@ -111,21 +102,13 @@ class BannerVariableController extends Controller
         /**
          * VIRTUALSERVER SERVERGROUPS
          */
-        try {
-            $virtualserver_servergroups = $this->virtualserver->serverGroupList(['type' => 1]);
-        } catch (ServerQueryException) {
-            $virtualserver_servergroups = [];
-        }
+        $virtualserver_servergroups = $this->virtualserver->serverGroupList(['type' => 1]);
 
         $servergroups = [];
         foreach ($virtualserver_servergroups as $servergroup) {
             $servergroups['servergroup_'.$servergroup->sgid.'_id'] = $servergroup->sgid;
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
-            try {
-                $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
-            } catch (ServerQueryException) {
-                $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = 0;
-            }
+            $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
             $servergroups['servergroup_'.$servergroup->sgid.'_member_online_count'] = (in_array($servergroup->sgid, $client_servergroup_ids)) ? array_count_values($client_servergroup_ids)[$servergroup->sgid] : 0;
         }
 

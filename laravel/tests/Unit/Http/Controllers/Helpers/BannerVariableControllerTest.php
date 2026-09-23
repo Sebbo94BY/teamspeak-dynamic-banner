@@ -3,6 +3,7 @@
 namespace Tests\Unit\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Helpers\BannerVariableController;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use PlanetTeamSpeak\TeamSpeak3Framework\Helper\StringHelper;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Client;
@@ -10,6 +11,20 @@ use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
 
 class BannerVariableControllerTest extends TestCase
 {
+    public function test_time_variables_use_the_current_minute_without_ahead_of_time_offset(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 9, 23, 12, 34, 56, 'Europe/Berlin'));
+
+        try {
+            $variables = (new BannerVariableController(null))->get_current_time_data();
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $this->assertSame('12:34', $variables['CURRENT_TIME_EUROPE_BERLIN_HI']);
+        $this->assertSame('10:34', $variables['CURRENT_TIME_UTC_HI']);
+    }
+
     public function test_client_cache_data_uses_the_public_client_variable_names(): void
     {
         $server = new class extends Server
