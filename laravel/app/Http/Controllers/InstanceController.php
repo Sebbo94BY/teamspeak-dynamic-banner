@@ -21,6 +21,10 @@ use PlanetTeamSpeak\TeamSpeak3Framework\Exception\TransportException;
 
 class InstanceController extends Controller
 {
+    private const BOT_STOP_TIMEOUT_SECONDS = 15;
+
+    private const BOT_STOP_POLL_MICROSECONDS = 100000;
+
     /**
      * Display the main page.
      */
@@ -188,7 +192,7 @@ class InstanceController extends Controller
 
         return Redirect::route('instances')->with([
             'success' => 'instance-start-successful',
-            'message' => 'Successfully started the instance. Refreshing status in 5 seconds...',
+            'message' => 'Successfully started the instance. Refreshing status in 30 seconds...',
         ]);
     }
 
@@ -206,6 +210,13 @@ class InstanceController extends Controller
             return Redirect::route('instances')->with([
                 'error' => 'instance-stop-error',
                 'message' => 'Failed to stop the instance.',
+            ]);
+        }
+
+        if (! $this->wait_for_bot_to_stop($process_id)) {
+            return Redirect::route('instances')->with([
+                'error' => 'instance-stop-error',
+                'message' => 'The bot did not stop within the expected time. Please try again.',
             ]);
         }
 
@@ -239,6 +250,13 @@ class InstanceController extends Controller
             ]);
         }
 
+        if (! $this->wait_for_bot_to_stop($process_id)) {
+            return Redirect::route('instances')->with([
+                'error' => 'instance-stop-error',
+                'message' => 'The bot did not stop within the expected time. Please try again.',
+            ]);
+        }
+
         if (! $instance->process->delete()) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-process-error',
@@ -257,7 +275,23 @@ class InstanceController extends Controller
 
         return Redirect::route('instances')->with([
             'success' => 'instance-restart-successful',
-            'message' => 'Successfully restarted the instance. Refreshing status in 5 seconds...',
+            'message' => 'Successfully restarted the instance. Refreshing status in 30 seconds...',
         ]);
+    }
+
+    /** Wait until the signalled bot has actually exited before starting a replacement. */
+    protected function wait_for_bot_to_stop(int $process_id): bool
+    {
+        $deadline = microtime(true) + self::BOT_STOP_TIMEOUT_SECONDS;
+
+        while (file_exists("/proc/$process_id")) {
+            if (microtime(true) >= $deadline) {
+                return false;
+            }
+
+            usleep(self::BOT_STOP_POLL_MICROSECONDS);
+        }
+
+        return true;
     }
 }

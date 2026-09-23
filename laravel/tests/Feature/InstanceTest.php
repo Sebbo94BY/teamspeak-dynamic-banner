@@ -101,6 +101,7 @@ class InstanceTest extends TestCase
         $response = $this->actingAs($this->user)->post(route('instance.start', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
+        $response->assertSessionHas('message', 'Successfully started the instance. Refreshing status in 30 seconds...');
     }
 
     /**
@@ -125,5 +126,6 @@ class InstanceTest extends TestCase
         $response = $this->actingAs($this->user)->post(route('instance.restart', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
         $response->assertSessionHas('success');
+        $response->assertSessionHas('message', 'Successfully restarted the instance. Refreshing status in 30 seconds...');
     }
 }
