@@ -198,7 +198,7 @@ class TeamspeakBot extends Command
     {
         $this->message('DEBUG', 'Received the following event: '.json_encode($event->getType()));
 
-        if ($this->teamspeak_refresh_in_progress) {
+        if (! $this->keep_running || $this->teamspeak_refresh_in_progress) {
             return;
         }
 
@@ -446,6 +446,10 @@ class TeamspeakBot extends Command
             try {
                 $this->virtualserver->getAdapter()->wait();
             } catch (TransportException $transport_exception) {
+                if (! $this->keep_running) {
+                    break;
+                }
+
                 $this->message('WARNING', "Connection to `{$this->instance->host}` was lost. Reconnecting...");
                 $this->reconnect_to_virtualserver($virtualserver_helper);
             }
@@ -493,6 +497,10 @@ class TeamspeakBot extends Command
      */
     protected function reconnect_to_virtualserver(TeamSpeakVirtualserver $virtualserver_helper): bool
     {
+        if (! $this->keep_running) {
+            return false;
+        }
+
         try {
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
             $this->refresh_cached_data();

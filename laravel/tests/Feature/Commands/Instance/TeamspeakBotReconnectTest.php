@@ -123,6 +123,31 @@ class TeamspeakBotReconnectTest extends TestCase
         $this->assertSame(['ERROR: Reconnect to `ts.sample.com` failed: Connection refused'], $command->messages);
     }
 
+    public function test_stopping_bot_does_not_reconnect_after_a_transport_failure(): void
+    {
+        $helper = new class extends TeamSpeakVirtualserver
+        {
+            public int $connections = 0;
+
+            public function __construct()
+            {
+            }
+
+            public function get_virtualserver_connection(bool $blocking = true): Server
+            {
+                $this->connections++;
+
+                throw new \Exception('This connection attempt must not happen');
+            }
+        };
+        $command = $this->command();
+        $command->stopForTest();
+
+        $this->assertFalse($command->reconnectForTest($helper));
+        $this->assertSame(0, $helper->connections);
+        $this->assertSame(0, $command->retryCount);
+    }
+
     private function command(): TeamspeakBot
     {
         $instance = new Instance();
@@ -151,6 +176,11 @@ class TeamspeakBotReconnectTest extends TestCase
             public function connectForTest(TeamSpeakVirtualserver $helper): bool
             {
                 return $this->connect_to_virtualserver_with_retries($helper);
+            }
+
+            public function stopForTest(): void
+            {
+                $this->keep_running = false;
             }
 
             public function __destruct()
