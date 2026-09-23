@@ -145,8 +145,20 @@ class BannerVariableController extends Controller
 
         /**
          * VIRTUALSERVER CONNECTION INFO
+         *
+         * Some TeamSpeak server versions return every connection property as a
+         * separate result row. Flatten those rows so that the property names,
+         * rather than their numeric result indexes, become banner variables.
          */
-        $virtualserver_info = array_merge($virtualserver_info, $this->virtualserver->connectionInfo());
+        foreach ($this->virtualserver->connectionInfo() as $key => $value) {
+            if (is_array($value)) {
+                $virtualserver_info = array_merge($virtualserver_info, $value);
+
+                continue;
+            }
+
+            $virtualserver_info[$key] = $value;
+        }
 
         return array_change_key_case($virtualserver_info, CASE_UPPER);
     }
