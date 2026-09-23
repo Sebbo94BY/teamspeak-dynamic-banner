@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Instance;
 use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
+use App\Support\BannerVariables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
@@ -141,7 +142,7 @@ class BannerVariableController extends Controller
         /**
          * VIRTUALSERVER NODE INFO
          */
-        $virtualserver_info = array_merge($virtualserver_info, $this->virtualserver->getInfo(true, true));
+        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->virtualserver->getInfo(true, true)));
 
         /**
          * VIRTUALSERVER CONNECTION INFO
@@ -150,17 +151,31 @@ class BannerVariableController extends Controller
          * separate result row. Flatten those rows so that the property names,
          * rather than their numeric result indexes, become banner variables.
          */
-        foreach ($this->virtualserver->connectionInfo() as $key => $value) {
+        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->virtualserver->connectionInfo()));
+
+        return BannerVariables::sanitize($virtualserver_info);
+    }
+
+    /** @param array<array-key, mixed> $variables
+     *  @return array<string, mixed>
+     */
+    private function flatten_variables(array $variables): array
+    {
+        $flattened = [];
+
+        foreach ($variables as $key => $value) {
             if (is_array($value)) {
-                $virtualserver_info = array_merge($virtualserver_info, $value);
+                $flattened = array_merge($flattened, $this->flatten_variables($value));
 
                 continue;
             }
 
-            $virtualserver_info[$key] = $value;
+            if (is_string($key)) {
+                $flattened[$key] = $value;
+            }
         }
 
-        return array_change_key_case($virtualserver_info, CASE_UPPER);
+        return $flattened;
     }
 
     /**

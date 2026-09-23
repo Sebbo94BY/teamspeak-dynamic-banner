@@ -20,6 +20,8 @@ return [
      */
     'preview_with_grid_system' => 'Vorschau mit Gittersystem',
     'preview_without_grid_system' => 'Vorschau',
+    'live_preview' => 'Live-Vorschau',
+    'live_preview_help' => 'Änderungen an den Textzeilen werden sofort angezeigt. Klicke in die Vorschau, um die Koordinaten der aktiven Textzeile zu setzen.',
 
     /**
      * About Grid System

@@ -11,8 +11,8 @@
                         {{$instanceVariableModal->variables()['redis_connection_error']}}
                     </div>
                 @endif
-                <div class="col-lg-12">
-                    <table class="table" id="availableVariables">
+                <div class="col-lg-12 table-responsive">
+                    <table class="table table-striped" id="availableVariables-{{ $instanceVariableModal->id }}">
                         <thead>
                         <tr>
                             <th scope="col">{{ __('views/modals/modal-variables.table_variable_name') }}</th>
@@ -45,3 +45,34 @@
         </div>
     </div>
 </div>
+
+<script type="module">
+    window.addEventListener('load', function () {
+        const variablesModal = document.getElementById('modalAvailableVariables-{{ $instanceVariableModal->id }}');
+        const variablesTable = $('#availableVariables-{{ $instanceVariableModal->id }}');
+        let variablesDataTable;
+
+        variablesModal.addEventListener('shown.bs.modal', function () {
+            if (!variablesDataTable) {
+                variablesDataTable = variablesTable.DataTable({
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_all')) }}]],
+                    language: {
+                        emptyTable: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_empty')) }},
+                        info: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_info')) }},
+                        infoEmpty: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_info_empty')) }},
+                        lengthMenu: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_length_menu')) }},
+                        search: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_search')) }},
+                        zeroRecords: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_zero_records')) }},
+                        paginate: {
+                            previous: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_previous')) }},
+                            next: {{ Illuminate\Support\Js::from(__('views/modals/modal-variables.datatable_next')) }},
+                        },
+                    },
+                });
+            } else {
+                variablesDataTable.columns.adjust();
+            }
+        });
+    });
+</script>

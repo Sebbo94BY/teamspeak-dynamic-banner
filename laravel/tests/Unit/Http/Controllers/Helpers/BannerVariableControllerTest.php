@@ -75,7 +75,7 @@ class BannerVariableControllerTest extends TestCase
             {
                 return [
                     ['connection_packets_sent_total' => 123],
-                    ['connection_packets_received_total' => 456],
+                    [306 => ['connection_packets_received_total' => 456]],
                 ];
             }
         };
@@ -89,5 +89,6 @@ class BannerVariableControllerTest extends TestCase
         ], $variables);
         $this->assertArrayNotHasKey(0, $variables);
         $this->assertArrayNotHasKey(1, $variables);
+        $this->assertArrayNotHasKey(306, $variables);
     }
 }

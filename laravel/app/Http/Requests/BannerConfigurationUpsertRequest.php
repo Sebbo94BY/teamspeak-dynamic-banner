@@ -49,7 +49,7 @@ class BannerConfigurationUpsertRequest extends FormRequest
             'disable_at' => ['nullable', 'date'],
             'time_based_enable_at' => ['nullable', 'date_format:H:i,H:i:s'],
             'time_based_disable_at' => ['nullable', 'date_format:H:i,H:i:s'],
-            'configuration' => ['required', 'array:banner_configuration_id,x_coordinate,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],
+            'configuration' => ['required', 'array:banner_configuration_id,internal_field_label,x_coordinate,text_alignment,y_coordinate,text,font_id,font_size,font_angle,font_color_in_hexadecimal'],
 
             'configuration.banner_configuration_id' => ['sometimes', 'array'],
             'configuration.banner_configuration_id.*' => [
@@ -59,6 +59,12 @@ class BannerConfigurationUpsertRequest extends FormRequest
 
             'configuration.x_coordinate' => ['required', 'array', 'min:1'],
             'configuration.x_coordinate.*' => ['integer', 'min:0', 'max:'.($this->banner_template->template->width - 1)],
+
+            'configuration.internal_field_label' => ['nullable', 'array'],
+            'configuration.internal_field_label.*' => ['nullable', 'string', 'max:255'],
+
+            'configuration.text_alignment' => ['sometimes', 'array', 'min:1'],
+            'configuration.text_alignment.*' => ['in:left,center,right'],
 
             'configuration.y_coordinate' => ['required', 'array', 'min:1'],
             'configuration.y_coordinate.*' => ['integer', 'min:0', 'max:'.$this->banner_template->template->height],

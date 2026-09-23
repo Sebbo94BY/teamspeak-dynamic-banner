@@ -18,6 +18,8 @@ class BannerConfigurationFactory extends Factory
     {
         return [
             'x_coordinate' => fake()->numberBetween(60, 300),
+            'internal_field_label' => fake()->optional()->word(),
+            'text_alignment' => fake()->randomElement(['left', 'center', 'right']),
             'y_coordinate' => fake()->numberBetween(468, 1024),
             'text' => fake()->text(32),
             'font_size' => fake()->numberBetween(1, 5),

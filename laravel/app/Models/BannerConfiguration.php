@@ -17,7 +17,9 @@ class BannerConfiguration extends Model
      */
     protected $fillable = [
         'banner_template_id',
+        'internal_field_label',
         'x_coordinate',
+        'text_alignment',
         'y_coordinate',
         'text',
         'font_id',

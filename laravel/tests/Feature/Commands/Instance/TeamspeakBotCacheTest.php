@@ -57,22 +57,88 @@ class TeamspeakBotCacheTest extends TestCase
         };
         $command->setContextForTest($instance, $server);
 
-        Redis::shouldReceive('del')->once()->with('instance_1_client_ip_index');
         foreach ([
             42 => ['Max', '192.168.2.17'],
             43 => ['Peter', '192.168.2.20'],
             44 => ['Ulrike', '192.168.2.34'],
         ] as $databaseId => [$nickname, $ip]) {
-            Redis::shouldReceive('del')->once()->with('instance_1_client_'.$databaseId);
             Redis::shouldReceive('hmset')->once()->with(
                 'instance_1_client_'.$databaseId,
                 \Mockery::on(static fn (array $client): bool => $client['CLIENT_NICKNAME'] === $nickname && $client['CLIENT_CONNECTION_CLIENT_IP'] === $ip)
             );
             Redis::shouldReceive('expire')->once()->with('instance_1_client_'.$databaseId, 43200);
-            Redis::shouldReceive('hset')->once()->with('instance_1_client_ip_index', $ip, $databaseId);
         }
+        Redis::shouldNotReceive('del');
+        Redis::shouldReceive('hmset')->once()->with(
+            \Mockery::on(static fn (string $key): bool => str_starts_with($key, 'instance_1_client_ip_index:staging:')),
+            [
+                '192.168.2.17' => 42,
+                '192.168.2.20' => 43,
+                '192.168.2.34' => 44,
+            ]
+        );
+        Redis::shouldReceive('expire')->once()->with(
+            \Mockery::on(static fn (string $key): bool => str_starts_with($key, 'instance_1_client_ip_index:staging:')),
+            43200
+        );
+        Redis::shouldReceive('rename')->once()->with(
+            \Mockery::on(static fn (string $key): bool => str_starts_with($key, 'instance_1_client_ip_index:staging:')),
+            'instance_1_client_ip_index'
+        );
         Redis::shouldReceive('set')->once()->with('instance_1_client_default', 42, 'EX', 43200);
-        Redis::shouldReceive('expire')->once()->with('instance_1_client_ip_index', 43200);
+
+        $command->updateClientList();
+    }
+
+    public function test_keeps_existing_client_cache_when_publishing_a_refresh_fails(): void
+    {
+        $instance = new Instance();
+        $instance->id = 1;
+        $server = new class extends Server
+        {
+            public array $clients = [];
+
+            public function __construct()
+            {
+            }
+
+            public function clientListReset(): void
+            {
+            }
+
+            public function clientList(array $filter = []): array
+            {
+                return $this->clients;
+            }
+        };
+        $server->clients = [$this->client($server, 42, 'Max', '192.168.2.17')];
+
+        $command = new class extends TeamspeakBot
+        {
+            public function setContextForTest(Instance $instance, Server $server): void
+            {
+                $this->instance = $instance;
+                $this->virtualserver = $server;
+            }
+
+            public function __destruct()
+            {
+            }
+
+            protected function message(string $log_level, string $message)
+            {
+            }
+        };
+        $command->setContextForTest($instance, $server);
+
+        Redis::shouldReceive('hmset')->once()->with('instance_1_client_42', \Mockery::type('array'));
+        Redis::shouldNotReceive('del');
+        Redis::shouldReceive('expire')->once()->with('instance_1_client_42', 43200);
+        Redis::shouldReceive('hmset')->once()->with(
+            \Mockery::on(static fn (string $key): bool => str_starts_with($key, 'instance_1_client_ip_index:staging:')),
+            ['192.168.2.17' => 42]
+        )->andThrow(new \RuntimeException('Redis write failed'));
+        Redis::shouldReceive('set')->once()->with('instance_1_client_default', 42, 'EX', 43200);
 
         $command->updateClientList();
     }

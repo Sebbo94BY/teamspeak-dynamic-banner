@@ -172,9 +172,12 @@ class TeamspeakBot extends Command
         }
 
         try {
-            Redis::expire($redis_key, -2);
-            Redis::hmset($redis_key, $this->normalize_data_for_redis($data));
-            Redis::expire($redis_key, $ttl);
+            // Write to a separate key first and atomically replace the old hash only
+            // after it is complete. Readers must never observe a partly refreshed cache.
+            $staging_key = $redis_key.':staging:'.bin2hex(random_bytes(8));
+            Redis::hmset($staging_key, $this->normalize_data_for_redis($data));
+            Redis::expire($staging_key, $ttl);
+            Redis::rename($staging_key, $redis_key);
         } catch (RedisException | ConnectionException | Exception) {
             // Do nothing when the Redis
             // - should not answer within the expected timeout time.
@@ -191,6 +194,8 @@ class TeamspeakBot extends Command
         foreach ($data as $key => $value) {
             if ($value instanceof \Stringable) {
                 $data[$key] = (string) $value;
+            } elseif (! is_scalar($value)) {
+                unset($data[$key]);
             }
         }
 
@@ -226,23 +231,23 @@ class TeamspeakBot extends Command
         $ip_index_key = 'instance_'.$this->instance->id.'_client_ip_index';
 
         try {
-            // Rebuild the small IP index atomically enough for this single bot. Client
-            // records may expire naturally; disconnected clients must not stay selectable.
-            Redis::del($ip_index_key);
+            $ip_index = [];
 
             foreach ($clients as $client_database_id => $client) {
                 $client_key = 'instance_'.$this->instance->id.'_client_'.$client_database_id;
                 $client = $this->normalize_data_for_redis($client);
-                Redis::del($client_key);
                 Redis::hmset($client_key, $client);
                 Redis::expire($client_key, $cache_ttl);
-                Redis::hset($ip_index_key, $client['CLIENT_CONNECTION_CLIENT_IP'], $client_database_id);
+                $ip_index[$client['CLIENT_CONNECTION_CLIENT_IP']] = $client_database_id;
             }
 
             if ($clients !== []) {
+                // The index is read alongside the client hashes. Replacing it atomically
+                // avoids a momentary empty client selection during a refresh.
+                $this->update_data_in_redis($ip_index, $ip_index_key, $cache_ttl);
                 Redis::set('instance_'.$this->instance->id.'_client_default', array_key_first($clients), 'EX', $cache_ttl);
-                Redis::expire($ip_index_key, $cache_ttl);
             } else {
+                Redis::del($ip_index_key);
                 Redis::del('instance_'.$this->instance->id.'_client_default');
             }
         } catch (RedisException | ConnectionException | Exception) {
