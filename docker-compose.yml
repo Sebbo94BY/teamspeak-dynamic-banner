@@ -55,7 +55,24 @@ services:
     working_dir: /var/www/
     volumes:
       - ./laravel/:/var/www
-    command: php artisan queue:listen --timeout=10 --tries=1 --no-interaction -vvv
+    command: php artisan queue:listen --queue=default --timeout=10 --tries=1 --no-interaction -vvv
+
+  queue-matomo:
+    profiles:
+      - matomo
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: debian:bookworm-slim
+    container_name: application-queue-matomo
+    depends_on:
+      - database
+      - cache
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./laravel/:/var/www
+    command: php artisan queue:listen --queue=matomo --timeout=10 --tries=1 --no-interaction -vvv
 
   cache:
     image: redis:7.0.12

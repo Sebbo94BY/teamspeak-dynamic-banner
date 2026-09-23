@@ -92,6 +92,8 @@ If you're interested in some statistics of this application, you can configure a
 
 Simply configure the Matomo tracking in your DotEnv file (`.env`) with the respective variables. See the configuration file `laravel/config/matomo.php` for the available environment variables and a detailed explanation.
 
+When `MATOMO_ENABLED=true`, tracking is dispatched to the dedicated Laravel queue `matomo`, so slow tracking does not delay banner responses or other background jobs. Keep `QUEUE_CONNECTION` on an asynchronous driver (the default is `database`, not `sync`) and ensure that a worker for the `matomo` queue is running. The Docker Compose Matomo worker uses the optional `matomo` profile and can be started with `docker compose --profile matomo up -d`.
+
 After configuring it, don't forget to cache your configuration: `php artisan config:cache`
 
 

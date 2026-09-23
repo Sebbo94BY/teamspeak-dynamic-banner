@@ -4,9 +4,9 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
+use App\Jobs\TrackMatomoPageView;
 use App\Models\Banner;
 use App\Models\BannerTemplate;
-use App\Support\ThrottledErrorLogger;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,8 +19,6 @@ class BannerController extends Controller
     /**
      * Class properties
      */
-    private \MatomoTracker $matomo;
-
     private Banner $banner;
 
     private Collection|BannerTemplate $banner_templates;
@@ -92,15 +90,14 @@ class BannerController extends Controller
         }
 
         if (config('matomo.enabled')) {
-            $this->matomo = new \MatomoTracker(config('matomo.site_id'), config('matomo.base_url'));
-            $this->matomo->setRequestConnectTimeout(config('matomo.connect_timeout'));
-
-            try {
-                $this->matomo->doTrackPageView($this->selected_banner_template->banner->name.': '.$this->selected_banner_template->name);
-            } catch (Exception $matomo_exception) {
-                $message = 'Matomo tracking failed. Received the following error: '.preg_replace('/\s\s+/', ' ', $matomo_exception->getMessage());
-                (new ThrottledErrorLogger())->log($message, config('matomo.error_log_cooldown'));
-            }
+            TrackMatomoPageView::dispatch(
+                $this->selected_banner_template->banner->name.': '.$this->selected_banner_template->name,
+                $request->fullUrl(),
+                $request->header('referer'),
+                $request->ip(),
+                $request->userAgent(),
+                $request->header('accept-language'),
+            )->onQueue('matomo');
         }
     }
 
@@ -114,7 +111,7 @@ class BannerController extends Controller
         }
 
         // Return the generated image to the client
-        $draw_text_on_template_helper = new DrawTextOnTemplateController();
+        $draw_text_on_template_helper = new DrawTextOnTemplateController;
 
         try {
             return $draw_text_on_template_helper->draw_text_to_image($this->selected_banner_template, false, true, $request->ip());
