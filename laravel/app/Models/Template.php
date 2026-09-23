@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksUpdatedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Template extends Model
 {
     use HasFactory;
+    use TracksUpdatedBy;
 
     /**
      * The attributes that are mass assignable.

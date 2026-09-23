@@ -8,6 +8,7 @@ use App\Http\Requests\BannerUpdateRequest;
 use App\Models\Banner;
 use App\Models\Instance;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -16,11 +17,23 @@ class BannerController extends Controller
     /**
      * Display the main page.
      */
-    public function overview(): View
+    public function overview(Request $request): View
     {
+        $attention = $request->query('attention');
+        $banners = Banner::query();
+
+        if ($attention === 'without-templates') {
+            $banners->doesntHave('templates');
+        } elseif ($attention === 'without-active-templates') {
+            $banners->has('templates')->whereDoesntHave('templates', fn ($query) => $query->where('enabled', true));
+        } else {
+            $attention = null;
+        }
+
         return view('banners')->with([
-            'banners'=>Banner::all(),
-            'instance_list'=>Instance::all(),
+            'banners' => $banners->with(['instance', 'templates'])->get(),
+            'instance_list' => Instance::all(),
+            'attention' => $attention,
         ]);
     }
 

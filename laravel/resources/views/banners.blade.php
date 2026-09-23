@@ -52,6 +52,9 @@
 @endcan
 <div class="container mt-3">
     @include('inc.standard-alerts')
+    @if($attention)
+        <div class="alert alert-warning" role="alert">{{ __('views/banners.attention_'.$attention.'_filter') }}</div>
+    @endif
     @if ($banners->count() == 0)
     <div class="row">
         <div class="col-lg-12">
@@ -87,6 +90,7 @@
                     </td>
                     <td class="col-lg-2">
                         <span class="badge text-bg-secondary fs-6">{{ $banner->templates->count() }}</span>
+                        <span class="small text-muted">{{ trans_choice('views/banners.table_active_templates', $banner->templates->where('enabled', true)->count(), ['count' => $banner->templates->where('enabled', true)->count()]) }}</span>
                     </td>
                     <td class="col-lg-2">
                         <div class="d-flex">
@@ -113,6 +117,11 @@
 @can('add banners')
     @if ($instance_list->count() > 0)
         @include('modals.banners.modal-add')
+        @if(request()->boolean('create'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => new bootstrap.Modal('#addBanner').show());
+        </script>
+        @endif
     @endif
 @endcan
 

@@ -107,6 +107,7 @@ class BannerTest extends TestCase
         $response = $this->get(route('api.banner', ['banner_id' => base_convert($this->banner->id, 10, 35)]));
         $response->assertSeeText('The template does not have any configurations. This seems wrong.');
         $response->assertStatus(500);
+        $this->assertNull($banner_template->refresh()->last_rendered_at);
     }
 
     /**
@@ -158,6 +159,7 @@ class BannerTest extends TestCase
         $response->assertHeader('Last-Modified');
         $this->assertContains($response->headers->get('Content-Type'), ['image/png', 'image/jpeg', 'image/gif']);
         $response->assertStatus(200);
+        $this->assertNotNull($banner_template->refresh()->last_rendered_at);
 
         // Delete temporary files again
         Storage::disk('public')->delete($this->upload_directory.DIRECTORY_SEPARATOR.$banner_configuration->font->filename);

@@ -8,6 +8,7 @@ use App\Http\Requests\TemplateUpdateRequest;
 use App\Jobs\DrawGridSystemOnTemplate;
 use App\Models\Template;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -23,9 +24,21 @@ class TemplateController extends Controller
     /**
      * Display the main page.
      */
-    public function overview(): View
+    public function overview(Request $request): View
     {
-        return view('templates')->with('templates', Template::all());
+        $attention = $request->query('attention');
+        $templates = Template::with('banner_templates.banner');
+
+        if ($attention === 'unused') {
+            $templates->doesntHave('banner_templates');
+        } else {
+            $attention = null;
+        }
+
+        return view('templates')->with([
+            'templates' => $templates->get(),
+            'attention' => $attention,
+        ]);
     }
 
     /**
@@ -36,7 +49,7 @@ class TemplateController extends Controller
         $filename = time().'_'.$request->file->getClientOriginalName();
         $request->file->move(public_path($this->upload_directory_original), $filename);
 
-        list($width, $height) = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
+        [$width, $height] = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
 
         $template = new Template;
         $template->alias = $request->alias;
@@ -84,7 +97,7 @@ class TemplateController extends Controller
             $filename = time().'_'.$request->file->getClientOriginalName();
             $request->file->move(public_path($this->upload_directory_original), $filename);
 
-            list($width, $height) = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
+            [$width, $height] = getimagesize(public_path($this->upload_directory_original).'/'.$filename);
 
             $template->filename = $filename;
             $template->file_path_original = $this->upload_directory_original;

@@ -25,6 +25,9 @@ return [
     'table_name' => 'Name',
     'table_instance' => 'Instanz',
     'table_templates_in_use' => 'Vorlagen in Verwendung',
+    'table_active_templates' => '{0} keine aktiv|{1} :count aktiv|[2,*] :count aktiv',
     'table_actions' => 'Aktionen',
+    'attention_without-templates_filter' => 'Es werden nur Banner ohne Vorlage angezeigt.',
+    'attention_without-active-templates_filter' => 'Es werden nur Banner ohne aktive Vorlage angezeigt.',
 
 ];

@@ -28,5 +28,8 @@ return [
     'table_file_size' => 'Dateigröße',
     'table_file_dimensions' => 'Dateimaße',
     'table_last_modified' => 'Zuletzt geändert',
+    'table_used_by' => 'Verwendet von',
+    'table_used_by_none' => 'Keinem Banner',
+    'attention_unused_filter' => 'Es werden nur Vorlagen angezeigt, die keinem Banner zugeordnet sind.',
 
 ];

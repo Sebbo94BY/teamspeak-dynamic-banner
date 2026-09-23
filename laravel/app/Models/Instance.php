@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Controllers\BannerVariableController;
+use App\Models\Concerns\TracksUpdatedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Instance extends Model
 {
     use HasFactory;
+    use TracksUpdatedBy;
 
     /**
      * The attributes that are mass assignable.
@@ -65,7 +67,7 @@ class Instance extends Model
      */
     public function variables(): array
     {
-        $varController = new BannerVariableController();
+        $varController = new BannerVariableController;
 
         return $varController->getInstanceVariables($this);
     }

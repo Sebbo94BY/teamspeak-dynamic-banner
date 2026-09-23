@@ -15,17 +15,6 @@ use Predis\PredisException;
 use RedisException;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
-/**
- * Possible system status severities.
- */
-enum SystemStatusSeverity: string
-{
-    case Info = 'info';
-    case Success = 'success';
-    case Warning = 'warning';
-    case Danger = 'danger';
-}
-
 class SystemStatusController extends Controller
 {
     public const QUEUE_METRIC_HISTORY_RANGES = [
@@ -672,6 +661,24 @@ class SystemStatusController extends Controller
         }
 
         return $system_status;
+    }
+
+    /**
+     * Return the most severe result of the checks shown on the system status page.
+     */
+    public function overall_severity(): SystemStatusSeverity
+    {
+        $status = json_encode($this->system_status_json(false));
+
+        if (str_contains($status, '"severity":"danger"')) {
+            return SystemStatusSeverity::Danger;
+        }
+
+        if (str_contains($status, '"severity":"warning"')) {
+            return SystemStatusSeverity::Warning;
+        }
+
+        return SystemStatusSeverity::Success;
     }
 
     public function system_status(string $queue_history_range = '30m'): array

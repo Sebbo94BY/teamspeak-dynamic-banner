@@ -45,6 +45,9 @@
 @endcan
 <div class="container mt-3">
     @include('inc.standard-alerts')
+    @if($attention === 'unused')
+        <div class="alert alert-warning" role="alert">{{ __('views/templates.attention_unused_filter') }}</div>
+    @endif
     @if($templates->count() == 0)
         <div class="row">
             <div class="col-lg-12">
@@ -78,6 +81,18 @@
                         <p>{{ __('views/templates.table_file_size') }}: {{ ceil(filesize($template->file_path_original.'/'.$template->filename) / 1024) }} KiB</p>
                         <p>{{ __('views/templates.table_file_dimensions') }}: {{ $template->width }}x{{ $template->height }} Pixel</p>
                         <p>{{ __('views/templates.table_last_modified') }}: {{ Carbon\Carbon::parse($template->updated_at)->setTimezone(Request::header('X-Timezone')) }}</p>
+                        <p class="mb-0">{{ __('views/templates.table_used_by') }}:
+                            @forelse($template->banner_templates->pluck('banner')->unique('id') as $banner)
+                                @can('edit banners')
+                                    <a href="{{ route('banner.templates', ['banner_id' => $banner->id]) }}">{{ $banner->name }}</a>
+                                @else
+                                    {{ $banner->name }}
+                                @endcan
+                                @if (! $loop->last), @endif
+                            @empty
+                                <span class="text-muted">{{ __('views/templates.table_used_by_none') }}</span>
+                            @endforelse
+                        </p>
                     </td>
                     <td class="col-lg-2">
                         @can('edit templates')
@@ -97,6 +112,12 @@
 </div>
 
 @include('modals.templates.modal-add')
+
+@if(request()->boolean('create'))
+<script>
+    document.addEventListener('DOMContentLoaded', () => new bootstrap.Modal('#addTemplate').show());
+</script>
+@endif
 
 @foreach($templates as $templateModal)
     @can('edit templates')
