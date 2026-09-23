@@ -173,11 +173,14 @@ class BannerVariableController extends Controller
         try {
             $client_database_id = Redis::hget('instance_'.$instance->id.'_client_ip_index', $ip_address);
 
-            if (is_null($client_database_id)) {
+            // phpredis returns false for a missing hash field, whereas Predis
+            // returns null. Neither is a usable client ID, so use the cached
+            // default client in both cases.
+            if (is_null($client_database_id) || $client_database_id === false) {
                 $client_database_id = Redis::get('instance_'.$instance->id.'_client_default');
             }
 
-            if (! is_null($client_database_id)) {
+            if (! is_null($client_database_id) && $client_database_id !== false) {
                 return Redis::hgetall('instance_'.$instance->id.'_client_'.$client_database_id);
             }
 
