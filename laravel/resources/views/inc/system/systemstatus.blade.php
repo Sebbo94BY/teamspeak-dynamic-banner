@@ -280,37 +280,68 @@
             <div id="accordionSystemStatusQueueHealth" class="accordion-collapse collapse @if($queue_health_warning_count > 0  || $queue_health_error_count > 0 ) show @endif" aria-labelledby="accordionSystemStatusQueueHealthHeading">
                 <div class="accordion-body bg-light">
                     <div class="col-lg-12">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th class="col-lg-6 border-0" scope="col"></th>
-                                <th class="col-lg-6 border-0" scope="col"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($queue_health_size as $key => $queueSize)
-                                <tr>
-                                    <td class="border-0">{{$queueSize->name}} <code>{{$queueSize->required_value}}</code></td>
-                                    <td class="border-0">
-                                        @switch($queueSize->severity)
-                                            @case('success')
-                                                <i class="fa-solid fa-check-circle text-success me-3"></i>
-                                                @break
-                                            @case('warning')
-                                                <i class="fa-solid fa-triangle-exclamation text-warning me-3"></i>
-                                                @break
-                                            @case('danger')
-                                                <i class="fa-solid fa-circle-xmark text-danger me-3"></i>
-                                                @break
-                                            @default
-                                                <i class="fa-solid fa-info-circle text-info me-3"></i>
-                                        @endswitch
-                                        {{$queueSize->current_value}}
-                                    </td>
-                                </tr>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <p class="mb-0 text-muted">{{ __('views/inc/system/systemstatus.accordion_section_queue_health_intro') }}</p>
+                            <form method="get" action="{{ route('administration.systemstatus') }}" class="d-flex align-items-center gap-2">
+                                <label for="queueHistoryRange" class="small text-nowrap">{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_range') }}</label>
+                                <select id="queueHistoryRange" name="queue_history_range" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    @foreach($queue_metric_history_ranges as $range => $minutes)
+                                        <option value="{{ $range }}" @selected($queue_history_range === $range)>{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_range_'.$range) }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_range_apply') }}</button>
+                            </form>
+                        </div>
+                        @foreach($queue_health_sections as $queueHealthSection)
+                            <h3 class="fs-6 fw-bold mt-3">{{ $queueHealthSection['name'] }}</h3>
+                            <div class="row g-3">
+                            @foreach($queueHealthSection['metrics'] as $queueSize)
+                                <div class="col-md-6">
+                                    <div class="border rounded bg-white h-100 p-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            @switch($queueSize->severity)
+                                                @case('success')
+                                                    <i class="fa-solid fa-check-circle text-success me-2"></i>
+                                                    @break
+                                                @case('warning')
+                                                    <i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>
+                                                    @break
+                                                @case('danger')
+                                                    <i class="fa-solid fa-circle-xmark text-danger me-2"></i>
+                                                    @break
+                                                @default
+                                                    <i class="fa-solid fa-circle-info text-info me-2"></i>
+                                            @endswitch
+                                            <span class="fw-bold">{{ $queueSize->name }}</span>
+                                        </div>
+                                        <div class="fs-4 fw-bold">{{ $queueSize->current_value }}</div>
+                                        @if(isset($queueSize->history_key) && $queueHealthSection['history']->count() > 1)
+                                            @php
+                                                $historyValues = $queueHealthSection['history']->pluck($queueSize->history_key)->map(fn ($value) => (int) $value)->values();
+                                                $historyMaximum = max(1, $historyValues->max());
+                                                $historyDivisor = max(1, $historyValues->count() - 1);
+                                                $historyPoints = $historyValues->map(fn ($value, $index) => round($index * 100 / $historyDivisor, 2).','.round(28 - ($value * 24 / $historyMaximum), 2))->implode(' ');
+                                            @endphp
+                                            <div class="queue-metric-chart position-relative mt-2 text-{{ $queueSize->severity === 'warning' ? 'warning' : 'primary' }}" data-queue-metric-chart>
+                                                <svg class="w-100" viewBox="0 0 100 32" height="42" role="img" aria-label="{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_label', ['range' => __('views/inc/system/systemstatus.accordion_section_queue_health_history_range_'.$queue_history_range)]) }}">
+                                                    <line x1="0" y1="28" x2="100" y2="28" stroke="currentColor" stroke-opacity="0.2" stroke-width="1" />
+                                                    <polyline points="{{ $historyPoints }}" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+                                                    @foreach($queueHealthSection['history'] as $index => $snapshot)
+                                                        <circle class="queue-metric-point" cx="{{ round($index * 100 / $historyDivisor, 2) }}" cy="{{ round(28 - ($historyValues[$index] * 24 / $historyMaximum), 2) }}" r="2" fill="currentColor" tabindex="0" data-tooltip="{{ $snapshot->recorded_at->format('d.m.Y H:i') }}: {{ $historyValues[$index] }}" aria-label="{{ $snapshot->recorded_at->format('d.m.Y H:i') }}: {{ $historyValues[$index] }}" />
+                                                    @endforeach
+                                                </svg>
+                                                <div class="queue-metric-tooltip position-absolute d-none rounded bg-dark px-2 py-1 small text-white" style="z-index: 1; pointer-events: none;"></div>
+                                                <div class="small text-muted">{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_label', ['range' => __('views/inc/system/systemstatus.accordion_section_queue_health_history_range_'.$queue_history_range)]) }}</div>
+                                            </div>
+                                        @elseif(isset($queueSize->history_key))
+                                            <div class="mt-2 small text-muted">{{ __('views/inc/system/systemstatus.accordion_section_queue_health_history_collecting') }}</div>
+                                        @endif
+                                        <p class="mb-0 mt-2 small text-muted">{{ $queueSize->required_value }}</p>
+                                    </div>
+                                </div>
                             @endforeach
-                            </tbody>
-                        </table>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -616,6 +647,30 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-queue-metric-chart]').forEach((chart) => {
+            const tooltip = chart.querySelector('.queue-metric-tooltip');
+
+            chart.querySelectorAll('.queue-metric-point').forEach((point) => {
+                const showTooltip = () => {
+                    const chartBounds = chart.getBoundingClientRect();
+                    const pointBounds = point.getBoundingClientRect();
+
+                    tooltip.textContent = point.dataset.tooltip;
+                    tooltip.classList.remove('d-none');
+                    tooltip.style.left = `${pointBounds.left - chartBounds.left}px`;
+                    tooltip.style.top = `${Math.max(0, pointBounds.top - chartBounds.top - tooltip.offsetHeight - 4)}px`;
+                };
+
+                point.addEventListener('mouseenter', showTooltip);
+                point.addEventListener('focus', showTooltip);
+                point.addEventListener('mouseleave', () => tooltip.classList.add('d-none'));
+                point.addEventListener('blur', () => tooltip.classList.add('d-none'));
+            });
+        });
+    });
+</script>
 
 <script type="module">
     $(document).ready(function () {

@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Models\Instance;
-use App\Models\InstanceProcess;
+use App\Support\QueueMetrics;
 use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Console\Scheduling\Schedule;
@@ -23,9 +23,6 @@ class Kernel extends ConsoleKernel
 
     /**
      * Define the application's command schedule.
-     *
-     * @param  Schedule  $schedule
-     * @return void
      */
     protected function schedule(Schedule $schedule): void
     {
@@ -41,6 +38,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             Log::debug('Your `APP_ENV` is set to `local`. Current datetime in UTC: '.Carbon::now());
         })->environments(['local'])->name('docker:debug')->everyFifteenMinutes();
+
+        // SYSTEM STATUS: Keep a short queue history for the status page.
+        $schedule->call(function () {
+            app(QueueMetrics::class)->record();
+        })->name('system-status:record-queue-metrics')->everyMinute()->withoutOverlapping();
 
         // INSTANCES: Cleanup dead processes
         $schedule->call(function () {
