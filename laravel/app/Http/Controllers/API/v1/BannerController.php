@@ -93,6 +93,7 @@ class BannerController extends Controller
 
         if (config('matomo.enabled')) {
             $this->matomo = new \MatomoTracker(config('matomo.site_id'), config('matomo.base_url'));
+            $this->matomo->setRequestConnectTimeout(config('matomo.connect_timeout'));
 
             try {
                 $this->matomo->doTrackPageView($this->selected_banner_template->banner->name.': '.$this->selected_banner_template->name);
