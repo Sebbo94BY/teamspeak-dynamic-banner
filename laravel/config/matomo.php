@@ -44,6 +44,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Matomo Connect Timeout
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the maximum time in seconds that the application
+    | waits while establishing a connection to Matomo. The tracker default is
+    | two seconds.
+    |
+    */
+
+    'connect_timeout' => (int) env('MATOMO_CONNECT_TIMEOUT', 2),
+
+    /*
+    |--------------------------------------------------------------------------
     | Matomo Error Log Cooldown
     |--------------------------------------------------------------------------
     |
