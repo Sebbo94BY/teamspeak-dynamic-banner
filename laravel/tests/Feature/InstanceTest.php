@@ -118,7 +118,7 @@ class InstanceTest extends TestCase
      */
     public function test_stopping_an_instance_is_possible(): void
     {
-        InstanceProcess::factory()->for($this->instance)->create();
+        InstanceProcess::factory()->for($this->instance)->create(['process_id' => PHP_INT_MAX]);
 
         $response = $this->actingAs($this->user)->post(route('instance.stop', ['instance_id' => $this->instance->id]));
         $response->assertRedirectToRoute('instances');
@@ -130,7 +130,7 @@ class InstanceTest extends TestCase
      */
     public function test_restarting_an_instance_is_possible(): void
     {
-        InstanceProcess::factory()->for($this->instance)->create();
+        InstanceProcess::factory()->for($this->instance)->create(['process_id' => PHP_INT_MAX]);
         Process::fake(function ($process) {
             if (str_contains($process->command, 'nohup php')) {
                 InstanceProcess::factory()->for($this->instance)->create();
