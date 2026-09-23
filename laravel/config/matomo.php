@@ -44,6 +44,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Matomo Error Log Cooldown
+    |--------------------------------------------------------------------------
+    |
+    | Banner images may be requested frequently. Repeatedly failing tracking
+    | requests are logged only once during this period.
+    |
+    */
+
+    'error_log_cooldown' => (int) env('MATOMO_ERROR_LOG_COOLDOWN', 300),
+
+    /*
+    |--------------------------------------------------------------------------
     | Matomo Heartbeat Timer
     |--------------------------------------------------------------------------
     |

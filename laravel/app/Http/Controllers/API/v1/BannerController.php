@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\DrawTextOnTemplateController;
 use App\Models\Banner;
 use App\Models\BannerTemplate;
+use App\Support\ThrottledErrorLogger;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class BannerController extends Controller
@@ -97,7 +97,8 @@ class BannerController extends Controller
             try {
                 $this->matomo->doTrackPageView($this->selected_banner_template->banner->name.': '.$this->selected_banner_template->name);
             } catch (Exception $matomo_exception) {
-                Log::error('Matomo tracking is enabled, but the configuration seems to be invalid. Please ensure, that all `MATOMO_` environment variables are properly set. Received the following error: '.preg_replace('/\s\s+/', ' ', $matomo_exception->getMessage()));
+                $message = 'Matomo tracking failed. Received the following error: '.preg_replace('/\s\s+/', ' ', $matomo_exception->getMessage());
+                (new ThrottledErrorLogger())->log($message, config('matomo.error_log_cooldown'));
             }
         }
     }
