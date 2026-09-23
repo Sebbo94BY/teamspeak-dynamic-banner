@@ -107,7 +107,7 @@ class DrawTextOnTemplateController extends Controller
     /**
      * Draws the configured text on the template(s) (image(s)) and either writes it to the storage or returns it from the memory without saving it.
      */
-    public function draw_text_to_image(BannerTemplate $banner_template, bool $write_to_filesystem, bool $only_original, string $ip_address): BinaryFileResponse
+    public function draw_text_to_image(BannerTemplate $banner_template, bool $write_to_filesystem, bool $only_original, string $ip_address, bool $fallback_to_default_client = true): BinaryFileResponse
     {
         if ($only_original) {
             $files_to_update = [
@@ -131,7 +131,7 @@ class DrawTextOnTemplateController extends Controller
         }
 
         $banner_variable_helper = new BannerVariableController(null);
-        $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_client_specific_info_from_cache($banner_template->banner->instance, $ip_address));
+        $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_client_specific_info_from_cache($banner_template->banner->instance, $ip_address, $fallback_to_default_client));
         $variables_and_values = array_merge($variables_and_values, $banner_variable_helper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer));
 
         foreach ($files_to_update as $source_path => $target_path) {

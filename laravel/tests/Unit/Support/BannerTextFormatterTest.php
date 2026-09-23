@@ -55,4 +55,29 @@ class BannerTextFormatterTest extends TestCase
     {
         $this->assertSame('Unknown', $this->formatter->format('$(phpinfo())', []));
     }
+
+    public function test_it_renders_numeric_conditions_including_nested_conditions(): void
+    {
+        $text = '$if(%VIRTUALSERVER_PING_TOTAL% <= 20, "Perfect", $if(%VIRTUALSERVER_PING_TOTAL% <= 40, "Good", "Poor"))';
+
+        $this->assertSame('Perfect', $this->formatter->format($text, ['VIRTUALSERVER_PING_TOTAL' => 20]));
+        $this->assertSame('Good', $this->formatter->format($text, ['VIRTUALSERVER_PING_TOTAL' => 21]));
+        $this->assertSame('Poor', $this->formatter->format($text, ['VIRTUALSERVER_PING_TOTAL' => 41]));
+    }
+
+    public function test_it_uses_fallback_or_hides_text_when_a_variable_is_not_set(): void
+    {
+        $this->assertSame('Welcome, Max', $this->formatter->format('Welcome, $default(%CLIENT_NICKNAME%, "Visitor")', ['CLIENT_NICKNAME' => 'Max']));
+        $this->assertSame('Welcome, Visitor', $this->formatter->format('Welcome, $default(%CLIENT_NICKNAME%, "Visitor")', []));
+        $this->assertSame('', $this->formatter->format('$ifset(%CLIENT_NICKNAME%, "Welcome, %CLIENT_NICKNAME%", "")', []));
+        $this->assertSame('Welcome, Max', $this->formatter->format('$ifset(%CLIENT_NICKNAME%, "Welcome, %CLIENT_NICKNAME%", "")', ['CLIENT_NICKNAME' => 'Max']));
+    }
+
+    public function test_it_renders_invalid_conditions_and_conditional_function_calls_as_unknown(): void
+    {
+        $this->assertSame('Unknown / Unknown / Unknown', $this->formatter->format(
+            '$if(%MISSING% <= 20, "yes", "no") / $if(%PING% === 20, "yes", "no") / $default(not-a-variable, "Visitor")',
+            ['PING' => 20],
+        ));
+    }
 }

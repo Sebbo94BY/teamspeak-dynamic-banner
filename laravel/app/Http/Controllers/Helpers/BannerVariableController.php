@@ -166,7 +166,7 @@ class BannerVariableController extends Controller
     /**
      * Get client specific information.
      */
-    public function get_client_specific_info_from_cache(Instance $instance, string $ip_address): array
+    public function get_client_specific_info_from_cache(Instance $instance, string $ip_address, bool $fallback_to_default_client = true): array
     {
         $client_info = [];
 
@@ -174,9 +174,9 @@ class BannerVariableController extends Controller
             $client_database_id = Redis::hget('instance_'.$instance->id.'_client_ip_index', $ip_address);
 
             // phpredis returns false for a missing hash field, whereas Predis
-            // returns null. Neither is a usable client ID, so use the cached
-            // default client in both cases.
-            if (is_null($client_database_id) || $client_database_id === false) {
+            // returns null. Neither is a usable client ID. The admin preview
+            // may use the cached default client, while API rendering must not.
+            if ((is_null($client_database_id) || $client_database_id === false) && $fallback_to_default_client) {
                 $client_database_id = Redis::get('instance_'.$instance->id.'_client_default');
             }
 
@@ -192,9 +192,13 @@ class BannerVariableController extends Controller
 
         $client_variable_key_name = array_search($ip_address, $client_variables);
 
-        if ($client_variable_key_name === false) {
+        if ($client_variable_key_name === false && $fallback_to_default_client) {
             $random_client_from_cache = array_key_first($client_variables);
             $client_variable_key_name = (! is_null($random_client_from_cache)) ? $random_client_from_cache : '';
+        }
+
+        if ($client_variable_key_name === false) {
+            return $client_info;
         }
 
         preg_match('/[0-9]+/', $client_variable_key_name, $client_database_id);
