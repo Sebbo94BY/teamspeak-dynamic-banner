@@ -56,7 +56,8 @@ class DrawTextOnTemplateController extends Controller
 
             // Calculate required text width in pixel
             $text_bounding_box = imagettfbbox($configuration->font_size, $configuration->font_angle, public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename), $text);
-            $total_text_width_in_pixel = $text_bounding_box[2];
+            $total_text_width_in_pixel = max($text_bounding_box[0], $text_bounding_box[2], $text_bounding_box[4], $text_bounding_box[6])
+                - min($text_bounding_box[0], $text_bounding_box[2], $text_bounding_box[4], $text_bounding_box[6]);
 
             // Avoid writing text outside of the template. Instead, automatically wrap the text.
             if ($configuration->x_coordinate + $total_text_width_in_pixel >= $banner_template->template->width) {
@@ -64,10 +65,16 @@ class DrawTextOnTemplateController extends Controller
                 $text = wordwrap($text, $word_wrap_width, "\n", false);
             }
 
+            $x_coordinate = match ($configuration->text_alignment) {
+                'center' => $configuration->x_coordinate - ($total_text_width_in_pixel / 2),
+                'right' => $configuration->x_coordinate - $total_text_width_in_pixel,
+                default => $configuration->x_coordinate,
+            };
+
             if (! imagefttext($gd_image,
                 $configuration->font_size,
                 $configuration->font_angle,
-                $configuration->x_coordinate,
+                (int) round($x_coordinate),
                 $configuration->y_coordinate,
                 $font_color,
                 public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename),
@@ -90,7 +97,13 @@ class DrawTextOnTemplateController extends Controller
             // Search for variables (`%SAMPLE_VARIABLE%`) and replace it with their current value, if possible
             $text = $this->replace_variables_with_actual_values($configuration->text, $variables_and_values);
 
-            $text_configs[] = "drawtext=text='".$this->escape_ffmpeg_filter_value($text)."':fontsize=$configuration->font_size:x=$configuration->x_coordinate:y=$configuration->y_coordinate:fontcolor=$configuration->font_color_in_hexadecimal:fontfile='".$this->escape_ffmpeg_filter_value(public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename))."'";
+            $x_coordinate = match ($configuration->text_alignment) {
+                'center' => $configuration->x_coordinate.'-text_w/2',
+                'right' => $configuration->x_coordinate.'-text_w',
+                default => (string) $configuration->x_coordinate,
+            };
+
+            $text_configs[] = "drawtext=text='".$this->escape_ffmpeg_filter_value($text)."':fontsize=$configuration->font_size:x=$x_coordinate:y=$configuration->y_coordinate:fontcolor=$configuration->font_color_in_hexadecimal:fontfile='".$this->escape_ffmpeg_filter_value(public_path($this->upload_directory.DIRECTORY_SEPARATOR.$configuration->font->filename))."'";
         }
 
         $process = new Process(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin', '-y', '-i', $source_image_filepath, '-vf', implode(',', $text_configs), $target_image_filepath]);

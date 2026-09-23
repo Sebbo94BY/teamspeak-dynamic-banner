@@ -13,7 +13,17 @@ return [
      */
     'x_coordinate' => 'X-Coordinate (horizontal)',
     'x_coordinate_placeholder' => 'e. g. 30',
-    'x_coordinate_help' => 'The X-Coordinate, at which position the text should start.',
+    'x_coordinate_help' => 'The anchor point for the horizontal text alignment.',
+
+    'internal_field_label' => 'Internal field label',
+    'internal_field_label_placeholder' => 'e. g. Ping or latency',
+    'internal_field_label_help' => 'Optional internal name for this text row. This value is not displayed on the banner.',
+
+    'text_alignment' => 'Horizontal alignment',
+    'text_alignment_left' => 'Left',
+    'text_alignment_center' => 'Center',
+    'text_alignment_right' => 'Right',
+    'text_alignment_help' => 'Choose whether the X coordinate marks the left edge, center, or right edge of the text.',
 
     'y_coordinate' => 'Y-Coordinate (vertical)',
     'y_coordinate_placeholder' => 'e. g. 60',
@@ -42,6 +52,8 @@ return [
      */
     'form_validation_looks_good' => 'Looks good!',
     'x_coordinate_validation_error' => 'Please provide a valid X-Coordinate!',
+    'internal_field_label_validation_error' => 'Please provide a valid internal field label!',
+    'text_alignment_validation_error' => 'Please select a valid horizontal alignment!',
     'y_coordinate_validation_error' => 'Please provide a valid Y-Coordinate!',
     'text_validation_error' => 'Please provide a valid text!',
     'font_id_validation_error' => 'Please select an available font!',

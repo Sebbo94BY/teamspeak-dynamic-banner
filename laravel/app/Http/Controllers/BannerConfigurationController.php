@@ -15,8 +15,8 @@ use App\Models\TwitchStreamer;
 use App\Support\BannerVariables;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\View\View;
@@ -115,7 +115,9 @@ class BannerConfigurationController extends Controller
 
             $configuration['id'] = isset($request->validated('configuration')['banner_configuration_id'][$i]) ? $request->validated('configuration')['banner_configuration_id'][$i] : null;
             $configuration['banner_template_id'] = $request->validated('banner_template_id');
+            $configuration['internal_field_label'] = $request->validated('configuration')['internal_field_label'][$i] ?? null;
             $configuration['x_coordinate'] = $request->validated('configuration')['x_coordinate'][$i];
+            $configuration['text_alignment'] = $request->validated('configuration')['text_alignment'][$i] ?? 'left';
             $configuration['y_coordinate'] = $request->validated('configuration')['y_coordinate'][$i];
             $configuration['text'] = $request->validated('configuration')['text'][$i];
             $configuration['font_id'] = $request->validated('configuration')['font_id'][$i];
@@ -128,7 +130,9 @@ class BannerConfigurationController extends Controller
 
         if (! BannerConfiguration::upsert($banner_configurations, ['id'], [
             'banner_template_id',
+            'internal_field_label',
             'x_coordinate',
+            'text_alignment',
             'y_coordinate',
             'text',
             'font_id',

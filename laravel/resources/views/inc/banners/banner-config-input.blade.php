@@ -14,6 +14,17 @@
         </div>
     </div>
     <div class="col-lg-4 mb-2">
+        <label for="validationInternalFieldLabel" class="form-label">{{ __('views/inc/banners/banner-config-input.internal_field_label') }}</label>
+        <input class="form-control" id="validationInternalFieldLabel" type="text"
+               name="configuration[internal_field_label][]"
+               value="{{ old('configuration[internal_field_label][]', (isset($configuration)) ? $configuration->internal_field_label : '') }}"
+               aria-describedby="internalFieldLabelHelp validationInternalFieldLabelFeedback"
+               placeholder="{{ __('views/inc/banners/banner-config-input.internal_field_label_placeholder') }}">
+        <div id="internalFieldLabelHelp" class="form-text">{{ __('views/inc/banners/banner-config-input.internal_field_label_help') }}</div>
+        <div id="validationInternalFieldLabelFeedback" class="invalid-feedback">{{ __('views/inc/banners/banner-config-input.internal_field_label_validation_error') }}</div>
+    </div>
+
+    <div class="col-lg-4 mb-2">
         <label for="validationXCoordinate" class="form-label">{{ __('views/inc/banners/banner-config-input.x_coordinate') }}</label>
             <input class="form-control" id="validationXCoordinate" type="number" min="0" step="1" max="{{ $template->width }}"
                name="configuration[x_coordinate][]"
@@ -23,6 +34,17 @@
         <div id="xcoordinateHelp" class="form-text">{{ __('views/inc/banners/banner-config-input.x_coordinate_help') }}</div>
         <div class="valid-feedback">{{ __('views/inc/banners/banner-config-input.form_validation_looks_good') }}</div>
         <div id="validationXCoordinateFeedback" class="invalid-feedback">{{ __('views/inc/banners/banner-config-input.x_coordinate_validation_error') }}</div>
+    </div>
+
+    <div class="col-lg-4 mb-2">
+        <label for="validationTextAlignment" class="form-label">{{ __('views/inc/banners/banner-config-input.text_alignment') }}</label>
+        <select class="form-select" name="configuration[text_alignment][]" id="validationTextAlignment" aria-describedby="textAlignmentHelp validationTextAlignmentFeedback" required>
+            @foreach (['left', 'center', 'right'] as $alignment)
+                <option value="{{ $alignment }}" @selected(old('configuration[text_alignment][]', isset($configuration) ? $configuration->text_alignment : 'left') === $alignment)>{{ __('views/inc/banners/banner-config-input.text_alignment_'.$alignment) }}</option>
+            @endforeach
+        </select>
+        <div id="textAlignmentHelp" class="form-text">{{ __('views/inc/banners/banner-config-input.text_alignment_help') }}</div>
+        <div id="validationTextAlignmentFeedback" class="invalid-feedback">{{ __('views/inc/banners/banner-config-input.text_alignment_validation_error') }}</div>
     </div>
 
     <div class="col-lg-4 mb-2">

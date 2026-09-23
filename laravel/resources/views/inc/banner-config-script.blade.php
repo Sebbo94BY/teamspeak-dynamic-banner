@@ -73,6 +73,7 @@
                 const size = Number(inputInRow($row, 'font_size').val()) || 25;
                 const angle = Number(inputInRow($row, 'font_angle').val()) || 0;
                 const color = inputInRow($row, 'font_color_in_hexadecimal').val() || '#000000';
+                const alignment = inputInRow($row, 'text_alignment').val() || 'left';
                 const family = $row.find('[name="configuration[font_id][]"] option:selected').data('font-family') || 'sans-serif';
 
                 if (!text || xValue === '' || yValue === '' || !Number.isFinite(x) || !Number.isFinite(y)) return;
@@ -83,6 +84,7 @@
                 context.rotate(-angle * Math.PI / 180);
                 context.font = size + 'px "' + family + '", sans-serif';
                 context.fillStyle = color;
+                context.textAlign = alignment;
                 context.fillText(text, 0, 0);
                 context.restore();
             });
@@ -238,7 +240,7 @@
         });
 
         // Hidden draft rows must not be submitted or block validation.
-        $('div.d-none > div > div > input').each(function () {
+        $('div.d-none').find('input, select').each(function () {
             $(this).removeAttr('name').prop('required', false);
         });
 
