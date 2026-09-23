@@ -66,4 +66,24 @@ class BannerVariableControllerTest extends TestCase
 
         $this->assertSame(['CLIENT_NICKNAME' => 'Max'], $controller->get_client_specific_info_from_cache($instance, '192.168.2.99'));
     }
+
+    public function test_client_variables_do_not_fall_back_to_the_default_client_when_disabled_for_api_requests(): void
+    {
+        $instance = new Instance();
+        $instance->id = 1;
+
+        Redis::shouldReceive('hget')
+            ->once()
+            ->with('instance_1_client_ip_index', '192.168.2.99')
+            ->andReturnFalse();
+        Redis::shouldReceive('hgetall')
+            ->once()
+            ->with('instance_1_clientlist')
+            ->andReturn([]);
+        Redis::shouldNotReceive('get');
+
+        $controller = new BannerVariableController(null);
+
+        $this->assertSame([], $controller->get_client_specific_info_from_cache($instance, '192.168.2.99', false));
+    }
 }

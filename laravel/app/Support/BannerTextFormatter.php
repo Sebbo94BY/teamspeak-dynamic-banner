@@ -9,13 +9,17 @@ class BannerTextFormatter
     /**
      * Expand variables and the supported numeric expressions in banner text.
      *
-     * Supported expressions are `$(%A% - %B%)` and
-     * `$format(%A%, "000")`. Invalid expressions are rendered as Unknown.
+     * Supported expressions are `$(%A% - %B%)`, `$format(%A%, "000")`,
+     * `$if(%A% <= 20, "yes", "no")`, `$default(%NAME%, "Guest")`,
+     * and `$ifset(%NAME%, "Hello %NAME%", "")`. Invalid expressions are
+     * rendered as Unknown.
      *
      * @param  array<string, mixed>  $variables
      */
     public function format(string $text, array $variables): string
     {
+        $text = $this->replaceConditionalFunctions($text, $variables);
+
         $text = preg_replace_callback(
             '/\$format\(\s*(%[A-Z0-9_?]+%)\s*,\s*"([0#,\.]+)"\s*\)/i',
             fn (array $matches): string => $this->formatVariable($matches[1], $matches[2], $variables),
@@ -29,6 +33,165 @@ class BannerTextFormatter
             fn (array $matches): string => $this->variableValue($matches[0], $variables) ?? 'Unknown',
             $text,
         ) ?? $text;
+    }
+
+    /** @param array<string, mixed> $variables */
+    private function replaceConditionalFunctions(string $text, array $variables): string
+    {
+        while (preg_match('/\$(ifset|default|if)\(/i', $text, $match, PREG_OFFSET_CAPTURE)) {
+            $name = strtolower($match[1][0]);
+            $start = $match[0][1];
+            $openingParenthesis = $start + strlen($match[0][0]) - 1;
+            $end = $this->findClosingParenthesis($text, $openingParenthesis);
+
+            if ($end === null) {
+                return substr_replace($text, 'Unknown', $start, strlen($match[0][0]));
+            }
+
+            $arguments = $this->splitFunctionArguments(substr($text, $openingParenthesis + 1, $end - $openingParenthesis - 1));
+            $replacement = $this->evaluateConditionalFunction($name, $arguments, $variables);
+            $text = substr_replace($text, $replacement, $start, $end - $start + 1);
+        }
+
+        return $text;
+    }
+
+    private function findClosingParenthesis(string $text, int $openingParenthesis): ?int
+    {
+        $depth = 0;
+        $quote = null;
+        for ($position = $openingParenthesis; $position < strlen($text); $position++) {
+            $character = $text[$position];
+            if ($quote !== null) {
+                if ($character === '\\' && $position + 1 < strlen($text)) {
+                    $position++;
+                } elseif ($character === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+            if ($character === '"' || $character === "'") {
+                $quote = $character;
+            } elseif ($character === '(') {
+                $depth++;
+            } elseif ($character === ')' && --$depth === 0) {
+                return $position;
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array<int, string>|null */
+    private function splitFunctionArguments(string $arguments): ?array
+    {
+        $result = [];
+        $start = 0;
+        $depth = 0;
+        $quote = null;
+        for ($position = 0; $position < strlen($arguments); $position++) {
+            $character = $arguments[$position];
+            if ($quote !== null) {
+                if ($character === '\\' && $position + 1 < strlen($arguments)) {
+                    $position++;
+                } elseif ($character === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+            if ($character === '"' || $character === "'") {
+                $quote = $character;
+            } elseif ($character === '(') {
+                $depth++;
+            } elseif ($character === ')') {
+                $depth--;
+            } elseif ($character === ',' && $depth === 0) {
+                $result[] = trim(substr($arguments, $start, $position - $start));
+                $start = $position + 1;
+            }
+        }
+        if ($quote !== null || $depth !== 0) {
+            return null;
+        }
+        $result[] = trim(substr($arguments, $start));
+
+        return $result;
+    }
+
+    /** @param array<int, string>|null $arguments
+     *  @param array<string, mixed> $variables
+     */
+    private function evaluateConditionalFunction(string $name, ?array $arguments, array $variables): string
+    {
+        if ($arguments === null
+            || ($name === 'if' && count($arguments) !== 3)
+            || ($name === 'default' && count($arguments) !== 2)
+            || ($name === 'ifset' && ! in_array(count($arguments), [2, 3], true))) {
+            return 'Unknown';
+        }
+
+        if ($name === 'if') {
+            $condition = $this->evaluateCondition($arguments[0], $variables);
+            if ($condition === null) {
+                return 'Unknown';
+            }
+
+            return $this->unquote($condition ? $arguments[1] : $arguments[2]);
+        }
+
+        if (! preg_match('/^%[A-Z0-9_?]+%$/i', $arguments[0])) {
+            return 'Unknown';
+        }
+        $value = $this->variableValue($arguments[0], $variables);
+        $isSet = $value !== null && trim($value) !== '';
+
+        if ($name === 'default') {
+            return $this->unquote($isSet ? $value : $arguments[1]);
+        }
+
+        return $this->unquote($isSet ? $arguments[1] : ($arguments[2] ?? ''));
+    }
+
+    /** @param array<string, mixed> $variables */
+    private function evaluateCondition(string $condition, array $variables): ?bool
+    {
+        if (! preg_match('/^\s*(%[A-Z0-9_?]+%|-?(?:\d+(?:\.\d*)?|\.\d+))\s*(<=|>=|==|!=|<|>)\s*(%[A-Z0-9_?]+%|-?(?:\d+(?:\.\d*)?|\.\d+))\s*$/i', $condition, $matches)) {
+            return null;
+        }
+        $left = $this->numericConditionValue($matches[1], $variables);
+        $right = $this->numericConditionValue($matches[3], $variables);
+        if ($left === null || $right === null) {
+            return null;
+        }
+
+        return match ($matches[2]) {
+            '<' => $left < $right,
+            '<=' => $left <= $right,
+            '>' => $left > $right,
+            '>=' => $left >= $right,
+            '==' => $left == $right,
+            '!=' => $left != $right,
+        };
+    }
+
+    /** @param array<string, mixed> $variables */
+    private function numericConditionValue(string $value, array $variables): ?float
+    {
+        if (str_starts_with($value, '%')) {
+            $value = $this->variableValue($value, $variables);
+        }
+
+        return $value !== null && is_numeric($value) ? (float) $value : null;
+    }
+
+    private function unquote(string $value): string
+    {
+        $value = trim($value);
+        if (strlen($value) >= 2 && (($value[0] === '"' && $value[-1] === '"') || ($value[0] === "'" && $value[-1] === "'"))) {
+            return stripcslashes(substr($value, 1, -1));
+        }
+
+        return $value;
     }
 
     /** @param array<string, mixed> $variables */

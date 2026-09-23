@@ -114,7 +114,7 @@ class BannerController extends Controller
         $draw_text_on_template_helper = new DrawTextOnTemplateController;
 
         try {
-            return $draw_text_on_template_helper->draw_text_to_image($this->selected_banner_template, false, true, $request->ip());
+            return $draw_text_on_template_helper->draw_text_to_image($this->selected_banner_template, false, true, $request->ip(), false);
         } catch (Exception $exception) {
             return response($exception->getMessage(), 500);
         }

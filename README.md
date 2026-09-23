@@ -78,6 +78,19 @@ $format(%CONNECTION_BYTES_SENT_KEEPALIVE%, "#,##0.00")
 
 Number patterns use `0` for a required digit, `#` for an optional digit, `.` as the decimal separator, and `,` as the grouping separator. Thus, `"000"` renders `1` as `001`, while `"#,##0.00"` renders `12345.6` as `12,345.60`. Invalid calculations, unknown variables, and attempts to format non-numeric values render as `Unknown`.
 
+Conditional text can be rendered with `$if(condition, "when true", "when false")`. Numeric comparisons support `<`, `<=`, `>`, `>=`, `==`, and `!=`, and conditions can contain variables:
+
+```
+$if(%VIRTUALSERVER_PING_TOTAL% <= 20, "Perfect", $if(%VIRTUALSERVER_PING_TOTAL% <= 40, "Good", "Poor"))
+```
+
+Use `$default(%VARIABLE%, "fallback")` when a variable is missing or empty, or `$ifset(%VARIABLE%, "shown when set", "")` to hide text when it is unavailable. `$ifset` also accepts an optional third argument for text shown when the variable is missing:
+
+```
+Welcome, $default(%CLIENT_NICKNAME%, "Visitor")
+$ifset(%CLIENT_NICKNAME%, "Welcome, %CLIENT_NICKNAME%", "")
+```
+
 
 ## Supported Languages
 
