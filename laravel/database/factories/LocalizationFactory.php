@@ -17,7 +17,7 @@ class LocalizationFactory extends Factory
     public function definition()
     {
         return [
-            'language_name' => fake()->text(16),
+            'language_name' => fake()->unique()->text(16),
             'locale' => fake()->randomElement(['en', 'de']), // only list here available locales
         ];
     }
