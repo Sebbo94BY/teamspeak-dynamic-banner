@@ -8,6 +8,7 @@ use App\Models\Instance;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use PlanetTeamSpeak\TeamSpeak3Framework\Adapter\ServerQuery;
 use PlanetTeamSpeak\TeamSpeak3Framework\Helper\StringHelper;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Client;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
@@ -77,6 +78,62 @@ class TeamspeakBotCacheTest extends TestCase
         $command->refreshForTest();
 
         $this->assertSame(['datetime', 'clients', 'servergroups', 'virtualserver'], $command->refreshedSources);
+    }
+
+    public function test_timeout_does_not_start_a_nested_teamspeak_refresh(): void
+    {
+        $serverQuery = new class extends ServerQuery
+        {
+            public function __construct()
+            {
+            }
+
+            public function getQueryLastTimestamp(): ?int
+            {
+                return time();
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+        $command = new class extends TeamspeakBot
+        {
+            public array $refreshedSources = [];
+
+            public function simulateTimeoutDuringRefresh(ServerQuery $serverQuery): void
+            {
+                $this->teamspeak_refresh_in_progress = true;
+                $this->onWaitTimeout(60, $serverQuery);
+            }
+
+            public function updateDatetime()
+            {
+                $this->refreshedSources[] = 'datetime';
+            }
+
+            public function updateServergroupList()
+            {
+                $this->refreshedSources[] = 'servergroups';
+            }
+
+            public function updateVirtualserverInfo()
+            {
+                $this->refreshedSources[] = 'virtualserver';
+            }
+
+            protected function message(string $log_level, string $message)
+            {
+            }
+
+            public function __destruct()
+            {
+            }
+        };
+
+        $command->simulateTimeoutDuringRefresh($serverQuery);
+
+        $this->assertSame([], $command->refreshedSources);
     }
 
     public function test_startup_retries_the_complete_cache_refresh(): void

@@ -96,6 +96,9 @@ class TeamspeakBot extends Command
     /** Whether a TeamSpeak request lost its connection during the current refresh. */
     protected bool $teamspeak_connection_lost = false;
 
+    /** Prevent nested TeamSpeak requests from timeout and event callbacks. */
+    protected bool $teamspeak_refresh_in_progress = false;
+
     /**
      * Destructor
      */
@@ -154,6 +157,13 @@ class TeamspeakBot extends Command
             exit(0);
         }
 
+        // waitForReadyRead() emits this callback while any non-blocking query
+        // is waiting for its reply. Starting another query here would mix both
+        // replies and can make a client list look like a server group list.
+        if ($this->teamspeak_refresh_in_progress) {
+            return;
+        }
+
         // If the timestamp on the last query is more than 300 seconds (5 minutes) in the past, send 'keepalive'
         // 'keepalive' command is just server query command 'clientupdate' which does nothing without properties. So nothing changes.
         if ($serverquery->getQueryLastTimestamp() < time() - 260) {
@@ -187,6 +197,10 @@ class TeamspeakBot extends Command
     public function onEvent(Event $event, Host $host)
     {
         $this->message('DEBUG', 'Received the following event: '.json_encode($event->getType()));
+
+        if ($this->teamspeak_refresh_in_progress) {
+            return;
+        }
 
         // Those `client*view` events also include events for kicked and banned clients.
         if (in_array($event->getType(), ['cliententerview', 'clientleftview'])) {
@@ -266,8 +280,13 @@ class TeamspeakBot extends Command
      */
     public function updateClientList()
     {
+        if ($this->teamspeak_refresh_in_progress) {
+            return false;
+        }
+
         $this->message('DEBUG', 'Caching the current client list...');
 
+        $this->teamspeak_refresh_in_progress = true;
         try {
             $this->teamspeak_connection_lost = false;
             $banner_variable_helper = new BannerVariableController($this->virtualserver);
@@ -306,6 +325,8 @@ class TeamspeakBot extends Command
             throw $exception;
         } catch (RedisException | ConnectionException | Exception) {
             $this->log_cache_refresh_failure('client');
+        } finally {
+            $this->teamspeak_refresh_in_progress = false;
         }
 
         return false;
@@ -316,10 +337,15 @@ class TeamspeakBot extends Command
      */
     public function updateServergroupList()
     {
+        if ($this->teamspeak_refresh_in_progress) {
+            return false;
+        }
+
         $this->message('DEBUG', 'Caching the current servergroup list...');
 
         $banner_variable_helper = new BannerVariableController($this->virtualserver);
         $failure_logged = false;
+        $this->teamspeak_refresh_in_progress = true;
 
         try {
             $this->teamspeak_connection_lost = false;
@@ -339,6 +365,8 @@ class TeamspeakBot extends Command
             $cache_refreshed = false;
             $this->log_cache_refresh_failure('server group', $exception);
             $failure_logged = true;
+        } finally {
+            $this->teamspeak_refresh_in_progress = false;
         }
 
         if (! $cache_refreshed && ! $failure_logged) {
@@ -353,10 +381,15 @@ class TeamspeakBot extends Command
      */
     public function updateVirtualserverInfo()
     {
+        if ($this->teamspeak_refresh_in_progress) {
+            return false;
+        }
+
         $this->message('DEBUG', 'Caching the current virtualserver info...');
 
         $banner_variable_helper = new BannerVariableController($this->virtualserver);
 
+        $this->teamspeak_refresh_in_progress = true;
         try {
             $this->teamspeak_connection_lost = false;
 
@@ -372,6 +405,8 @@ class TeamspeakBot extends Command
             throw $exception;
         } catch (\Throwable $exception) {
             $this->log_cache_refresh_failure('virtual server', $exception);
+        } finally {
+            $this->teamspeak_refresh_in_progress = false;
         }
 
         return false;
