@@ -35,6 +35,7 @@ class TeamspeakBotCacheTest extends TestCase
             $constants['VIRTUALSERVER_CACHE_TTL_SECONDS']
         );
         $this->assertGreaterThanOrEqual(60 * 60 * 12, $constants['CLIENT_CACHE_TTL_SECONDS']);
+        $this->assertSame(10, $constants['STARTUP_REFRESH_RETRY_DELAY_SECONDS']);
     }
 
     public function test_full_cache_refresh_loads_every_banner_data_source(): void

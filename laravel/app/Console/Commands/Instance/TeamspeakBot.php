@@ -35,7 +35,12 @@ class TeamspeakBot extends Command
 
     private const STARTUP_REFRESH_ATTEMPTS = 3;
 
-    private const STARTUP_REFRESH_RETRY_DELAY_SECONDS = 1;
+    // TeamSpeak may accept the query connection before all connection metrics are available.
+    private const STARTUP_REFRESH_RETRY_DELAY_SECONDS = 10;
+
+    private const INITIAL_CONNECTION_ATTEMPTS = 3;
+
+    private const INITIAL_CONNECTION_RETRY_DELAY_SECONDS = 1;
 
     private const CACHE_REFRESH_ERROR_LOG_COOLDOWN_SECONDS = 60 * 5;
 
@@ -381,16 +386,8 @@ class TeamspeakBot extends Command
 
         $virtualserver_helper = $this->create_virtualserver_helper();
 
-        try {
-            $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
-        } catch (TransportException $transport_exception) {
-            $this->message('ERROR', "Could not connect to the host `$this->instance->host`: ".$transport_exception->getMessage());
-
-            $this->cleanup_instance_process_id();
-
-            return;
-        } catch (ServerQueryException $serverquery_exception) {
-            $this->message('ERROR', 'ServerQuery command failed: '.$serverquery_exception->getMessage().' (Error #'.$serverquery_exception->getCode().')');
+        if (! $this->connect_to_virtualserver_with_retries($virtualserver_helper)) {
+            $this->message('ERROR', "Could not connect to the host `$this->instance->host` after ".self::INITIAL_CONNECTION_ATTEMPTS.' attempts.');
 
             $this->cleanup_instance_process_id();
 
@@ -429,6 +426,34 @@ class TeamspeakBot extends Command
     }
 
     /**
+     * Connects a new bot with short delays so a just-stopped query client can
+     * finish disconnecting before its replacement uses the same nickname.
+     */
+    protected function connect_to_virtualserver_with_retries(TeamSpeakVirtualserver $virtualserver_helper): bool
+    {
+        for ($attempt = 1; $attempt <= self::INITIAL_CONNECTION_ATTEMPTS; $attempt++) {
+            try {
+                $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
+
+                return true;
+            } catch (TransportException | ServerQueryException | Exception $connection_exception) {
+                $this->message('WARNING', "TeamSpeak connection attempt $attempt/".self::INITIAL_CONNECTION_ATTEMPTS." failed: {$connection_exception->getMessage()}");
+
+                if ($attempt < self::INITIAL_CONNECTION_ATTEMPTS) {
+                    $this->wait_before_initial_connection_retry();
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected function wait_before_initial_connection_retry(): void
+    {
+        sleep(self::INITIAL_CONNECTION_RETRY_DELAY_SECONDS);
+    }
+
+    /**
      * Reconnects the bot and restores its event subscriptions and cached data.
      */
     protected function reconnect_to_virtualserver(TeamSpeakVirtualserver $virtualserver_helper): bool
@@ -437,7 +462,7 @@ class TeamspeakBot extends Command
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
             $this->refresh_cached_data();
             $this->virtualserver->notifyRegister('server');
-        } catch (TransportException | ServerQueryException $connection_exception) {
+        } catch (TransportException | ServerQueryException | Exception $connection_exception) {
             $this->message('ERROR', "Reconnect to `{$this->instance->host}` failed: ".$connection_exception->getMessage());
             $this->wait_before_reconnect();
 
