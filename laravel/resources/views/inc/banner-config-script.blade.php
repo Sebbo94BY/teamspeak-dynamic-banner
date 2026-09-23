@@ -1,7 +1,8 @@
 <script type="module">
     $(document).ready(function () {
         const $form = $('#template-configuration');
-        const previewVariables = {{ Illuminate\Support\Js::from($preview_variables) }};
+        let previewVariables = {{ Illuminate\Support\Js::from($preview_variables) }};
+        const previewVariablesUrl = $('.banner-preview-sticky').data('preview-variables-url');
         const previews = [];
         const loadedFonts = new Set();
         let activeRow = null;
@@ -91,6 +92,18 @@
             let resolvedText = replaceConditionalFunctions(String(text));
 
             return resolvedText.replace(/%[A-Z0-9_?]+%/gi, variable => variableValue(variable) ?? 'Unknown');
+        }
+
+        function refreshPreviewVariables() {
+            if (!previewVariablesUrl) return;
+
+            fetch(previewVariablesUrl, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+                .then(response => response.ok ? response.json() : Promise.reject())
+                .then(variables => {
+                    previewVariables = variables;
+                    redrawPreview();
+                })
+                .catch(() => {});
         }
 
         function variableValue(variable) {
@@ -260,5 +273,8 @@
         }
 
         selectActiveRow(visibleRows().first());
+        refreshPreviewVariables();
+        window.addEventListener('focus', refreshPreviewVariables);
+        window.setInterval(refreshPreviewVariables, 15000);
     });
 </script>

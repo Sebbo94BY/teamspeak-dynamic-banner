@@ -15,6 +15,7 @@ use App\Models\TwitchStreamer;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\View\View;
@@ -68,6 +69,16 @@ class BannerConfigurationController extends Controller
         ), CASE_UPPER);
 
         return array_map(static fn (mixed $value): mixed => is_scalar($value) || is_null($value) ? $value : (string) $value, $variables);
+    }
+
+    /**
+     * Return fresh values for the browser-based banner preview.
+     */
+    public function previewVariables(BannerConfigurationEditRequest $request): JsonResponse
+    {
+        $bannerTemplate = BannerTemplate::findOrFail($request->banner_template_id);
+
+        return response()->json($this->getPreviewVariables($bannerTemplate, $request->ip()));
     }
 
     /**

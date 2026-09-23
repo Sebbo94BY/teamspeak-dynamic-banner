@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/banner/template/{banner_template_id}/enable', [BannerTemplateController::class, 'enable'])->name('banner.template.enable')->middleware('permission:edit banners');
 
     Route::get('/banner/configuration/{banner_template_id}', [BannerConfigurationController::class, 'edit'])->name('banner.template.configuration.edit');
+    Route::get('/banner/configuration/{banner_template_id}/preview-variables', [BannerConfigurationController::class, 'previewVariables'])->name('banner.template.configuration.preview-variables');
     Route::patch('/banner/configuration/{banner_template_id}/upsert', [BannerConfigurationController::class, 'upsert'])->name('banner.template.configuration.upsert');
     Route::get('/banner/configuration/{banner_configuration_id}/delete', [BannerConfigurationController::class, 'delete'])->name('banner.template.configuration.delete');
 
