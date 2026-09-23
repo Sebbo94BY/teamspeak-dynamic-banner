@@ -145,8 +145,20 @@ class BannerVariableController extends Controller
 
         /**
          * VIRTUALSERVER CONNECTION INFO
+         *
+         * Some TeamSpeak server versions return every connection property as a
+         * separate result row. Flatten those rows so that the property names,
+         * rather than their numeric result indexes, become banner variables.
          */
-        $virtualserver_info = array_merge($virtualserver_info, $this->virtualserver->connectionInfo());
+        foreach ($this->virtualserver->connectionInfo() as $key => $value) {
+            if (is_array($value)) {
+                $virtualserver_info = array_merge($virtualserver_info, $value);
+
+                continue;
+            }
+
+            $virtualserver_info[$key] = $value;
+        }
 
         return array_change_key_case($virtualserver_info, CASE_UPPER);
     }
@@ -161,11 +173,14 @@ class BannerVariableController extends Controller
         try {
             $client_database_id = Redis::hget('instance_'.$instance->id.'_client_ip_index', $ip_address);
 
-            if (is_null($client_database_id)) {
+            // phpredis returns false for a missing hash field, whereas Predis
+            // returns null. Neither is a usable client ID, so use the cached
+            // default client in both cases.
+            if (is_null($client_database_id) || $client_database_id === false) {
                 $client_database_id = Redis::get('instance_'.$instance->id.'_client_default');
             }
 
-            if (! is_null($client_database_id)) {
+            if (! is_null($client_database_id) && $client_database_id !== false) {
                 return Redis::hgetall('instance_'.$instance->id.'_client_'.$client_database_id);
             }
 

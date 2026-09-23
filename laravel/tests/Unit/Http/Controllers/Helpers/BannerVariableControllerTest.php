@@ -57,4 +57,37 @@ class BannerVariableControllerTest extends TestCase
         $this->assertSame($nickname, $clients[42]['CLIENT_NICKNAME']);
         $this->assertArrayNotHasKey('NICKNAME', $clients[42]);
     }
+
+    public function test_virtualserver_variables_flatten_connection_information_rows(): void
+    {
+        $server = new class extends Server
+        {
+            public function __construct()
+            {
+            }
+
+            public function getInfo(bool $extend = true, bool $convert = false): array
+            {
+                return ['virtualserver_name' => 'Example TeamSpeak'];
+            }
+
+            public function connectionInfo(): array
+            {
+                return [
+                    ['connection_packets_sent_total' => 123],
+                    ['connection_packets_received_total' => 456],
+                ];
+            }
+        };
+
+        $variables = (new BannerVariableController($server))->get_current_virtualserver_info();
+
+        $this->assertSame([
+            'VIRTUALSERVER_NAME' => 'Example TeamSpeak',
+            'CONNECTION_PACKETS_SENT_TOTAL' => 123,
+            'CONNECTION_PACKETS_RECEIVED_TOTAL' => 456,
+        ], $variables);
+        $this->assertArrayNotHasKey(0, $variables);
+        $this->assertArrayNotHasKey(1, $variables);
+    }
 }
