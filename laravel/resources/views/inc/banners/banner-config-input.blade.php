@@ -15,7 +15,7 @@
     </div>
     <div class="col-lg-4 mb-2">
         <label for="validationXCoordinate" class="form-label">{{ __('views/inc/banners/banner-config-input.x_coordinate') }}</label>
-        <input class="form-control" id="validationXCoordinate" type="number" min="0" step="1" max="{{ $template->width }}"
+            <input class="form-control" id="validationXCoordinate" type="number" min="0" step="1" max="{{ $template->width }}"
                name="configuration[x_coordinate][]"
                value="{{ old('configuration[x_coordinate][]', (isset($configuration)) ? $configuration->x_coordinate : '') }}"
                aria-describedby="xcoordinateHelp validationXCoordinateFeedback"
@@ -27,7 +27,7 @@
 
     <div class="col-lg-4 mb-2">
         <label for="validationYCoordinate" class="form-label">{{ __('views/inc/banners/banner-config-input.y_coordinate') }}</label>
-        <input class="form-control" id="validationYCoordinate" type="number" min="0" step="1" max="{{ $template->height }}"
+            <input class="form-control" id="validationYCoordinate" type="number" min="0" step="1" max="{{ $template->height }}"
                name="configuration[y_coordinate][]" value="{{ old('configuration[y_coordinate][]', (isset($configuration)) ? $configuration->y_coordinate : '') }}"
                aria-describedby="ycoordinateHelp validationYCoordinateFeedback"
                placeholder="{{ __('views/inc/banners/banner-config-input.y_coordinate_placeholder') }}" required>
@@ -52,9 +52,9 @@
         <select class="form-select" name="configuration[font_id][]" id="validationFont" aria-describedby="FontHelp validationFontFeedback" required>
         @foreach ($fonts as $font)
             @if (isset($configuration) && $configuration->font->id == $font->id)
-                <option value="{{ $font->id }}" selected>{{ $font->filename }}</option>
+                <option value="{{ $font->id }}" data-font-family="banner-font-{{ $font->id }}" data-font-url="{{ asset('uploads/fonts/'.$font->filename) }}" selected>{{ $font->filename }}</option>
             @else
-                <option value="{{ $font->id }}">{{ $font->filename }}</option>
+                <option value="{{ $font->id }}" data-font-family="banner-font-{{ $font->id }}" data-font-url="{{ asset('uploads/fonts/'.$font->filename) }}">{{ $font->filename }}</option>
             @endif
         @endforeach
         </select>

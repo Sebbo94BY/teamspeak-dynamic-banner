@@ -16,7 +16,10 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\View\View;
+use Predis\PredisException;
+use RedisException;
 
 class BannerConfigurationController extends Controller
 {
@@ -35,7 +38,36 @@ class BannerConfigurationController extends Controller
             'twitch_api' => TwitchApi::first(),
             'twitch_streamer' => TwitchStreamer::all(),
             'twitch_streamer_variables' => $banner_variable_helper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer),
+            'preview_variables' => $this->getPreviewVariables($banner_template, $request->ip()),
         ]);
+    }
+
+    /**
+     * Get the same current values that are used for the server-rendered preview.
+     *
+     * @return array<string, mixed>
+     */
+    private function getPreviewVariables(BannerTemplate $banner_template, string $ipAddress): array
+    {
+        $variables = [];
+
+        try {
+            $variables = array_merge($variables, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_datetime'));
+            $variables = array_merge($variables, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_servergrouplist'));
+            $variables = array_merge($variables, Redis::hgetall('instance_'.$banner_template->banner->instance->id.'_virtualserver_info'));
+        } catch (RedisException | PredisException) {
+            // The editor remains usable when no cached TeamSpeak data is available.
+        }
+
+        $variableHelper = new BannerVariableController(null);
+
+        $variables = array_change_key_case(array_merge(
+            $variables,
+            $variableHelper->get_client_specific_info_from_cache($banner_template->banner->instance, $ipAddress),
+            $variableHelper->get_twitch_streamer_information_from_database($banner_template->twitch_streamer),
+        ), CASE_UPPER);
+
+        return array_map(static fn (mixed $value): mixed => is_scalar($value) || is_null($value) ? $value : (string) $value, $variables);
     }
 
     /**

@@ -29,13 +29,22 @@
     <div class="row">
         <div class="col-lg-6">
             <p class="fs-5 m-0 mb-3 fw-bold">{{ __('views/banner/configuration.preview_with_grid_system') }}</p>
-            <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="templateWithGrid" src="{{ asset($banner_template->file_path_drawed_grid_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+            <canvas class="live-preview img-fluid shadow-lg rounded"
+                data-image-src="{{ asset($banner_template->template->file_path_drawed_grid.'/'.$banner_template->template->filename) }}"
+                data-width="{{ $banner_template->template->width }}"
+                data-height="{{ $banner_template->template->height }}"
+                aria-label="{{ __('views/banner/configuration.preview_with_grid_system') }}"></canvas>
         </div>
         <div class="col-lg-6">
             <p class="fs-5 m-0 mb-3 fw-bold">{{ __('views/banner/configuration.preview_without_grid_system') }}</p>
-            <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded" id="renderedTemplate" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+            <canvas class="live-preview img-fluid shadow-lg rounded"
+                data-image-src="{{ asset($banner_template->template->file_path_original.'/'.$banner_template->template->filename) }}"
+                data-width="{{ $banner_template->template->width }}"
+                data-height="{{ $banner_template->template->height }}"
+                aria-label="{{ __('views/banner/configuration.preview_without_grid_system') }}"></canvas>
         </div>
     </div>
+    <p class="text-muted mt-2">{{ __('views/banner/configuration.live_preview_help') }}</p>
     <hr>
     <div class="row">
         <div class="col-lg-12">
@@ -271,16 +280,16 @@
                             <div class="accordion-body">
                                 @if($banner_template->configurations->count() > 0)
                                     @foreach($banner_template->configurations as $configuration)
-                                    <div class="mt-2" id="config-row-{{ $configuration->id }}">
+                                    <div class="mt-2 banner-config-row" id="config-row-{{ $configuration->id }}">
                                         @include('inc.banners.banner-config-input', ['template' => $banner_template->template, 'configuration' => $configuration])
                                     </div>
                                     @endforeach
                                     @php unset($configuration) @endphp
-                                    <div id="new-config-row-1" class="d-none">
+                                    <div id="new-config-row-1" class="d-none banner-config-row">
                                         @include('inc.banners.banner-config-input', ['template' => $banner_template->template])
                                     </div>
                                 @else
-                                    <div id="new-config-row-1">
+                                    <div id="new-config-row-1" class="banner-config-row">
                                         @include('inc.banners.banner-config-input', ['template' => $banner_template->template])
                                     </div>
                                 @endif

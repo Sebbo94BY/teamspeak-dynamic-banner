@@ -20,6 +20,8 @@ return [
      */
     'preview_with_grid_system' => 'Preview with Grid System',
     'preview_without_grid_system' => 'Preview',
+    'live_preview' => 'Live Preview',
+    'live_preview_help' => 'Changes to text configurations are shown immediately. Click the preview to set the coordinates for the active text configuration.',
 
     /**
      * About Grid System

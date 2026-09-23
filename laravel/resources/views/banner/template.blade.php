@@ -66,7 +66,7 @@
                 <tr>
                     <td class="col-lg-5">{{$banner_template->name}}</td>
                     <td class="col-lg-6 text-start">
-                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}" alt="{{ $banner_template->template->alias }}">
+                        <img class="img-fluid shadow-lg p-1 mb-2 bg-white rounded opacity-{{ ($banner_template->enabled) ? 100 : 50 }}" src="{{ asset($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename) }}?v={{ md5_file(public_path($banner_template->file_path_drawed_text.'/'.$banner_template->template->filename)) }}" alt="{{ $banner_template->template->alias }}">
                     </td>
                     <td class="col-lg-1 text-end">
                         <div class="d-flex">
