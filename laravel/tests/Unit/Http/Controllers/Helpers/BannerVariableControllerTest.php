@@ -90,7 +90,7 @@ class BannerVariableControllerTest extends TestCase
             {
                 return [
                     ['connection_packets_sent_total' => 123],
-                    [306 => ['connection_packets_received_total' => 456]],
+                    [306 => ['connection_packets_received_total' => 456, 'connection_ping' => 42]],
                 ];
             }
         };
@@ -101,6 +101,7 @@ class BannerVariableControllerTest extends TestCase
             'VIRTUALSERVER_NAME' => 'Example TeamSpeak',
             'CONNECTION_PACKETS_SENT_TOTAL' => 123,
             'CONNECTION_PACKETS_RECEIVED_TOTAL' => 456,
+            'CONNECTION_PING' => 42,
         ], $variables);
         $this->assertArrayNotHasKey(0, $variables);
         $this->assertArrayNotHasKey(1, $variables);
