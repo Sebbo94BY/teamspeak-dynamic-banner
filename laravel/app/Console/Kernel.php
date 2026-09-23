@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Models\Instance;
 use App\Support\QueueMetrics;
+use App\Support\TeamSpeakBotLauncher;
 use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Console\Scheduling\Schedule;
@@ -54,7 +55,7 @@ class Kernel extends ConsoleKernel
             foreach (Instance::where(['autostart_enabled' => true])->get(['id']) as $instance) {
                 if (is_null($instance->process)) {
                     Log::info("Starting instance $instance->id since autostart is enabled...");
-                    Process::start('php '.base_path().'/artisan instance:start-teamspeak-bot '.$instance->id.' --background');
+                    app(TeamSpeakBotLauncher::class)->start($instance);
                 }
             }
         })->environments(['staging', 'production'])->name('instances:autostart')->everyFiveMinutes();

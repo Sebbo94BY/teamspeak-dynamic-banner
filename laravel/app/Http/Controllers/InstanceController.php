@@ -10,6 +10,8 @@ use App\Http\Requests\InstanceStartRequest;
 use App\Http\Requests\InstanceStopRequest;
 use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
+use App\Models\InstanceProcess;
+use App\Support\TeamSpeakBotLauncher;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +26,14 @@ class InstanceController extends Controller
     private const BOT_STOP_TIMEOUT_SECONDS = 15;
 
     private const BOT_STOP_POLL_MICROSECONDS = 100000;
+
+    private const BOT_START_TIMEOUT_SECONDS = 5;
+
+    private const BOT_START_POLL_MICROSECONDS = 100000;
+
+    public function __construct(private readonly TeamSpeakBotLauncher $teamSpeakBotLauncher)
+    {
+    }
 
     /**
      * Display the main page.
@@ -181,9 +191,7 @@ class InstanceController extends Controller
     {
         $instance = Instance::find($request->instance_id);
 
-        $process = Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
-
-        if (! $process->running()) {
+        if (! $this->start_bot($instance)) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-start-error',
                 'message' => 'Failed to start the instance.',
@@ -265,9 +273,7 @@ class InstanceController extends Controller
             ]);
         }
 
-        $process = Process::start('php '.base_path()."/artisan instance:start-teamspeak-bot $instance->id --background");
-
-        if (! $process->running()) {
+        if (! $this->start_bot($instance)) {
             return Redirect::route('instances')->with([
                 'error' => 'instance-restart-error',
                 'message' => 'Failed to restart the instance.',
@@ -292,6 +298,26 @@ class InstanceController extends Controller
             }
 
             usleep(self::BOT_STOP_POLL_MICROSECONDS);
+        }
+
+        return true;
+    }
+
+    /** Start the detached bot and confirm that it registered its PID. */
+    protected function start_bot(Instance $instance): bool
+    {
+        if (! $this->teamSpeakBotLauncher->start($instance)) {
+            return false;
+        }
+
+        $deadline = microtime(true) + self::BOT_START_TIMEOUT_SECONDS;
+
+        while (! InstanceProcess::where('instance_id', $instance->id)->exists()) {
+            if (microtime(true) >= $deadline) {
+                return false;
+            }
+
+            usleep(self::BOT_START_POLL_MICROSECONDS);
         }
 
         return true;
