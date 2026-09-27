@@ -16,6 +16,13 @@
                 @if($instanceHealthModal->health_last_checked_at)
                     <p class="small text-muted">{{ __('views/instances.health_last_checked_at', ['time' => $instanceHealthModal->health_last_checked_at->setTimezone(Request::header('X-Timezone'))]) }}</p>
                 @endif
+                @if($instanceHealthModal->bot_restart_scheduled_at)
+                    <div class="alert alert-warning" role="alert">
+                        <strong>{{ __('views/instances.bot_restart_scheduled') }}</strong><br>
+                        {{ __('views/instances.bot_restart_scheduled_at', ['time' => $instanceHealthModal->bot_restart_scheduled_at->setTimezone(Request::header('X-Timezone'))]) }}<br>
+                        <span class="small">{{ __('views/instances.bot_restart_reason') }}: {{ $instanceHealthModal->bot_restart_reason }}</span>
+                    </div>
+                @endif
                 @if($instanceHealth['checks'] !== [])
                     <div class="list-group">
                         @foreach($instanceHealth['checks'] as $check)

@@ -38,6 +38,9 @@ class Instance extends Model
         'health_channel_list',
         'health_last_checked_at',
         'health_problem_started_at',
+        'bot_recovery_attempts',
+        'bot_restart_scheduled_at',
+        'bot_restart_reason',
     ];
 
     /**
@@ -68,6 +71,8 @@ class Instance extends Model
             'health_channel_list' => 'array',
             'health_last_checked_at' => 'datetime',
             'health_problem_started_at' => 'datetime',
+            'bot_recovery_attempts' => 'integer',
+            'bot_restart_scheduled_at' => 'datetime',
         ];
     }
 

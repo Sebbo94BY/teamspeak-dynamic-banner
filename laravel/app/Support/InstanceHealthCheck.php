@@ -110,6 +110,9 @@ class InstanceHealthCheck
         $now = now();
         $attributes = [
             'health_last_success_at' => $now,
+            'bot_recovery_attempts' => 0,
+            'bot_restart_scheduled_at' => null,
+            'bot_restart_reason' => null,
         ];
 
         if ($instance->health_last_check_healthy !== false) {

@@ -58,7 +58,7 @@ class Kernel extends ConsoleKernel
 
         // INSTANCES: Autostart
         $schedule->call(function () {
-            foreach (Instance::where(['autostart_enabled' => true])->get(['id']) as $instance) {
+            foreach (Instance::where(['autostart_enabled' => true])->whereNull('bot_restart_scheduled_at')->get(['id']) as $instance) {
                 if (is_null($instance->process)) {
                     Log::info("Starting instance $instance->id since autostart is enabled...");
                     app(TeamSpeakBotLauncher::class)->start($instance);
