@@ -12,7 +12,6 @@ use App\Http\Requests\InstanceUpdateRequest;
 use App\Models\Instance;
 use App\Models\InstanceProcess;
 use App\Support\TeamSpeakBotLauncher;
-use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
@@ -31,8 +30,9 @@ class InstanceController extends Controller
 
     private const BOT_START_POLL_MICROSECONDS = 100000;
 
-    public function __construct(private readonly TeamSpeakBotLauncher $teamSpeakBotLauncher)
-    {
+    public function __construct(
+        private readonly TeamSpeakBotLauncher $teamSpeakBotLauncher,
+    ) {
     }
 
     /**
@@ -51,22 +51,27 @@ class InstanceController extends Controller
 
         $instances = $instances->get();
 
-        $channelListForEachInstance = [];
-        foreach ($instances as $instance) {
-            try {
-                $virtualserver_helper = new TeamSpeakVirtualserver($instance);
-                $virtualserver = $virtualserver_helper->get_virtualserver_connection();
-                $channel_list = $virtualserver->channelList();
-                $channelListForEachInstance[$instance->id]['channel_list'] = $channel_list;
-            } catch (TransportException|ServerQueryException|Exception $teamspeak_exception) {
-                $channelListForEachInstance[$instance->id]['channel_list'] = [];
-                $channelListForEachInstance[$instance->id]['error'] = $teamspeak_exception->getMessage();
-            }
-        }
+        // Health is deliberately read from the last scheduled check. Connecting
+        // here would make the instance overview wait for slow TeamSpeak hosts.
+        $channelListForEachInstance = $instances->mapWithKeys(function (Instance $instance): array {
+            $checks = $instance->health_last_check_results ?? [];
+            $channelCheck = collect($checks)->firstWhere('label', 'health_check_channels');
+
+            return [$instance->id => [
+                'channel_list' => array_map(fn (array $channel) => (object) $channel, $instance->health_channel_list ?? []),
+                'error' => is_null($channelCheck) || ! $channelCheck['healthy'],
+            ]];
+        })->all();
+        $healthChecks = $instances->mapWithKeys(fn (Instance $instance) => [$instance->id => [
+            'checked' => ! is_null($instance->health_last_checked_at),
+            'healthy' => $instance->health_last_check_healthy === true,
+            'checks' => $instance->health_last_check_results ?? [],
+        ]])->all();
 
         return view('instances')->with([
             'instances' => $instances,
             'channel_list' => $channelListForEachInstance,
+            'health_checks' => $healthChecks,
             'attention' => $attention,
         ]);
     }

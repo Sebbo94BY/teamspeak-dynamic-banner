@@ -7,6 +7,8 @@ use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
 use App\Models\Instance;
 use App\Models\InstanceProcess;
 use App\Support\ThrottledErrorLogger;
+use App\Support\InstanceHealthCheck;
+use App\Support\TeamSpeak\TeamSpeakQueryOperations;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -115,7 +117,15 @@ class TeamspeakBot extends Command
      */
     protected function message(string $log_level, string $message)
     {
-        switch (strtoupper($log_level)) {
+        $normalized_level = strtoupper($log_level);
+
+        // A long-running bot otherwise leaves operational errors only in the
+        // application log, where administrators are unlikely to see them.
+        if (isset($this->instance) && in_array($normalized_level, ['WARNING', 'ERROR'], true)) {
+            app(InstanceHealthCheck::class)->recordRuntimeFailure($this->instance, $message);
+        }
+
+        switch ($normalized_level) {
             case 'INFO':
                 (boolval($this->option('background'))) ? Log::info($message) : $this->info($message);
                 break;
@@ -437,6 +447,14 @@ class TeamspeakBot extends Command
             return;
         }
 
+        $startup_health = app(InstanceHealthCheck::class)->checkConnected($this->virtualserver);
+        app(InstanceHealthCheck::class)->storeResult($this->instance, $startup_health);
+        foreach ($startup_health['checks'] as $check) {
+            if (! $check['healthy']) {
+                $this->message('ERROR', "ServerQuery startup check failed: {$check['label']}. Required permission(s): ".implode(', ', $check['permissions']).". {$check['message']}");
+            }
+        }
+
         $this->refresh_cached_data();
         $this->retry_cache_refresh_during_startup($virtualserver_helper);
 
@@ -445,7 +463,7 @@ class TeamspeakBot extends Command
         }
 
         // register for server events
-        $this->virtualserver->notifyRegister('server');
+        app(TeamSpeakQueryOperations::class)->subscribeToServerEvents($this->virtualserver);
 
         // register a callback for notifyEvent events
         Signal::getInstance()->subscribe('notifyEvent', $this->onEvent(...));
@@ -516,7 +534,7 @@ class TeamspeakBot extends Command
         try {
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
             $this->refresh_cached_data();
-            $this->virtualserver->notifyRegister('server');
+            app(TeamSpeakQueryOperations::class)->subscribeToServerEvents($this->virtualserver);
         } catch (TransportException | ServerQueryException | Exception $connection_exception) {
             $this->message('ERROR', "Reconnect to `{$this->instance->host}` failed: ".$connection_exception->getMessage());
             $this->wait_before_reconnect();
@@ -562,7 +580,13 @@ class TeamspeakBot extends Command
             ];
         }
 
-        return ! in_array(false, $this->cache_refresh_status, true);
+        $healthy = ! in_array(false, $this->cache_refresh_status, true);
+
+        if ($healthy) {
+            app(InstanceHealthCheck::class)->recordRuntimeSuccess($this->instance);
+        }
+
+        return $healthy;
     }
 
     /**
@@ -617,6 +641,9 @@ class TeamspeakBot extends Command
         if (! is_null($exception)) {
             $message .= ': '.$exception->getMessage();
         }
+
+        // Cache refreshes do not use message(), so persist them explicitly.
+        app(InstanceHealthCheck::class)->recordRuntimeFailure($this->instance, $message);
 
         (new ThrottledErrorLogger)->log($message, self::CACHE_REFRESH_ERROR_LOG_COOLDOWN_SECONDS);
     }

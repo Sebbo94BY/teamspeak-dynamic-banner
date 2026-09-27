@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Instance;
+use App\Support\TeamSpeak\TeamSpeakQueryOperations;
 use Exception;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\ServerQueryException;
 use PlanetTeamSpeak\TeamSpeak3Framework\Exception\TransportException;
@@ -31,6 +32,8 @@ class TeamSpeakVirtualserver extends Controller
 
     private ?int $default_channel_id = null;
 
+    private TeamSpeakQueryOperations $operations;
+
     public Server $virtualserver;
 
     /**
@@ -38,6 +41,7 @@ class TeamSpeakVirtualserver extends Controller
      */
     public function __construct(Instance $instance)
     {
+        $this->operations = new TeamSpeakQueryOperations;
         $this->serverquery_username = $instance->serverquery_username;
         $this->serverquery_password = $instance->serverquery_password;
         $this->host = $instance->host;
@@ -134,7 +138,7 @@ class TeamSpeakVirtualserver extends Controller
 
         if (! is_null($this->default_channel_id)) {
             try {
-                $this->virtualserver->clientMove($this->virtualserver->whoamiGet('client_id'), $this->default_channel_id);
+                $this->operations->moveQueryClientToChannel($this->virtualserver, $this->default_channel_id);
             } catch (ServerQueryException $serverquery_exception) {
                 throw new ServerQueryException($serverquery_exception->getMessage(), $serverquery_exception->getCode());
             }

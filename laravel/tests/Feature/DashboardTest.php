@@ -10,6 +10,7 @@ use App\Models\Localization;
 use App\Models\Template;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -80,6 +81,27 @@ class DashboardTest extends TestCase
         $response->assertViewHas('recent_changes', fn ($changes) => $changes->contains(
             fn ($change) => $change->name === $banner_without_active_template->name && $change->changed_by === $this->user->name,
         ));
+    }
+
+    public function test_dashboard_ignores_instance_timestamps_left_by_legacy_health_checks(): void
+    {
+        Carbon::setTestNow('2026-09-28 12:00:00');
+        $instance = Instance::factory()->create();
+
+        Carbon::setTestNow('2026-09-28 12:05:00');
+        $instance->forceFill([
+            'health_last_checked_at' => now(),
+            'updated_at' => now(),
+        ])->saveQuietly();
+
+        $response = $this->actingAs($this->user)->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertViewHas('recent_changes', fn ($changes) => ! $changes->contains(
+            fn ($change) => $change->type === 'instance' && $change->name === $instance->virtualserver_name,
+        ));
+
+        Carbon::setTestNow();
     }
 
     /**

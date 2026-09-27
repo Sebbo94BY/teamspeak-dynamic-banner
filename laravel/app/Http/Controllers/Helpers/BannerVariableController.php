@@ -7,6 +7,7 @@ use App\Models\Instance;
 use App\Models\TwitchApi;
 use App\Models\TwitchStreamer;
 use App\Support\BannerVariables;
+use App\Support\TeamSpeak\TeamSpeakQueryOperations;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redis;
 use PlanetTeamSpeak\TeamSpeak3Framework\Node\Server;
@@ -20,12 +21,15 @@ class BannerVariableController extends Controller
      */
     private ?Server $virtualserver = null;
 
+    private TeamSpeakQueryOperations $operations;
+
     /**
      * The class constructor
      */
-    public function __construct(?Server $virtualserver)
+    public function __construct(?Server $virtualserver, ?TeamSpeakQueryOperations $operations = null)
     {
         $this->virtualserver = $virtualserver;
+        $this->operations = $operations ?? new TeamSpeakQueryOperations;
     }
 
     /**
@@ -60,9 +64,7 @@ class BannerVariableController extends Controller
      */
     public function get_current_client_list(): array
     {
-        $this->virtualserver->clientListReset();
-
-        $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
+        $virtualserver_clientlist = $this->operations->readClients($this->virtualserver);
 
         $clientlist = [];
         foreach ($virtualserver_clientlist as $client) {
@@ -86,13 +88,10 @@ class BannerVariableController extends Controller
      */
     public function get_current_servergroup_list(): array
     {
-        $this->virtualserver->clientListReset();
-        $this->virtualserver->serverGroupListReset();
-
         /**
          * SERVERGROUP MEMBER ONLINE COUNTER VARIABLE
          */
-        $virtualserver_clientlist = $this->virtualserver->clientList(['client_type' => 0]);
+        $virtualserver_clientlist = $this->operations->readClients($this->virtualserver);
 
         $client_servergroup_ids = [];
         foreach ($virtualserver_clientlist as $client) {
@@ -102,13 +101,13 @@ class BannerVariableController extends Controller
         /**
          * VIRTUALSERVER SERVERGROUPS
          */
-        $virtualserver_servergroups = $this->virtualserver->serverGroupList(['type' => 1]);
+        $virtualserver_servergroups = $this->operations->readServerGroups($this->virtualserver);
 
         $servergroups = [];
         foreach ($virtualserver_servergroups as $servergroup) {
             $servergroups['servergroup_'.$servergroup->sgid.'_id'] = $servergroup->sgid;
             $servergroups['servergroup_'.$servergroup->sgid.'_name'] = $servergroup->name;
-            $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->virtualserver->serverGroupClientList($servergroup->sgid));
+            $servergroups['servergroup_'.$servergroup->sgid.'_member_total_count'] = count($this->operations->readServerGroupMembers($this->virtualserver, $servergroup->sgid));
             $servergroups['servergroup_'.$servergroup->sgid.'_member_online_count'] = (in_array($servergroup->sgid, $client_servergroup_ids)) ? array_count_values($client_servergroup_ids)[$servergroup->sgid] : 0;
         }
 
@@ -125,7 +124,7 @@ class BannerVariableController extends Controller
         /**
          * VIRTUALSERVER NODE INFO
          */
-        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->virtualserver->getInfo(true, true)));
+        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->operations->readServerInfo($this->virtualserver)));
 
         /**
          * VIRTUALSERVER CONNECTION INFO
@@ -134,7 +133,7 @@ class BannerVariableController extends Controller
          * separate result row. Flatten those rows so that the property names,
          * rather than their numeric result indexes, become banner variables.
          */
-        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->virtualserver->connectionInfo()));
+        $virtualserver_info = array_merge($virtualserver_info, $this->flatten_variables($this->operations->readConnectionInfo($this->virtualserver)));
 
         return BannerVariables::sanitize($virtualserver_info);
     }

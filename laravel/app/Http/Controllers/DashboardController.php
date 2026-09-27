@@ -62,32 +62,51 @@ class DashboardController extends Controller
      */
     private function recent_changes(): Collection
     {
-        return Instance::with('updatedBy')->latest('updated_at')->take(5)->get()->map(fn (Instance $instance) => (object) [
-            'type' => 'instance',
-            'name' => $instance->virtualserver_name,
-            'changed_at' => $instance->updated_at,
-            'changed_by' => $instance->updatedBy?->name,
-        ])->concat(
-            Template::with('updatedBy')->latest('updated_at')->take(5)->get()->map(fn (Template $template) => (object) [
-                'type' => 'template',
-                'name' => $template->alias,
-                'changed_at' => $template->updated_at,
-                'changed_by' => $template->updatedBy?->name,
-            ]),
-        )->concat(
-            Banner::with('updatedBy')->latest('updated_at')->take(5)->get()->map(fn (Banner $banner) => (object) [
-                'type' => 'banner',
-                'name' => $banner->name,
-                'changed_at' => $banner->updated_at,
-                'changed_by' => $banner->updatedBy?->name,
-            ]),
-        )->concat(
-            BannerTemplate::with(['banner', 'updatedBy'])->latest('updated_at')->take(10)->get()->map(fn (BannerTemplate $bannerTemplate) => (object) [
-                'type' => 'banner',
-                'name' => $bannerTemplate->banner->name,
-                'changed_at' => $bannerTemplate->updated_at,
-                'changed_by' => $bannerTemplate->updatedBy?->name,
-            ]),
-        )->sortByDesc('changed_at')->take(6)->values();
+        return Instance::with('updatedBy')->latest('updated_at')->get()
+            ->filter(fn (Instance $instance) => $this->isConfigurationChange($instance))
+            ->take(5)->map(fn (Instance $instance) => (object) [
+                'type' => 'instance',
+                'name' => $instance->virtualserver_name,
+                'changed_at' => $instance->updated_at,
+                'changed_by' => $instance->updatedBy?->name,
+            ])->concat(
+                Template::with('updatedBy')->latest('updated_at')->take(5)->get()->map(fn (Template $template) => (object) [
+                    'type' => 'template',
+                    'name' => $template->alias,
+                    'changed_at' => $template->updated_at,
+                    'changed_by' => $template->updatedBy?->name,
+                ]),
+            )->concat(
+                Banner::with('updatedBy')->latest('updated_at')->take(5)->get()->map(fn (Banner $banner) => (object) [
+                    'type' => 'banner',
+                    'name' => $banner->name,
+                    'changed_at' => $banner->updated_at,
+                    'changed_by' => $banner->updatedBy?->name,
+                ]),
+            )->concat(
+                BannerTemplate::with(['banner', 'updatedBy'])->latest('updated_at')->take(10)->get()->map(fn (BannerTemplate $bannerTemplate) => (object) [
+                    'type' => 'banner',
+                    'name' => $bannerTemplate->banner->name,
+                    'changed_at' => $bannerTemplate->updated_at,
+                    'changed_by' => $bannerTemplate->updatedBy?->name,
+                ]),
+            )->sortByDesc('changed_at')->take(6)->values();
+    }
+
+    /**
+     * Hide legacy health/recovery writes that updated the timestamp before
+     * operational state became timestamp-neutral.
+     */
+    private function isConfigurationChange(Instance $instance): bool
+    {
+        $lastOperationalUpdate = collect([
+            $instance->health_last_checked_at,
+            $instance->health_last_error_at,
+            $instance->health_last_runtime_error_at,
+            $instance->health_last_success_at,
+            $instance->bot_restart_scheduled_at,
+        ])->filter()->max();
+
+        return is_null($lastOperationalUpdate) || $instance->updated_at->greaterThan($lastOperationalUpdate);
     }
 }
