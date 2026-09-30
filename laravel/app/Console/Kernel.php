@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\CheckInstanceHealth;
 use App\Models\Instance;
 use App\Support\QueueMetrics;
 use App\Support\TeamSpeakBotLauncher;
@@ -50,9 +51,14 @@ class Kernel extends ConsoleKernel
             Process::start('php '.base_path().'/artisan process:cleanup-dead-pids');
         })->environments(['staging', 'production'])->name('instances:cleanup-dead-processes')->everyMinute();
 
+        // INSTANCES: Persist TeamSpeak health outside HTTP requests.
+        $schedule->call(function () {
+            Instance::query()->pluck('id')->each(fn (int $id) => CheckInstanceHealth::dispatch($id));
+        })->name('instances:queue-health-checks')->everyFiveMinutes()->withoutOverlapping();
+
         // INSTANCES: Autostart
         $schedule->call(function () {
-            foreach (Instance::where(['autostart_enabled' => true])->get(['id']) as $instance) {
+            foreach (Instance::where(['autostart_enabled' => true])->whereNull('bot_restart_scheduled_at')->get(['id']) as $instance) {
                 if (is_null($instance->process)) {
                     Log::info("Starting instance $instance->id since autostart is enabled...");
                     app(TeamSpeakBotLauncher::class)->start($instance);

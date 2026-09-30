@@ -4,8 +4,13 @@ namespace App\Console\Commands\Instance;
 
 use App\Http\Controllers\Helpers\BannerVariableController;
 use App\Http\Controllers\Helpers\TeamSpeakVirtualserver;
+use App\Jobs\RestartTeamSpeakBot;
 use App\Models\Instance;
 use App\Models\InstanceProcess;
+use App\Support\InstanceHealthCheck;
+use App\Support\TeamSpeak\TeamSpeakConnectionFailure;
+use App\Support\TeamSpeak\TeamSpeakQueryOperations;
+use App\Support\TeamSpeakBotRecovery;
 use App\Support\ThrottledErrorLogger;
 use Exception;
 use Illuminate\Console\Command;
@@ -53,6 +58,8 @@ class TeamspeakBot extends Command
     // Client data is event-driven, rather than polled; retain it across reconnects.
     private const CLIENT_CACHE_TTL_SECONDS = 60 * 60 * 12;
 
+    private const MAX_CONSECUTIVE_RECONNECT_FAILURES = 3;
+
     /**
      * The name and signature of the console command.
      *
@@ -99,13 +106,24 @@ class TeamspeakBot extends Command
     /** Prevent nested TeamSpeak requests from timeout and event callbacks. */
     protected bool $teamspeak_refresh_in_progress = false;
 
+    /** Consecutive failed reconnects for the current bot process. */
+    protected int $consecutive_reconnect_failures = 0;
+
+    /** Prevents a failed connection from scheduling more than one restart. */
+    protected bool $recovery_scheduled = false;
+
     /**
      * Destructor
      */
     public function __destruct()
     {
         if (isset($this->virtualserver)) {
-            $this->virtualserver->request('quit');
+            try {
+                $this->virtualserver->request('quit');
+            } catch (\Throwable) {
+                // Recovery may intentionally stop after the connection has
+                // already become unusable.
+            }
             unset($this->virtualserver);
         }
     }
@@ -115,7 +133,15 @@ class TeamspeakBot extends Command
      */
     protected function message(string $log_level, string $message)
     {
-        switch (strtoupper($log_level)) {
+        $normalized_level = strtoupper($log_level);
+
+        // A long-running bot otherwise leaves operational errors only in the
+        // application log, where administrators are unlikely to see them.
+        if (isset($this->instance) && $normalized_level === 'ERROR') {
+            app(InstanceHealthCheck::class)->recordRuntimeFailure($this->instance, $message);
+        }
+
+        switch ($normalized_level) {
             case 'INFO':
                 (boolval($this->option('background'))) ? Log::info($message) : $this->info($message);
                 break;
@@ -327,7 +353,14 @@ class TeamspeakBot extends Command
             $this->log_cache_refresh_failure('client', $exception);
 
             throw $exception;
-        } catch (RedisException | ConnectionException | Exception) {
+        } catch (RedisException | ConnectionException | Exception $exception) {
+            if (TeamSpeakConnectionFailure::makesSessionUnusable($exception)) {
+                $this->teamspeak_connection_lost = true;
+                $this->log_cache_refresh_failure('client', $exception);
+
+                throw $exception;
+            }
+
             $this->log_cache_refresh_failure('client');
         } finally {
             $this->teamspeak_refresh_in_progress = false;
@@ -369,6 +402,12 @@ class TeamspeakBot extends Command
             $cache_refreshed = false;
             $this->log_cache_refresh_failure('server group', $exception);
             $failure_logged = true;
+
+            if (TeamSpeakConnectionFailure::makesSessionUnusable($exception)) {
+                $this->teamspeak_connection_lost = true;
+
+                throw $exception;
+            }
         } finally {
             $this->teamspeak_refresh_in_progress = false;
         }
@@ -409,6 +448,12 @@ class TeamspeakBot extends Command
             throw $exception;
         } catch (\Throwable $exception) {
             $this->log_cache_refresh_failure('virtual server', $exception);
+
+            if (TeamSpeakConnectionFailure::makesSessionUnusable($exception)) {
+                $this->teamspeak_connection_lost = true;
+
+                throw $exception;
+            }
         } finally {
             $this->teamspeak_refresh_in_progress = false;
         }
@@ -427,25 +472,45 @@ class TeamspeakBot extends Command
 
         if (! $this->connect_to_virtualserver_with_retries($virtualserver_helper)) {
             $this->message('ERROR', "Could not connect to the host `$this->instance->host` after ".self::INITIAL_CONNECTION_ATTEMPTS.' attempts.');
-
-            $this->cleanup_instance_process_id();
+            $this->schedule_bot_recovery('Initial ServerQuery connection could not be established.');
 
             return;
         }
 
         if (! $this->keep_running) {
+            return;
+        }
+
+        $startup_health = app(InstanceHealthCheck::class)->checkConnected($this->virtualserver);
+        app(InstanceHealthCheck::class)->storeResult($this->instance, $startup_health);
+        foreach ($startup_health['checks'] as $check) {
+            if (! $check['healthy']) {
+                $this->message('ERROR', "ServerQuery startup check failed: {$check['label']}. Required permission(s): ".implode(', ', $check['permissions']).". {$check['message']}");
+            }
+        }
+
+        if ($startup_health['connection_unusable']) {
+            $this->message('ERROR', 'ServerQuery connection became unusable during the startup health check. Scheduling a clean bot restart.');
+            $this->schedule_bot_recovery('ServerQuery connection became unusable during the startup health check.');
+
             return;
         }
 
         $this->refresh_cached_data();
         $this->retry_cache_refresh_during_startup($virtualserver_helper);
 
+        if ($this->teamspeak_connection_lost) {
+            $this->schedule_bot_recovery('ServerQuery connection was lost while building the startup cache.');
+
+            return;
+        }
+
         if (! $this->keep_running) {
             return;
         }
 
         // register for server events
-        $this->virtualserver->notifyRegister('server');
+        app(TeamSpeakQueryOperations::class)->subscribeToServerEvents($this->virtualserver);
 
         // register a callback for notifyEvent events
         Signal::getInstance()->subscribe('notifyEvent', $this->onEvent(...));
@@ -457,13 +522,17 @@ class TeamspeakBot extends Command
         while ($this->keep_running) {
             try {
                 $this->virtualserver->getAdapter()->wait();
-            } catch (TransportException $transport_exception) {
+            } catch (TransportException | ServerQueryException $transport_exception) {
                 if (! $this->keep_running) {
                     break;
                 }
 
                 $this->message('WARNING', "Connection to `{$this->instance->host}` was lost. Reconnecting...");
                 $this->reconnect_to_virtualserver($virtualserver_helper);
+
+                if ($this->recovery_scheduled) {
+                    break;
+                }
             }
         }
     }
@@ -515,10 +584,28 @@ class TeamspeakBot extends Command
 
         try {
             $this->virtualserver = $virtualserver_helper->get_virtualserver_connection(false);
-            $this->refresh_cached_data();
-            $this->virtualserver->notifyRegister('server');
+            $cache_refreshed = $this->refresh_cached_data();
+            if ($this->teamspeak_connection_lost) {
+                throw new TransportException('ServerQuery connection was lost while refreshing the cache.');
+            }
+            app(TeamSpeakQueryOperations::class)->subscribeToServerEvents($this->virtualserver);
+
+            if ($cache_refreshed) {
+                $this->consecutive_reconnect_failures = 0;
+            }
         } catch (TransportException | ServerQueryException | Exception $connection_exception) {
-            $this->message('ERROR', "Reconnect to `{$this->instance->host}` failed: ".$connection_exception->getMessage());
+            $this->consecutive_reconnect_failures++;
+            $reason = "Reconnect to `{$this->instance->host}` failed: ".$connection_exception->getMessage();
+
+            if ($this->is_invalid_server_id($connection_exception)
+                || $this->consecutive_reconnect_failures >= self::MAX_CONSECUTIVE_RECONNECT_FAILURES) {
+                $this->message('ERROR', $reason);
+                $this->schedule_bot_recovery($reason);
+
+                return false;
+            }
+
+            $this->message('WARNING', $reason);
             $this->wait_before_reconnect();
 
             return false;
@@ -533,6 +620,36 @@ class TeamspeakBot extends Command
     protected function wait_before_reconnect(): void
     {
         sleep(5);
+    }
+
+    protected function is_invalid_server_id(\Throwable $exception): bool
+    {
+        return str_contains(strtolower($exception->getMessage()), 'invalid serverid');
+    }
+
+    /** Stops this process and schedules a fresh bot process with bounded backoff. */
+    protected function schedule_bot_recovery(string $reason): void
+    {
+        if ($this->recovery_scheduled) {
+            return;
+        }
+
+        $attempt = min($this->instance->bot_recovery_attempts + 1, 255);
+        $delay_seconds = app(TeamSpeakBotRecovery::class)->delayForAttempt($attempt);
+        $scheduled_at = now()->addSeconds($delay_seconds);
+
+        $this->instance->saveOperationalState([
+            'bot_recovery_attempts' => $attempt,
+            'bot_restart_scheduled_at' => $scheduled_at,
+            'bot_restart_reason' => $reason,
+        ]);
+
+        RestartTeamSpeakBot::dispatch($this->instance->id, $scheduled_at->getTimestamp())->delay($scheduled_at);
+        $this->recovery_scheduled = true;
+        $this->keep_running = false;
+
+        $this->message('ERROR', "Bot restart scheduled in $delay_seconds seconds after recovery failure: $reason");
+        $this->cleanup_instance_process_id();
     }
 
     /**
@@ -552,7 +669,7 @@ class TeamspeakBot extends Command
             $this->cache_refresh_status['clients'] = (bool) $this->updateClientList();
             $this->cache_refresh_status['servergroups'] = (bool) $this->updateServergroupList();
             $this->cache_refresh_status['virtualserver'] = (bool) $this->updateVirtualserverInfo();
-        } catch (TransportException) {
+        } catch (TransportException | ServerQueryException) {
             // Startup retries reconnect before attempting a complete refresh again.
             $this->teamspeak_connection_lost = true;
             $this->cache_refresh_status += [
@@ -562,7 +679,13 @@ class TeamspeakBot extends Command
             ];
         }
 
-        return ! in_array(false, $this->cache_refresh_status, true);
+        $healthy = ! in_array(false, $this->cache_refresh_status, true);
+
+        if ($healthy) {
+            app(InstanceHealthCheck::class)->recordRuntimeSuccess($this->instance);
+        }
+
+        return $healthy;
     }
 
     /**
@@ -616,6 +739,11 @@ class TeamspeakBot extends Command
         $message = "TeamSpeak $source cache refresh failed for instance {$this->instance->id}";
         if (! is_null($exception)) {
             $message .= ': '.$exception->getMessage();
+        }
+
+        // Cache refreshes do not use message(), so persist them explicitly.
+        if (is_null($exception) || ! TeamSpeakConnectionFailure::makesSessionUnusable($exception)) {
+            app(InstanceHealthCheck::class)->recordRuntimeFailure($this->instance, $message);
         }
 
         (new ThrottledErrorLogger)->log($message, self::CACHE_REFRESH_ERROR_LOG_COOLDOWN_SECONDS);

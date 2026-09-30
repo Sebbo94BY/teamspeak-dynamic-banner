@@ -120,7 +120,7 @@ class TeamspeakBotReconnectTest extends TestCase
         $this->assertFalse($command->reconnectForTest($helper));
         $this->assertSame(0, $command->refreshCount);
         $this->assertSame(1, $command->retryCount);
-        $this->assertSame(['ERROR: Reconnect to `ts.sample.com` failed: Connection refused'], $command->messages);
+        $this->assertSame(['WARNING: Reconnect to `ts.sample.com` failed: Connection refused'], $command->messages);
     }
 
     public function test_stopping_bot_does_not_reconnect_after_a_transport_failure(): void

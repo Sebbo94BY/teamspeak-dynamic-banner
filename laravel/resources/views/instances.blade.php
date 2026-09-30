@@ -14,7 +14,7 @@
                 columnDefs:[
                     {
                         orderable: false,
-                        targets: 5,
+                        targets: 6,
                     }
                 ],
             });
@@ -85,6 +85,7 @@
                     <th scope="col">{{ __('views/instances.table_host') }}</th>
                     <th scope="col">{{ __('views/instances.table_voice_port') }}</th>
                     <th scope="col">{{ __('views/instances.table_client_nickname') }}</th>
+                    <th scope="col">{{ __('views/instances.table_health') }}</th>
                     <th scope="col">{{ __('views/instances.table_actions') }}</th>
                 </tr>
                 </thead>
@@ -130,6 +131,16 @@
                     </td>
                     <td class="col-lg-1">
                         {{ $instance->client_nickname }}
+                    </td>
+                    <td class="col-lg-2">
+                        @php($health = $health_checks[$instance->id])
+                        @php($hasUnresolvedRuntimeError = $instance->health_last_runtime_error_at && ! $instance->health_last_success_at?->greaterThan($instance->health_last_runtime_error_at))
+                        @php($healthStatusHealthy = $health['checked'] && $health['healthy'] && ! $hasUnresolvedRuntimeError)
+                        <button type="button" class="btn badge text-bg-{{ ! $health['checked'] ? 'secondary' : ($healthStatusHealthy ? 'success' : 'danger') }}"
+                            data-bs-toggle="modal" data-bs-target="#modalInstanceHealth-{{ $instance->id }}"
+                            aria-label="{{ __('views/instances.health_open_details') }}">
+                            {{ ! $health['checked'] ? __('views/instances.health_pending') : ($healthStatusHealthy ? __('views/instances.health_ok') : __('views/instances.health_failed')) }}
+                        </button>
                     </td>
                     <td class="col-lg-2">
                         <div class="d-flex">
@@ -180,6 +191,7 @@
 @endif
 
 @foreach($instances as $instanceModal)
+    @include('modals.instance.modal-health', ['instanceHealthModal' => $instanceModal, 'instanceHealth' => $health_checks[$instanceModal->id]])
     @include('modals.modal-variables', ['instanceVariableModal' => $instanceModal])
 
     @can('edit instances')
